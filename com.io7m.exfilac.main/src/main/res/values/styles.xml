@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <!-- A no-op theme used on devices that are on less than API 31. -->
+  <style name="ExTheme.Splash" parent="ExTheme.WithoutActionBar" />
+
+  <style name="ExTheme.WithoutActionBar" parent="Theme.Material3.DayNight.NoActionBar">
+    <item name="colorPrimary">#0000ff</item>
+    <item name="colorPrimaryVariant">#0055ff</item>
+    <item name="colorOnPrimary">#ffffff</item>
+    <item name="colorSurface">#ffffff</item>
+    <item name="colorSecondary">#008800</item>
+    <item name="colorSecondaryVariant">#008855</item>
+    <item name="colorOnSecondary">#ffffff</item>
+    <item name="colorOnBackground">#000000</item>
+    <item name="colorError">#ff0000</item>
+    <item name="colorOnError">#ffffff</item>
+  </style>
+</resources>

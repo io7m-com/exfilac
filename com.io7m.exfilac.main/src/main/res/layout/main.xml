@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <FrameLayout
+    android:id="@+id/mainTabsContent"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/mainTabs"/>
+
+  <com.google.android.material.tabs.TabLayout
+    android:id="@+id/mainTabs"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:tabGravity="fill"
+    app:tabMaxWidth="0dp"
+    app:tabMode="fixed">
+
+    <com.google.android.material.tabs.TabItem
+      android:id="@+id/mainTabsBuckets"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/buckets" />
+
+    <com.google.android.material.tabs.TabItem
+      android:id="@+id/mainTabsUploads"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/uploads" />
+
+    <com.google.android.material.tabs.TabItem
+      android:id="@+id/mainTabsProgress"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/progress" />
+
+    <com.google.android.material.tabs.TabItem
+      android:id="@+id/mainTabsSettings"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/settings" />
+
+  </com.google.android.material.tabs.TabLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

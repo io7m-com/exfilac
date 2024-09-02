@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <string name="app_name">Exfilac</string>
+
+  <string name="buckets">Buckets</string>
+  <string name="progress">Progress</string>
+  <string name="settings">Settings</string>
+  <string name="uploads">Uploads</string>
+
+  <string name="uploadsEmptyMessage0">
+    No uploads are currently defined.
+  </string>
+  <string name="uploadsEmptyMessage1">
+    Use the menu above to define new uploads.
+  </string>
+
+  <string name="bucketsEmptyMessage0">
+    No buckets are currently defined.
+  </string>
+  <string name="bucketsEmptyMessage1">
+    Use the menu above to define new buckets.
+  </string>
+
+  <string name="bucketAccessKey">Access Key</string>
+  <string name="bucketAdd">Add bucket</string>
+  <string name="bucketCreate">Create</string>
+  <string name="bucketDeleteConfirm">Are you sure you want to delete the selected buckets?</string>
+  <string name="bucketEditCreate">Create Bucket</string>
+  <string name="bucketEditModify">Modify Bucket</string>
+  <string name="bucketEndpoint">Endpoint</string>
+  <string name="bucketInvalidURI">Invalid URI.</string>
+  <string name="bucketName">Name</string>
+  <string name="bucketNameTaken">A bucket already exists with this name.</string>
+  <string name="bucketRegion">Region</string>
+  <string name="bucketRemove">Remove bucket(s)</string>
+  <string name="bucketSecret">Secret Key</string>
+
+  <string name="cancel">Cancel</string>
+  <string name="create">Create</string>
+  <string name="delete">Delete</string>
+  <string name="modify">Modify</string>
+
+  <string name="uploadName">Name</string>
+  <string name="uploadAdd">Add upload</string>
+  <string name="uploadRemove">Remove upload(s)</string>
+  <string name="uploadDeleteConfirm">Are you sure you want to delete the selected upload configurations?</string>
+
+</resources>

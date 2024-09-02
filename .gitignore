@@ -1,0 +1,10 @@
+*.iml
+*.so
+.idea
+build
+gen
+local.properties
+obj
+com.io7m.exfilac.main/src/main/jniLibs
+target
+.gradle

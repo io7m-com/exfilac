@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Schemas xmlns="urn:com.io7m.trasco.database.statements:1:0">
+  <Schema versionCurrent="0">
+    <Comment>
+      The schema version table stores the current version of the database schema. Implementations
+      are expected to query this table on connecting to the database in order to ensure that the
+      calling code is compatible with the tables in the database.
+    </Comment>
+
+    <Statement><![CDATA[
+CREATE TABLE schema_version (
+  version_lock            INTEGER NOT NULL DEFAULT 1,
+  version_application_id  TEXT    NOT NULL,
+  version_number          INTEGER NOT NULL,
+
+  CONSTRAINT check_lock_primary PRIMARY KEY (version_lock),
+  CONSTRAINT check_lock_locked CHECK (version_lock = 1)
+) STRICT
+]]></Statement>
+  </Schema>
+
+  <Schema versionCurrent="1">
+    <Comment>
+      The buckets table describes the S3 buckets.
+    </Comment>
+
+    <Statement><![CDATA[
+CREATE TABLE buckets (
+  bucket_id            INTEGER NOT NULL PRIMARY KEY,
+  bucket_name          TEXT    NOT NULL,
+  bucket_region        TEXT    NOT NULL,
+  bucket_access_key    TEXT    NOT NULL,
+  bucket_secret        TEXT    NOT NULL,
+  bucket_access_style  TEXT    NOT NULL,
+  bucket_endpoint      TEXT    NOT NULL,
+
+  CONSTRAINT bucket_name_unique
+    UNIQUE (bucket_name)
+
+) STRICT
+]]></Statement>
+
+    <Comment>
+      The upload_configurations table associates a bucket and a device directory with an upload
+      policy. The policy describes _when_ data will be uploaded, and also describes other aspects
+      such as where exactly in the bucket data will be uploaded.
+    </Comment>
+
+    <Statement><![CDATA[
+CREATE TABLE upload_configurations (
+  upload_configuration_id   INTEGER NOT NULL PRIMARY KEY,
+  upload_name               TEXT    NOT NULL,
+  upload_device_path        TEXT    NOT NULL,
+  upload_bucket_id          INTEGER NOT NULL,
+  upload_policy             BLOB    NOT NULL,
+
+  CONSTRAINT upload_name_unique
+    UNIQUE (upload_name),
+
+  CONSTRAINT upload_configurations_bucket_exists
+    FOREIGN KEY (upload_bucket_id)
+      REFERENCES buckets (bucket_id)
+        ON DELETE CASCADE
+
+) STRICT
+]]></Statement>
+
+    <Comment>
+      The upload_files table stores the set of files that either have been uploaded, or need
+      to be uploaded. A file is only removed from the table when it ceases to exist on the
+      device locally.
+    </Comment>
+
+    <Statement><![CDATA[
+CREATE TABLE upload_files (
+  upload_file_configuration  INTEGER NOT NULL,
+  upload_file_path           TEXT    NOT NULL,
+  upload_file_status         TEXT    NOT NULL,
+
+  CONSTRAINT upload_files_unique
+    UNIQUE (upload_file_configuration, upload_file_path),
+
+  CONSTRAINT upload_files_configuration_exists
+    FOREIGN KEY (upload_file_configuration)
+      REFERENCES upload_configurations (upload_configuration_id)
+        ON DELETE CASCADE
+
+) STRICT
+]]></Statement>
+  </Schema>
+</Schemas>

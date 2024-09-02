@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:orientation="vertical"
+  android:layout_margin="16dp"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <TextView
+    android:id="@+id/bucketHeader"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:text="CREATE / MODIFY"
+    android:textSize="20sp" />
+
+  <EditText
+    android:id="@+id/bucketName"
+    android:layout_marginTop="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:autofillHints="name"
+    android:ems="12"
+    android:hint="@string/bucketName"
+    android:inputType="text"
+    android:text="" />
+
+  <EditText
+    android:id="@+id/bucketRegion"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:autofillHints="name"
+    android:ems="12"
+    android:hint="@string/bucketRegion"
+    android:inputType="text"
+    android:text="us-east-1" />
+
+  <EditText
+    android:id="@+id/bucketAccessKey"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:autofillHints="username"
+    android:ems="12"
+    android:hint="@string/bucketAccessKey"
+    android:inputType="text"
+    android:text="" />
+
+  <EditText
+    android:id="@+id/bucketSecret"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:autofillHints="password"
+    android:ems="12"
+    android:hint="@string/bucketSecret"
+    android:inputType="text"
+    android:text="" />
+
+  <EditText
+    android:id="@+id/bucketEndpoint"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:autofillHints="name"
+    android:ems="12"
+    android:hint="@string/bucketEndpoint"
+    android:inputType="text"
+    android:text="" />
+
+  <Spinner
+    android:id="@+id/bucketAccessStyle"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:entries="@array/bucketAccessStyles"/>
+
+  <Button
+    android:id="@+id/bucketCancel"
+    android:layout_marginTop="64dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/cancel" />
+
+  <Button
+    android:id="@+id/bucketConfirm"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/bucketCreate" />
+
+</LinearLayout>
