@@ -17,6 +17,9 @@
       android:id="@+id/bucketsAppBar"
       android:layout_width="match_parent"
       android:layout_height="48dp"
+      app:logo="@drawable/io7m_24"
+      app:title="@string/app_name"
+      app:titleMarginStart="@dimen/appBarTitleMarginStart"
       app:menu="@menu/buckets_menu_add" />
 
     <View

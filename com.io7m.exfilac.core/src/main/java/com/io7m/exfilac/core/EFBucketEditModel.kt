@@ -25,6 +25,7 @@ object EFBucketEditModel {
     MODIFY
   }
 
+  var referenceName: String = ""
   var editOperation: EditOperation = EditOperation.CREATE
   var name: String = ""
   var region: String = "us-east-1"
@@ -34,24 +35,26 @@ object EFBucketEditModel {
   var accessStyle: EFBucketAccessStyle = EFBucketAccessStyle.VIRTUALHOST_STYLE
 
   fun clear() {
-    editOperation = EditOperation.CREATE
-    name = ""
-    region = "us-east-1"
-    accessKey = ""
-    secret = ""
-    endpoint = URI.create("https://s3.example.com")
-    accessStyle = EFBucketAccessStyle.VIRTUALHOST_STYLE
+    this.editOperation = EditOperation.CREATE
+    this.referenceName = ""
+    this.name = ""
+    this.region = "us-east-1"
+    this.accessKey = ""
+    this.secret = ""
+    this.endpoint = URI.create("https://s3.example.com")
+    this.accessStyle = EFBucketAccessStyle.VIRTUALHOST_STYLE
   }
 
   fun setBucket(
     configuration: EFBucketConfiguration
   ) {
-    editOperation = EditOperation.MODIFY
-    name = configuration.name.value
-    region = configuration.region.value
-    accessKey = configuration.accessKey.value
-    secret = configuration.secret.value
-    endpoint = configuration.endpoint
-    accessStyle = configuration.accessStyle
+    this.editOperation = EditOperation.MODIFY
+    this.referenceName = configuration.referenceName.value
+    this.name = configuration.name.value
+    this.region = configuration.region.value
+    this.accessKey = configuration.accessKey.value
+    this.secret = configuration.secret.value
+    this.endpoint = configuration.endpoint
+    this.accessStyle = configuration.accessStyle
   }
 }

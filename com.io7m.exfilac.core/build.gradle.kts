@@ -1,4 +1,8 @@
 dependencies {
+  implementation(project(":com.io7m.exfilac.content_tree.api"))
+  implementation(project(":com.io7m.exfilac.s3_uploader.api"))
+  implementation(project(":com.io7m.exfilac.service.api"))
+
   implementation(libs.io7m.anethum.api)
   implementation(libs.io7m.blackthorne.core)
   implementation(libs.io7m.blackthorne.jxe)

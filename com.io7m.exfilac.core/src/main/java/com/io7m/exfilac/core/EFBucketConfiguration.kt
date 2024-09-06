@@ -19,6 +19,7 @@ package com.io7m.exfilac.core
 import java.net.URI
 
 data class EFBucketConfiguration(
+  val referenceName: EFBucketReferenceName,
   val name: EFBucketName,
   val region: EFRegion,
   val accessKey: EFAccessKey,

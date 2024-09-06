@@ -33,10 +33,19 @@
     android:ellipsize="end"
     android:maxLines="1"
     app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintEnd_toStartOf="@id/uploadCheckBox"
     app:layout_constraintStart_toEndOf="@id/uploadIcon"
     app:layout_constraintTop_toTopOf="parent"
     tools:text="An upload with a very very very very very very very very very very very long name." />
+
+  <CheckBox
+    android:id="@+id/uploadCheckBox"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
   <View
     android:id="@+id/divider"

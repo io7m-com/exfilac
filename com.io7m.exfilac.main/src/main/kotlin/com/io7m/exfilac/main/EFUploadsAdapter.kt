@@ -19,9 +19,11 @@ package com.io7m.exfilac.main
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.io7m.exfilac.core.EFUploadConfiguration
+import com.io7m.exfilac.core.EFUploadEditModel
 
 class EFUploadsAdapter(
   private var items: List<EFUploadConfiguration>,
@@ -59,11 +61,29 @@ class EFUploadsAdapter(
   inner class UploadViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     private val name: TextView =
       this.itemView.findViewById(R.id.uploadName)
+    private val selected: CheckBox =
+      this.itemView.findViewById(R.id.uploadCheckBox)
 
     fun bind(
       configuration: EFUploadConfiguration,
     ) {
       this.name.text = configuration.name.value
+
+      this.selected.isChecked =
+        EFApplication.application.exfilac.uploadSelectionContains(configuration.name)
+
+      this.selected.setOnCheckedChangeListener { _, isChecked ->
+        if (isChecked) {
+          EFApplication.application.exfilac.uploadSelectionAdd(configuration.name)
+        } else {
+          EFApplication.application.exfilac.uploadSelectionRemove(configuration.name)
+        }
+      }
+
+      this.view.setOnClickListener {
+        EFUploadEditModel.setUploadConfiguration(configuration)
+        EFApplication.application.exfilac.uploadEditBegin()
+      }
     }
   }
 }

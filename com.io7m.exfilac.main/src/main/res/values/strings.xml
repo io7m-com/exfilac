@@ -4,7 +4,7 @@
   <string name="app_name">Exfilac</string>
 
   <string name="buckets">Buckets</string>
-  <string name="progress">Progress</string>
+  <string name="status">Status</string>
   <string name="settings">Settings</string>
   <string name="uploads">Uploads</string>
 
@@ -22,28 +22,70 @@
     Use the menu above to define new buckets.
   </string>
 
+  <string name="statusEmptyMessage0">
+    No uploads are currently defined.
+  </string>
+  <string name="statusEmptyMessage1">
+    Switch to the Uploads tab to configure one or more uploads.
+  </string>
+
   <string name="bucketAccessKey">Access Key</string>
+  <string name="bucketAccessKeyDescription">The access key used to access the bucket.</string>
+  <string name="bucketAccessStyle">Access Style</string>
+  <string name="bucketAccessStyleDescription">The access style for the bucket.</string>
   <string name="bucketAdd">Add bucket</string>
   <string name="bucketCreate">Create</string>
-  <string name="bucketDeleteConfirm">Are you sure you want to delete the selected buckets?</string>
+  <string name="bucketDeleteConfirm">Are you sure you want to delete the selected buckets?\n\nDeleting buckets will also delete any uploads associated with them.</string>
   <string name="bucketEditCreate">Create Bucket</string>
   <string name="bucketEditModify">Modify Bucket</string>
+  <string name="bucketEditSave">Save Bucket</string>
   <string name="bucketEndpoint">Endpoint</string>
+  <string name="bucketEndpointDescription">The base endpoint for the bucket.</string>
   <string name="bucketInvalidURI">Invalid URI.</string>
+  <string name="bucketRefName">Name</string>
+  <string name="bucketRefNameDescription">A unique name that will be used to refer to this bucket.</string>
+  <string name="bucketRefNameTaken">A bucket already exists with this name.</string>
   <string name="bucketName">Name</string>
-  <string name="bucketNameTaken">A bucket already exists with this name.</string>
+  <string name="bucketNameDescription">The name of the bucket on the server.</string>
   <string name="bucketRegion">Region</string>
+  <string name="bucketRegionDescription">The name of the region within this bucket resides.</string>
   <string name="bucketRemove">Remove bucket(s)</string>
   <string name="bucketSecret">Secret Key</string>
+  <string name="bucketSecretDescription">The secret key used to access the bucket.</string>
 
   <string name="cancel">Cancel</string>
   <string name="create">Create</string>
   <string name="delete">Delete</string>
   <string name="modify">Modify</string>
 
-  <string name="uploadName">Name</string>
   <string name="uploadAdd">Add upload</string>
-  <string name="uploadRemove">Remove upload(s)</string>
+  <string name="uploadBucket">Bucket</string>
+  <string name="uploadBucketDescription">The bucket to which files will be uploaded.</string>
   <string name="uploadDeleteConfirm">Are you sure you want to delete the selected upload configurations?</string>
+  <string name="uploadEditCreate">Create Upload</string>
+  <string name="uploadEditModify">Modify Upload</string>
+  <string name="uploadEditSave">Save Upload</string>
+  <string name="uploadName">Upload Name</string>
+  <string name="uploadNameDescription">A unique name that will be used to refer to this upload.</string>
+  <string name="uploadNameTaken">An upload already exists with this name.</string>
+  <string name="uploadPath">Device Directory</string>
+  <string name="uploadPathDescription">The directory on the device that will be scanned for files to be uploaded.</string>
+  <string name="uploadRemove">Remove upload(s)</string>
+  <string name="uploadSchedule">Schedule</string>
+  <string name="uploadScheduleDescription">The frequency at which the directory will be scanned for file changes.</string>
+  <string name="uploadSelectPath">Select Directory…</string>
+  <string name="uploadTriggerOnCall">A phone call ended.</string>
+  <string name="uploadTriggerOnPhoto">A photo was taken.</string>
+  <string name="uploadTriggerOnWifi">The network became available.</string>
+  <string name="uploadTriggers">Triggers</string>
+  <string name="uploadTriggersDescription">The events that will trigger this upload.</string>
+  <string name="uploadBucketNotSpecified">No bucket was specified.</string>
+  <string name="uploadStartedManually">Upload started manually.</string>
+
+  <string name="statusNotRunning">Not currently running.</string>
+  <string name="statusCompleted">Completed successfully at %s.</string>
+  <string name="statusCancelled">Cancelled at %s.</string>
+  <string name="statusCancelling">Cancelling…</string>
+  <string name="statusFailed">Failed at %s.</string>
 
 </resources>

@@ -16,11 +16,21 @@
 
 package com.io7m.exfilac.core
 
+import com.io7m.exfilac.content_tree.api.EFContentTreeFactoryType
 import com.io7m.exfilac.core.internal.Exfilac
+import com.io7m.exfilac.s3_uploader.api.EFS3UploaderFactoryType
 import java.nio.file.Path
 
 object ExfilacFactory : ExfilacFactoryType {
-  override fun open(dataDirectory: Path): ExfilacType {
-    return Exfilac.open(dataDirectory)
+  override fun open(
+    contentTrees: EFContentTreeFactoryType,
+    s3Uploaders: EFS3UploaderFactoryType,
+    dataDirectory: Path
+  ): ExfilacType {
+    return Exfilac.open(
+      contentTrees = contentTrees,
+      s3Uploaders = s3Uploaders,
+      dataDirectory = dataDirectory
+    )
   }
 }

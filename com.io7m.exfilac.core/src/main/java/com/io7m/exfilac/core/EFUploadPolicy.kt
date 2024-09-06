@@ -16,4 +16,7 @@
 
 package com.io7m.exfilac.core
 
-class EFUploadPolicy
+data class EFUploadPolicy(
+  val schedule: EFUploadSchedule,
+  val triggers: Set<EFUploadTrigger>
+)

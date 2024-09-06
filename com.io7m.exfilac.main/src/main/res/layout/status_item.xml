@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="88dp"
+  android:background="?android:attr/selectableItemBackground"
+  android:clickable="true">
+
+  <ImageView
+    android:id="@+id/statusStartOrCancel"
+    android:layout_width="32dp"
+    android:layout_height="32dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="16dp"
+    android:layout_marginBottom="16dp"
+    android:clickable="true"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:srcCompat="@drawable/status_32" />
+
+  <LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="24dp"
+    android:layout_marginTop="16dp"
+    android:orientation="vertical"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@id/statusStartOrCancel"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <TextView
+      android:id="@+id/statusName"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:clickable="false"
+      android:ellipsize="end"
+      android:gravity="top"
+      android:maxLines="1"
+      tools:text="An upload with a very very very very very very very very very very very long name." />
+
+    <ProgressBar
+      android:id="@+id/statusProgressMajor"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="match_parent"
+      android:layout_height="8dp" />
+
+    <ProgressBar
+      android:id="@+id/statusProgressMinor"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="match_parent"
+      android:layout_height="8dp" />
+
+    <TextView
+      android:id="@+id/statusDescription"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:clickable="false"
+      android:ellipsize="end"
+      android:gravity="top"
+      android:maxLines="1"
+      tools:text="An upload with a very very very very very very very very very very very long name." />
+
+  </LinearLayout>
+
+  <View
+    android:id="@+id/divider"
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="?android:attr/listDivider"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

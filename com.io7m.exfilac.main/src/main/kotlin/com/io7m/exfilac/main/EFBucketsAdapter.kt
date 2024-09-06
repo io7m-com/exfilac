@@ -69,13 +69,13 @@ class EFBucketsAdapter(
     ) {
       this.name.text = configuration.name.value
       this.selected.isChecked =
-        EFApplication.application.exfilac.bucketSelectionContains(configuration.name)
+        EFApplication.application.exfilac.bucketSelectionContains(configuration.referenceName)
 
       this.selected.setOnCheckedChangeListener { _, isChecked ->
         if (isChecked) {
-          EFApplication.application.exfilac.bucketSelectionAdd(configuration.name)
+          EFApplication.application.exfilac.bucketSelectionAdd(configuration.referenceName)
         } else {
-          EFApplication.application.exfilac.bucketSelectionRemove(configuration.name)
+          EFApplication.application.exfilac.bucketSelectionRemove(configuration.referenceName)
         }
       }
 

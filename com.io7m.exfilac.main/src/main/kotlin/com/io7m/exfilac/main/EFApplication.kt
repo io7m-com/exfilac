@@ -17,8 +17,10 @@
 package com.io7m.exfilac.main
 
 import android.app.Application
+import com.io7m.exfilac.content_tree.device.EFContentTreeDevice
 import com.io7m.exfilac.core.ExfilacFactory
 import com.io7m.exfilac.core.ExfilacType
+import com.io7m.exfilac.s3_uploader.amazon.EFS3AMZUploaders
 
 class EFApplication : Application() {
 
@@ -38,6 +40,14 @@ class EFApplication : Application() {
   override fun onCreate() {
     super.onCreate()
     INSTANCE = this
-    this.exfilacField = ExfilacOnUI(ExfilacFactory.open(application.dataDir.toPath()))
+
+    this.exfilacField =
+      ExfilacOnUI(
+        ExfilacFactory.open(
+          contentTrees = EFContentTreeDevice(this, this.contentResolver),
+          s3Uploaders = EFS3AMZUploaders(),
+          dataDirectory = application.dataDir.toPath()
+        )
+      )
   }
 }

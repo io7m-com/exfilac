@@ -9,18 +9,26 @@
     android:id="@+id/mainTabsContent"
     android:layout_width="match_parent"
     android:layout_height="0dp"
-    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/mainTabs"
     app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toTopOf="@id/mainTabs"/>
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="?android:attr/listDivider"
+    app:layout_constraintBottom_toTopOf="@id/mainTabs"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
 
   <com.google.android.material.tabs.TabLayout
     android:id="@+id/mainTabs"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
     app:tabGravity="fill"
     app:tabMaxWidth="0dp"
     app:tabMode="fixed">
@@ -38,10 +46,10 @@
       android:text="@string/uploads" />
 
     <com.google.android.material.tabs.TabItem
-      android:id="@+id/mainTabsProgress"
+      android:id="@+id/mainTabsStatus"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="@string/progress" />
+      android:text="@string/status" />
 
     <com.google.android.material.tabs.TabItem
       android:id="@+id/mainTabsSettings"

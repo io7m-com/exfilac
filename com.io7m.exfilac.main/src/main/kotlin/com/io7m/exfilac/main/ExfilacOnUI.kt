@@ -17,11 +17,12 @@
 package com.io7m.exfilac.main
 
 import com.io7m.exfilac.core.EFBucketConfiguration
-import com.io7m.exfilac.core.EFBucketName
+import com.io7m.exfilac.core.EFBucketReferenceName
 import com.io7m.exfilac.core.EFState
 import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadName
+import com.io7m.exfilac.core.EFUploadStatusChanged
 import com.io7m.exfilac.core.ExfilacType
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeSubscriptionType
@@ -55,7 +56,9 @@ import org.slf4j.LoggerFactory
  * result.
  */
 
-class ExfilacOnUI(private val delegate: ExfilacType) : ExfilacType by delegate {
+class ExfilacOnUI(
+  private val delegate: ExfilacType
+) : ExfilacType by delegate {
 
   private val logger =
     LoggerFactory.getLogger(ExfilacOnUI::class.java)
@@ -66,12 +69,14 @@ class ExfilacOnUI(private val delegate: ExfilacType) : ExfilacType by delegate {
     CloseableCollection.create()
   private val bucketsUI: AttributeType<List<EFBucketConfiguration>> =
     this.attributes.withValue(this.delegate.buckets.get())
-  private val bucketsSelectedUI: AttributeType<Set<EFBucketName>> =
+  private val bucketsSelectedUI: AttributeType<Set<EFBucketReferenceName>> =
     this.attributes.withValue(this.delegate.bucketsSelected.get())
   private val uploadsUI: AttributeType<List<EFUploadConfiguration>> =
     this.attributes.withValue(this.delegate.uploads.get())
   private val uploadsSelectedUI: AttributeType<Set<EFUploadName>> =
     this.attributes.withValue(this.delegate.uploadsSelected.get())
+  private val uploadsStatusUI: AttributeType<EFUploadStatusChanged> =
+    this.attributes.withValue(EFUploadStatusChanged())
   private val stateUI: AttributeType<EFState> =
     this.attributes.withValue(EFStateBooting("", 0.0))
 
@@ -87,9 +92,10 @@ class ExfilacOnUI(private val delegate: ExfilacType) : ExfilacType by delegate {
   init {
     this.subscriptions.add(wrap(this.delegate.buckets, this.bucketsUI))
     this.subscriptions.add(wrap(this.delegate.bucketsSelected, this.bucketsSelectedUI))
+    this.subscriptions.add(wrap(this.delegate.state, this.stateUI))
+    this.subscriptions.add(wrap(this.delegate.uploadStatus, this.uploadsStatusUI))
     this.subscriptions.add(wrap(this.delegate.uploads, this.uploadsUI))
     this.subscriptions.add(wrap(this.delegate.uploadsSelected, this.uploadsSelectedUI))
-    this.subscriptions.add(wrap(this.delegate.state, this.stateUI))
   }
 
   override fun close() {
@@ -97,13 +103,16 @@ class ExfilacOnUI(private val delegate: ExfilacType) : ExfilacType by delegate {
     this.delegate.close()
   }
 
+  override val uploadStatus: AttributeReadableType<EFUploadStatusChanged> =
+    this.uploadsStatusUI
+
   override val uploadsSelected: AttributeReadableType<Set<EFUploadName>> =
     this.uploadsSelectedUI
 
   override val buckets: AttributeReadableType<List<EFBucketConfiguration>> =
     this.bucketsUI
 
-  override val bucketsSelected: AttributeReadableType<Set<EFBucketName>> =
+  override val bucketsSelected: AttributeReadableType<Set<EFBucketReferenceName>> =
     this.bucketsSelectedUI
 
   override val uploads: AttributeReadableType<List<EFUploadConfiguration>> =

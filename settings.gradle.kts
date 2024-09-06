@@ -50,6 +50,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "com.io7m.exfilac"
 
+include(":com.io7m.exfilac.content_tree.api")
+include(":com.io7m.exfilac.content_tree.device")
 include(":com.io7m.exfilac.core")
 include(":com.io7m.exfilac.main")
+include(":com.io7m.exfilac.s3_uploader.amazon")
+include(":com.io7m.exfilac.s3_uploader.api")
+include(":com.io7m.exfilac.service.api")
 include(":com.io7m.exfilac.tests")
+include(":com.io7m.exfilac.tests.device")

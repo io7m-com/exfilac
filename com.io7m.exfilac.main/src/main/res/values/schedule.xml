@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <!-- Must match com.io7m.exfilac.core.EFUploadSchedule -->
+  <string-array name="uploadSchedules">
+    <item>Every five minutes.</item>
+    <item>Every ten minutes.</item>
+    <item>Every twenty minutes.</item>
+    <item>Every thirty minutes.</item>
+    <item>Every hour.</item>
+    <item>No schedule; only upload on trigger events.</item>
+    <item>No schedule; only upload manually.</item>
+  </string-array>
+</resources>

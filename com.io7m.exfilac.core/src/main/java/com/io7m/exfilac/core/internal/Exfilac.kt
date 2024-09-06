@@ -17,8 +17,9 @@
 package com.io7m.exfilac.core.internal
 
 import com.io7m.darco.api.DDatabaseUnit
+import com.io7m.exfilac.content_tree.api.EFContentTreeFactoryType
 import com.io7m.exfilac.core.EFBucketConfiguration
-import com.io7m.exfilac.core.EFBucketName
+import com.io7m.exfilac.core.EFBucketReferenceName
 import com.io7m.exfilac.core.EFState
 import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFStateBucketEditing
@@ -26,10 +27,25 @@ import com.io7m.exfilac.core.EFStateReady
 import com.io7m.exfilac.core.EFStateUploadConfigurationEditing
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadName
+import com.io7m.exfilac.core.EFUploadStatus
+import com.io7m.exfilac.core.EFUploadStatusChanged
+import com.io7m.exfilac.core.EFUploadStatusNone
 import com.io7m.exfilac.core.ExfilacType
-import com.io7m.exfilac.core.internal.repetoir.RPServiceDirectory
-import com.io7m.exfilac.core.internal.repetoir.RPServiceDirectoryType
-import com.io7m.exfilac.core.internal.repetoir.RPServiceType
+import com.io7m.exfilac.core.internal.boot.EFBootContextType
+import com.io7m.exfilac.core.internal.boot.EFBootS3Uploader
+import com.io7m.exfilac.core.internal.boot.EFBootServiceType
+import com.io7m.exfilac.core.internal.boot.EFBootUploads
+import com.io7m.exfilac.core.internal.database.EFBootDatabase
+import com.io7m.exfilac.core.internal.database.EFDatabaseType
+import com.io7m.exfilac.core.internal.database.EFQBucketDeleteType
+import com.io7m.exfilac.core.internal.database.EFQBucketListType
+import com.io7m.exfilac.core.internal.database.EFQBucketPutType
+import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationDeleteType
+import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationListType
+import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationPutType
+import com.io7m.exfilac.core.internal.uploads.EFUploadServiceType
+import com.io7m.exfilac.s3_uploader.api.EFS3UploaderFactoryType
+import com.io7m.exfilac.service.api.RPServiceType
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.jattribute.core.Attributes
@@ -50,19 +66,34 @@ internal class Exfilac private constructor(
   private val resources: CloseableCollectionType<ClosingResourceFailedException>,
   private val databaseExecutor: ExecutorService,
   private val commandExecutor: ExecutorService,
-  private val stateSource: AttributeType<EFState>,
-  private val bucketsSource: AttributeType<List<EFBucketConfiguration>>,
-  private val bucketsSelectedSource: AttributeType<Set<EFBucketName>>,
-  private val uploadsSource: AttributeType<List<EFUploadConfiguration>>,
-  private val uploadsSelectedSource: AttributeType<Set<EFUploadName>>,
   private val dataDirectory: Path,
+  private val contentTrees: EFContentTreeFactoryType,
+  private val s3Uploaders: EFS3UploaderFactoryType,
 ) : ExfilacType {
+
+  private val attributes =
+    Attributes.create { e -> logger.debug("Uncaught attribute exception: ", e) }
+  private val stateSource: AttributeType<EFState> =
+    this.attributes.withValue(EFStateBooting("", 0.0))
+  private val bucketsSource: AttributeType<List<EFBucketConfiguration>> =
+    this.attributes.withValue(listOf())
+  private val bucketsSelectedSource: AttributeType<Set<EFBucketReferenceName>> =
+    this.attributes.withValue(setOf())
+  private val uploadsSource: AttributeType<List<EFUploadConfiguration>> =
+    this.attributes.withValue(listOf())
+  private val uploadsSelectedSource: AttributeType<Set<EFUploadName>> =
+    this.attributes.withValue(setOf())
+  private val statusChangedSource: AttributeType<EFUploadStatusChanged> =
+    this.attributes.withValue(EFUploadStatusChanged())
+
+  @Volatile
+  private var uploadService: EFUploadServiceType? = null
 
   @Volatile
   private var database: EFDatabaseType? = null
 
   @Volatile
-  private var serviceDirectory: RPServiceDirectory? = null
+  private var serviceDirectory: com.io7m.exfilac.service.api.RPServiceDirectory? = null
 
   companion object {
 
@@ -70,11 +101,10 @@ internal class Exfilac private constructor(
       LoggerFactory.getLogger(Exfilac::class.java)
 
     fun open(
+      contentTrees: EFContentTreeFactoryType,
+      s3Uploaders: EFS3UploaderFactoryType,
       dataDirectory: Path,
     ): ExfilacType {
-      val attributes =
-        Attributes.create { e -> this.logger.debug("Uncaught attribute exception: ", e) }
-
       val resources =
         CloseableCollection.create()
 
@@ -102,11 +132,8 @@ internal class Exfilac private constructor(
         databaseExecutor = databaseExecutor,
         commandExecutor = commandExecutor,
         dataDirectory = dataDirectory,
-        stateSource = attributes.withValue(EFStateBooting("", 0.0)),
-        bucketsSource = attributes.withValue(listOf()),
-        bucketsSelectedSource = attributes.withValue(setOf()),
-        uploadsSource = attributes.withValue(listOf()),
-        uploadsSelectedSource = attributes.withValue(setOf()),
+        contentTrees = contentTrees,
+        s3Uploaders = s3Uploaders
       )
 
       commandExecutor.execute { controller.boot() }
@@ -121,13 +148,13 @@ internal class Exfilac private constructor(
     val progress =
       AtomicReference(0.0)
     val services =
-      RPServiceDirectory()
+      com.io7m.exfilac.service.api.RPServiceDirectory()
 
     val bootContext =
       object : EFBootContextType {
         override val progress: Double
           get() = progress.get()
-        override val services: RPServiceDirectoryType
+        override val services: com.io7m.exfilac.service.api.RPServiceDirectoryType
           get() = services
         override val resources: CloseableCollectionType<*>
           get() = this@Exfilac.resources
@@ -136,6 +163,8 @@ internal class Exfilac private constructor(
     val bootProcesses: List<EFBootServiceType<out RPServiceType>> =
       listOf(
         EFBootDatabase(this.dataDirectory.resolve("exfilac.db")),
+        EFBootS3Uploader(this.s3Uploaders),
+        EFBootUploads(this.statusChangedSource, this.contentTrees)
       )
 
     for (index in 0 until bootProcesses.size) {
@@ -162,12 +191,13 @@ internal class Exfilac private constructor(
 
     this.serviceDirectory = services
     this.database = services.requireService(EFDatabaseType::class.java)
+    this.uploadService = services.requireService(EFUploadServiceType::class.java)
     this.stateSource.set(EFStateReady())
     this.executeDatabase { this.loadData() }
   }
 
   private fun loadData() {
-    this.database!!.openTransaction().use { transaction ->
+    this.database?.openTransaction()?.use { transaction ->
       this.bucketsSource.set(
         transaction.query(EFQBucketListType::class.java)
           .execute(DDatabaseUnit.UNIT)
@@ -230,7 +260,7 @@ internal class Exfilac private constructor(
   override val buckets: AttributeReadableType<List<EFBucketConfiguration>> =
     this.bucketsSource
 
-  override val bucketsSelected: AttributeReadableType<Set<EFBucketName>> =
+  override val bucketsSelected: AttributeReadableType<Set<EFBucketReferenceName>> =
     this.bucketsSelectedSource
 
   override fun bucketEditBegin(): CompletableFuture<*> {
@@ -247,7 +277,7 @@ internal class Exfilac private constructor(
     bucket: EFBucketConfiguration
   ): CompletableFuture<*> {
     return this.executeDatabase {
-      this.database!!.openTransaction().use { transaction ->
+      this.database?.openTransaction()?.use { transaction ->
         transaction.query(EFQBucketPutType::class.java).execute(bucket)
         transaction.commit()
 
@@ -261,10 +291,10 @@ internal class Exfilac private constructor(
   }
 
   override fun bucketsDelete(
-    names: Set<EFBucketName>
+    names: Set<EFBucketReferenceName>
   ): CompletableFuture<*> {
     return this.executeDatabase {
-      this.database!!.openTransaction().use { transaction ->
+      this.database?.openTransaction()?.use { transaction ->
         transaction.query(EFQBucketDeleteType::class.java).execute(names)
         transaction.commit()
 
@@ -273,19 +303,23 @@ internal class Exfilac private constructor(
           transaction.query(EFQBucketListType::class.java)
             .execute(DDatabaseUnit.UNIT)
         )
+        this.uploadsSource.set(
+          transaction.query(EFQUploadConfigurationListType::class.java)
+            .execute(DDatabaseUnit.UNIT)
+        )
       }
     }
   }
 
   override fun bucketExists(
-    name: EFBucketName
+    name: EFBucketReferenceName
   ): Boolean {
     return this.buckets.get()
-      .any { c -> c.name == name }
+      .any { c -> c.referenceName == name }
   }
 
   override fun bucketSelectionAdd(
-    name: EFBucketName
+    name: EFBucketReferenceName
   ): CompletableFuture<*> {
     return this.executeCommand {
       this.bucketsSelectedSource.set(this.bucketsSelectedSource.get().plus(name))
@@ -293,7 +327,7 @@ internal class Exfilac private constructor(
   }
 
   override fun bucketSelectionRemove(
-    name: EFBucketName
+    name: EFBucketReferenceName
   ): CompletableFuture<*> {
     return this.executeCommand {
       this.bucketsSelectedSource.set(this.bucketsSelectedSource.get().minus(name))
@@ -307,7 +341,7 @@ internal class Exfilac private constructor(
   }
 
   override fun bucketSelectionContains(
-    name: EFBucketName
+    name: EFBucketReferenceName
   ): Boolean {
     return this.bucketsSelected.get().contains(name)
   }
@@ -332,7 +366,7 @@ internal class Exfilac private constructor(
     upload: EFUploadConfiguration
   ): CompletableFuture<*> {
     return this.executeDatabase {
-      this.database!!.openTransaction().use { transaction ->
+      this.database?.openTransaction()?.use { transaction ->
         transaction.query(EFQUploadConfigurationPutType::class.java).execute(upload)
         transaction.commit()
 
@@ -349,7 +383,7 @@ internal class Exfilac private constructor(
     names: Set<EFUploadName>
   ): CompletableFuture<*> {
     return this.executeDatabase {
-      this.database!!.openTransaction().use { transaction ->
+      this.database?.openTransaction()?.use { transaction ->
         transaction.query(EFQUploadConfigurationDeleteType::class.java).execute(names)
         transaction.commit()
 
@@ -395,5 +429,23 @@ internal class Exfilac private constructor(
     name: EFUploadName
   ): Boolean {
     return this.uploadsSelected.get().contains(name)
+  }
+
+  override val uploadStatus: AttributeReadableType<EFUploadStatusChanged> =
+    this.statusChangedSource
+
+  override fun uploadStatus(name: EFUploadName): EFUploadStatus {
+    return this.uploadService?.status(name) ?: EFUploadStatusNone(name)
+  }
+
+  override fun uploadStart(
+    name: EFUploadName,
+    reason: String
+  ): CompletableFuture<*> {
+    return this.uploadService?.upload(name, reason) ?: CompletableFuture.completedFuture(Unit)
+  }
+
+  override fun uploadCancel(name: EFUploadName) {
+    this.uploadService?.cancel(name)
   }
 }

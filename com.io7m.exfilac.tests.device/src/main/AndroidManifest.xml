@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <uses-permission android:name="android.permission.INTERNET" />
+
+  <application
+    android:name="com.io7m.exfilac.tests.device.EFExApplication"
+    android:allowBackup="false"
+    android:label="ExfilacTests"
+    tools:ignore="GoogleAppIndexingWarning"
+    tools:replace="android:label,android:allowBackup">
+
+    <meta-data
+      android:name="android.max_aspect"
+      android:value="2.1" />
+
+    <activity
+      android:name="com.io7m.exfilac.tests.device.EFContentTreeActivity"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+  </application>
+</manifest>

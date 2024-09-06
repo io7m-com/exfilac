@@ -18,14 +18,14 @@ package com.io7m.exfilac.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
+import com.google.android.material.appbar.MaterialToolbar
 import com.io7m.exfilac.core.EFAccessKey
 import com.io7m.exfilac.core.EFBucketAccessStyle
 import com.io7m.exfilac.core.EFBucketConfiguration
@@ -33,21 +33,22 @@ import com.io7m.exfilac.core.EFBucketEditModel
 import com.io7m.exfilac.core.EFBucketEditModel.EditOperation.CREATE
 import com.io7m.exfilac.core.EFBucketEditModel.EditOperation.MODIFY
 import com.io7m.exfilac.core.EFBucketName
+import com.io7m.exfilac.core.EFBucketReferenceName
 import com.io7m.exfilac.core.EFRegion
 import com.io7m.exfilac.core.EFSecretKey
 import java.net.URI
 
 class EFFragmentBucketEditing : EFFragment() {
 
+  private lateinit var refName: EditText
   private lateinit var accessKey: EditText
   private lateinit var accessStyle: Spinner
-  private lateinit var cancel: Button
-  private lateinit var confirm: Button
   private lateinit var endpoint: EditText
-  private lateinit var header: TextView
   private lateinit var name: EditText
   private lateinit var region: EditText
+  private lateinit var saveButton: MenuItem
   private lateinit var secret: EditText
+  private lateinit var toolbar: MaterialToolbar
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -57,26 +58,31 @@ class EFFragmentBucketEditing : EFFragment() {
     val view =
       inflater.inflate(R.layout.bucket_edit, container, false)
 
-    this.header =
-      view.findViewById(R.id.bucketHeader)
     this.name =
-      view.findViewById(R.id.bucketName)
+      view.findViewById(R.id.bucketEditName)
+    this.refName =
+      view.findViewById(R.id.bucketEditRefName)
     this.region =
-      view.findViewById(R.id.bucketRegion)
+      view.findViewById(R.id.bucketEditRegion)
     this.accessKey =
-      view.findViewById(R.id.bucketAccessKey)
+      view.findViewById(R.id.bucketEditAccessKey)
     this.secret =
-      view.findViewById(R.id.bucketSecret)
+      view.findViewById(R.id.bucketEditSecret)
     this.endpoint =
-      view.findViewById(R.id.bucketEndpoint)
+      view.findViewById(R.id.bucketEditEndpoint)
     this.accessStyle =
-      view.findViewById(R.id.bucketAccessStyle)
-    this.confirm =
-      view.findViewById(R.id.bucketConfirm)
-    this.cancel =
-      view.findViewById(R.id.bucketCancel)
+      view.findViewById(R.id.bucketEditAccessStyle)
+    this.toolbar =
+      view.findViewById(R.id.bucketEditAppBar)
+
+    this.toolbar.setNavigationIcon(R.drawable.back_24)
+    this.toolbar.menu.clear()
+    val activity = this.requireActivity()
+    activity.menuInflater.inflate(R.menu.buckets_edit_save, this.toolbar.menu)
+    this.saveButton = this.toolbar.menu.findItem(R.id.bucketEditMenuSave)
 
     this.name.setText(EFBucketEditModel.name)
+    this.refName.setText(EFBucketEditModel.referenceName)
     this.region.setText(EFBucketEditModel.region)
     this.accessKey.setText(EFBucketEditModel.accessKey)
     this.secret.setText(EFBucketEditModel.secret)
@@ -85,6 +91,10 @@ class EFFragmentBucketEditing : EFFragment() {
 
     this.name.addTextChangedListener {
       EFBucketEditModel.name = this.name.text.toString().trim()
+      this.validate()
+    }
+    this.refName.addTextChangedListener {
+      EFBucketEditModel.referenceName = this.refName.text.toString().trim()
       this.validate()
     }
     this.region.addTextChangedListener {
@@ -118,12 +128,7 @@ class EFFragmentBucketEditing : EFFragment() {
           id: Long,
         ) {
           try {
-            EFBucketEditModel.accessStyle =
-              EFBucketAccessStyle.valueOf(
-                this@EFFragmentBucketEditing.accessStyle.adapter.getItem(position)
-                  .toString()
-                  .trim()
-              )
+            EFBucketEditModel.accessStyle = EFBucketAccessStyle.entries.toTypedArray()[position]
           } catch (e: Exception) {
             // Nothing can be done.
           }
@@ -136,9 +141,10 @@ class EFFragmentBucketEditing : EFFragment() {
         }
       }
 
-    this.confirm.setOnClickListener {
+    this.saveButton.setOnMenuItemClickListener {
       EFApplication.application.exfilac.bucketEditConfirm(
         EFBucketConfiguration(
+          referenceName = EFBucketReferenceName(EFBucketEditModel.referenceName),
           name = EFBucketName(EFBucketEditModel.name),
           region = EFRegion(EFBucketEditModel.region),
           accessKey = EFAccessKey(EFBucketEditModel.accessKey),
@@ -147,24 +153,20 @@ class EFFragmentBucketEditing : EFFragment() {
           endpoint = EFBucketEditModel.endpoint
         )
       )
+      EFBucketEditModel.clear()
+      true
     }
 
     when (EFBucketEditModel.editOperation) {
       CREATE -> {
-        this.confirm.setText(R.string.create)
-        this.header.setText(R.string.bucketEditCreate)
-        this.name.isEnabled = true
+        this.toolbar.setTitle(R.string.bucketEditCreate)
+        this.refName.isEnabled = true
       }
 
       MODIFY -> {
-        this.confirm.setText(R.string.modify)
-        this.header.setText(R.string.bucketEditModify)
-        this.name.isEnabled = false
+        this.toolbar.setTitle(R.string.bucketEditModify)
+        this.refName.isEnabled = false
       }
-    }
-
-    this.cancel.setOnClickListener {
-      EFApplication.application.exfilac.bucketEditCancel()
     }
 
     this.validate()
@@ -195,11 +197,12 @@ class EFFragmentBucketEditing : EFFragment() {
 
   private fun validate() {
     var ok = this.validateName()
+    ok = ok and this.validateReferenceName()
     ok = ok and this.validateRegion()
     ok = ok and this.validateAccessKey()
     ok = ok and this.validateSecret()
     ok = ok and this.validateEndpoint()
-    this.confirm.isEnabled = ok
+    this.saveButton.isEnabled = ok
   }
 
   private fun validateEndpoint(): Boolean {
@@ -246,31 +249,42 @@ class EFFragmentBucketEditing : EFFragment() {
   }
 
   private fun validateName(): Boolean {
+    return try {
+      EFBucketName(this.name.text.toString().trim())
+      this.name.error = null
+      true
+    } catch (e: Exception) {
+      this.name.error = e.message
+      false
+    }
+  }
+
+  private fun validateReferenceName(): Boolean {
     return when (EFBucketEditModel.editOperation) {
       CREATE -> {
         try {
-          this.validateNameNonexistent(EFBucketName(this.name.text.toString().trim()))
+          this.validateNameNonexistent(EFBucketReferenceName(this.refName.text.toString().trim()))
         } catch (e: Exception) {
-          this.name.error = e.message
+          this.refName.error = e.message
           false
         }
       }
 
       MODIFY -> {
-        this.name.error = null
+        this.refName.error = null
         true
       }
     }
   }
 
   private fun validateNameNonexistent(
-    bucketName: EFBucketName
+    bucketName: EFBucketReferenceName
   ): Boolean {
     return if (EFApplication.application.exfilac.bucketExists(bucketName)) {
-      this.name.error = EFApplication.application.getString(R.string.bucketNameTaken)
+      this.refName.error = EFApplication.application.getString(R.string.bucketRefNameTaken)
       false
     } else {
-      this.name.error = null
+      this.refName.error = null
       true
     }
   }

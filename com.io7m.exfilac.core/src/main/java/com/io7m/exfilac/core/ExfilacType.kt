@@ -25,7 +25,7 @@ interface ExfilacType : AutoCloseable {
 
   val buckets: AttributeReadableType<List<EFBucketConfiguration>>
 
-  val bucketsSelected: AttributeReadableType<Set<EFBucketName>>
+  val bucketsSelected: AttributeReadableType<Set<EFBucketReferenceName>>
 
   fun bucketEditBegin(): CompletableFuture<*>
 
@@ -33,17 +33,17 @@ interface ExfilacType : AutoCloseable {
 
   fun bucketEditConfirm(bucket: EFBucketConfiguration): CompletableFuture<*>
 
-  fun bucketsDelete(names: Set<EFBucketName>): CompletableFuture<*>
+  fun bucketsDelete(names: Set<EFBucketReferenceName>): CompletableFuture<*>
 
-  fun bucketExists(name: EFBucketName): Boolean
+  fun bucketExists(name: EFBucketReferenceName): Boolean
 
-  fun bucketSelectionAdd(name: EFBucketName): CompletableFuture<*>
+  fun bucketSelectionAdd(name: EFBucketReferenceName): CompletableFuture<*>
 
-  fun bucketSelectionRemove(name: EFBucketName): CompletableFuture<*>
+  fun bucketSelectionRemove(name: EFBucketReferenceName): CompletableFuture<*>
 
   fun bucketSelectionClear(): CompletableFuture<*>
 
-  fun bucketSelectionContains(name: EFBucketName): Boolean
+  fun bucketSelectionContains(name: EFBucketReferenceName): Boolean
 
   val uploads: AttributeReadableType<List<EFUploadConfiguration>>
 
@@ -66,4 +66,15 @@ interface ExfilacType : AutoCloseable {
   fun uploadSelectionClear(): CompletableFuture<*>
 
   fun uploadSelectionContains(name: EFUploadName): Boolean
+
+  val uploadStatus: AttributeReadableType<EFUploadStatusChanged>
+
+  fun uploadStatus(name: EFUploadName): EFUploadStatus
+
+  fun uploadStart(
+    name: EFUploadName,
+    reason: String
+  ): CompletableFuture<*>
+
+  fun uploadCancel(name: EFUploadName)
 }

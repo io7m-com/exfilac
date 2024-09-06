@@ -4,7 +4,7 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
   <item
     android:id="@+id/uploadsMenuAddUpload"
-    android:icon="@drawable/upload_add_32"
+    android:icon="@drawable/upload_add_24"
     android:title="@string/uploadAdd"
     app:showAsAction="ifRoom" />
 </menu>

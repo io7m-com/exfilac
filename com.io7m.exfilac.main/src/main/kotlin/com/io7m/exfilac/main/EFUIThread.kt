@@ -64,23 +64,4 @@ object EFUIThread {
     val h = Handler(looper)
     h.post(r)
   }
-
-//  /**
-//   * Observe the given attribute on the UI thread.
-//   */
-//
-//  fun <T> observeOnUIThread(
-//    attribute: AttributeReadableType<T>,
-//    observer: (T, T) -> Unit
-//  ): AttributeSubscriptionType {
-//    return attribute.subscribe { oldValue, newValue ->
-//      runOnUIThread {
-//        try {
-//          observer.invoke(oldValue, newValue)
-//        } catch (e: Throwable) {
-//          // Nothing we can do about this.
-//        }
-//      }
-//    }
-//  }
 }

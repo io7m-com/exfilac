@@ -16,18 +16,9 @@
 
 package com.io7m.exfilac.core
 
-import java.nio.file.Path
-
 data class EFUploadConfiguration(
   val name: EFUploadName,
-  val devicePath: Path,
-  val bucket: EFBucketName,
+  val source: EFDeviceSource,
+  val bucket: EFBucketReferenceName,
   val policy: EFUploadPolicy
-) {
-
-  init {
-    require(this.devicePath.isAbsolute) {
-      "Device paths must be absolute."
-    }
-  }
-}
+)

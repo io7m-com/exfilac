@@ -17,6 +17,9 @@
 
     <com.google.android.material.appbar.MaterialToolbar
       android:id="@+id/settingsAppBar"
+      app:logo="@drawable/io7m_24"
+      app:title="@string/app_name"
+      app:titleMarginStart="@dimen/appBarTitleMarginStart"
       android:layout_width="match_parent"
       android:layout_height="48dp" />
 

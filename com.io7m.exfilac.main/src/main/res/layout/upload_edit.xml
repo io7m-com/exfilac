@@ -1,41 +1,252 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:orientation="vertical"
-  android:layout_margin="16dp"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
-  <TextView
-    android:id="@+id/uploadHeader"
-    android:layout_width="wrap_content"
+  <com.google.android.material.appbar.AppBarLayout
+    android:id="@+id/uploadEditAppBarLayout"
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
-    tools:text="CREATE / MODIFY"
-    android:textSize="20sp" />
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
 
-  <EditText
-    android:id="@+id/uploadName"
-    android:layout_marginTop="16dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:autofillHints="name"
-    android:ems="12"
-    android:hint="@string/uploadName"
-    android:inputType="text"
-    android:text="" />
+    <com.google.android.material.appbar.MaterialToolbar
+      android:id="@+id/uploadEditAppBar"
+      android:layout_width="match_parent"
+      android:layout_height="48dp" />
 
-  <Button
-    android:id="@+id/uploadCancel"
-    android:layout_marginTop="64dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/cancel" />
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="1dp"
+      android:background="?android:attr/listDivider" />
+  </com.google.android.material.appbar.AppBarLayout>
 
-  <Button
-    android:id="@+id/uploadConfirm"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/create" />
+  <ScrollView
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/uploadEditAppBarLayout">
 
-</LinearLayout>
+    <LinearLayout
+      android:id="@+id/uploadControlsTop"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+      <!-- Upload name. -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadName"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadNameDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <EditText
+        android:id="@+id/uploadEditName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:hint="@string/uploadName"
+        android:textSize="@dimen/settingsHeaderTextSize" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- Upload directory. -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadPath"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadPathDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <EditText
+        android:id="@+id/uploadEditPath"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:hint="@string/uploadPath"
+        android:textSize="@dimen/settingsHeaderTextSize" />
+
+      <Button
+        android:id="@+id/uploadEditPathSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadSelectPath" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- Schedule -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadSchedule"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadScheduleDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <Spinner
+        android:id="@+id/uploadEditSchedule"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:entries="@array/uploadSchedules" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- Bucket -->
+
+      <TextView
+        android:id="@+id/uploadEditBucketHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadBucket"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadBucketDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <Spinner
+        android:id="@+id/uploadEditBucket"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- Triggers -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadTriggers"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadTriggersDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/uploadTriggerPhoneCallEnded"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadTriggerOnCall" />
+
+      <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/uploadTriggerPhotoTaken"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadTriggerOnPhoto" />
+
+      <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/uploadTriggerNetworkAvailable"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/uploadTriggerOnWifi" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+    </LinearLayout>
+  </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,87 +1,302 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:orientation="vertical"
-  android:layout_margin="16dp"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
-  <TextView
-    android:id="@+id/bucketHeader"
-    android:layout_width="wrap_content"
+  <com.google.android.material.appbar.AppBarLayout
+    android:id="@+id/bucketEditAppBarLayout"
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
-    tools:text="CREATE / MODIFY"
-    android:textSize="20sp" />
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
 
-  <EditText
-    android:id="@+id/bucketName"
-    android:layout_marginTop="16dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:autofillHints="name"
-    android:ems="12"
-    android:hint="@string/bucketName"
-    android:inputType="text"
-    android:text="" />
+    <com.google.android.material.appbar.MaterialToolbar
+      android:id="@+id/bucketEditAppBar"
+      android:layout_width="match_parent"
+      android:layout_height="48dp" />
 
-  <EditText
-    android:id="@+id/bucketRegion"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:autofillHints="name"
-    android:ems="12"
-    android:hint="@string/bucketRegion"
-    android:inputType="text"
-    android:text="us-east-1" />
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="1dp"
+      android:background="?android:attr/listDivider" />
+  </com.google.android.material.appbar.AppBarLayout>
 
-  <EditText
-    android:id="@+id/bucketAccessKey"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:autofillHints="username"
-    android:ems="12"
-    android:hint="@string/bucketAccessKey"
-    android:inputType="text"
-    android:text="" />
+  <ScrollView
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/bucketEditAppBarLayout">
 
-  <EditText
-    android:id="@+id/bucketSecret"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:autofillHints="password"
-    android:ems="12"
-    android:hint="@string/bucketSecret"
-    android:inputType="text"
-    android:text="" />
+    <LinearLayout
+      android:id="@+id/bucketControlsTop"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
 
-  <EditText
-    android:id="@+id/bucketEndpoint"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:autofillHints="name"
-    android:ems="12"
-    android:hint="@string/bucketEndpoint"
-    android:inputType="text"
-    android:text="" />
+      <!-- Bucket name. -->
 
-  <Spinner
-    android:id="@+id/bucketAccessStyle"
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:entries="@array/bucketAccessStyles"/>
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketRefName"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
 
-  <Button
-    android:id="@+id/bucketCancel"
-    android:layout_marginTop="64dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/cancel" />
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketRefNameDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
 
-  <Button
-    android:id="@+id/bucketConfirm"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/bucketCreate" />
+      <EditText
+        android:id="@+id/bucketEditRefName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:hint="@string/bucketRefName"
+        android:textSize="@dimen/settingsHeaderTextSize" />
 
-</LinearLayout>
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- Bucket name. -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketName"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketNameDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <EditText
+        android:id="@+id/bucketEditName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:hint="@string/bucketName"
+        android:textSize="@dimen/settingsHeaderTextSize" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- Region -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketRegion"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketRegionDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <EditText
+        android:id="@+id/bucketEditRegion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:hint="@string/bucketRegion"
+        android:textSize="@dimen/settingsHeaderTextSize" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- AccessKey -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketAccessKey"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketAccessKeyDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <EditText
+        android:id="@+id/bucketEditAccessKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:hint="@string/bucketAccessKey"
+        android:textSize="@dimen/settingsHeaderTextSize" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- Secret -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketSecret"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketSecretDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <EditText
+        android:id="@+id/bucketEditSecret"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:hint="@string/bucketSecret"
+        android:textSize="@dimen/settingsHeaderTextSize" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- AccessStyle -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketAccessStyle"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketAccessStyleDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <Spinner
+        android:id="@+id/bucketEditAccessStyle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:entries="@array/bucketAccessStyles"/>
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <!-- Endpoint -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketEndpoint"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/bucketEndpointDescription"
+        android:textSize="@dimen/settingsDescriptionTextSize" />
+
+      <EditText
+        android:id="@+id/bucketEditEndpoint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:hint="@string/bucketEndpoint"
+        android:textSize="@dimen/settingsHeaderTextSize" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+    </LinearLayout>
+  </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,8 +28,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.exfilac.core.EFBucketConfiguration
-import com.io7m.exfilac.core.EFBucketEditModel
-import com.io7m.exfilac.core.EFBucketName
+import com.io7m.exfilac.core.EFBucketReferenceName
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
@@ -105,7 +104,7 @@ class EFFragmentTabBuckets : Fragment() {
 
   @UiThread
   private fun onBucketSelectionChanged(
-    selected: Set<EFBucketName>
+    selected: Set<EFBucketReferenceName>
   ) {
     EFUIThread.checkIsUIThread()
 
@@ -145,8 +144,6 @@ class EFFragmentTabBuckets : Fragment() {
   @UiThread
   private fun onBucketMenuAddSelected() {
     EFUIThread.checkIsUIThread()
-
-    EFBucketEditModel.clear()
     EFApplication.application.exfilac.bucketEditBegin()
   }
 

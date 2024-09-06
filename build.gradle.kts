@@ -50,16 +50,6 @@ plugins {
     .apply(false)
 
   /*
-   * Android Junit5 plugin. Required to run JUnit 5 tests on Android projects.
-   *
-   * https://github.com/mannodermaus/android-junit5
-   */
-
-  id("de.mannodermaus.android-junit5")
-    .version("1.9.3.0")
-    .apply(false)
-
-  /*
    * Download plugin. Used to fetch artifacts such as Scando during the build.
    *
    * https://plugins.gradle.org/plugin/de.undercouch.download
@@ -560,7 +550,6 @@ allprojects {
           propertyInt(this@allprojects, "com.io7m.build.androidSDKTarget")
         minSdk =
           propertyInt(this@allprojects, "com.io7m.build.androidSDKMinimum")
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
       }
 
       /*
@@ -585,7 +574,6 @@ allprojects {
 
       apply(plugin = "com.android.library")
       apply(plugin = "org.jetbrains.kotlin.android")
-      apply(plugin = "de.mannodermaus.android-junit5")
 
       /*
        * Configure the JVM toolchain version that we want to use for Kotlin.
@@ -613,9 +601,7 @@ allprojects {
 
       android.defaultConfig {
         multiDexEnabled = true
-        minSdk =
-          propertyInt(this@allprojects, "com.io7m.build.androidSDKMinimum")
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        minSdk = propertyInt(this@allprojects, "com.io7m.build.androidSDKMinimum")
       }
 
       /*
@@ -632,26 +618,6 @@ allprojects {
         encoding = "UTF-8"
         sourceCompatibility = JavaVersion.toVersion(jdkBytecodeTarget)
         targetCompatibility = JavaVersion.toVersion(jdkBytecodeTarget)
-      }
-
-      android.testOptions {
-        execution = "ANDROIDX_TEST_ORCHESTRATOR"
-        animationsDisabled = true
-
-        /*
-         * Enable the production of reports for all unit tests.
-         */
-
-        unitTests {
-          isIncludeAndroidResources = true
-
-          all { test ->
-            // Required for the Mockito ByteBuddy agent on modern VMs.
-            test.systemProperty("jdk.attach.allowAttachSelf", "true")
-            test.reports.html.required = true
-            test.reports.junitXml.required = true
-          }
-        }
       }
 
       /*

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="settingsMarginHorizontal">32dp</dimen>
+  <dimen name="settingsHeaderTextSize">14sp</dimen>
+  <dimen name="settingsDescriptionTextSize">14sp</dimen>
+  <dimen name="appBarTitleMarginStart">16dp</dimen>
+</resources>

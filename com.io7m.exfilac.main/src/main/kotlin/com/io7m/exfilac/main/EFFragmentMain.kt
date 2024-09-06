@@ -111,7 +111,7 @@ class EFFragmentMain : EFFragment() {
     when (tabIndex) {
       0 -> this.switchFragment(EFFragmentTabBuckets())
       1 -> this.switchFragment(EFFragmentTabUploads())
-      2 -> this.switchFragment(EFFragmentTabProgress())
+      2 -> this.switchFragment(EFFragmentTabStatus())
       3 -> this.switchFragment(EFFragmentTabSettings())
       else -> throw IllegalStateException("Unexpected tab index: $tabIndex")
     }

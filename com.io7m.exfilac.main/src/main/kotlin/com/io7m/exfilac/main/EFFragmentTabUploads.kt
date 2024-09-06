@@ -125,6 +125,9 @@ class EFFragmentTabUploads : Fragment() {
   ) {
     EFUIThread.checkIsUIThread()
 
+    EFApplication.application.exfilac.uploadSelectionClear()
+    this.adapter.setUploads(uploads)
+
     if (uploads.isEmpty()) {
       this.listView.visibility = View.INVISIBLE
       this.emptyView.visibility = View.VISIBLE
@@ -138,7 +141,6 @@ class EFFragmentTabUploads : Fragment() {
   @UiThread
   private fun onUploadMenuAddSelected() {
     EFUIThread.checkIsUIThread()
-
     EFApplication.application.exfilac.uploadEditBegin()
   }
 

@@ -30,3 +30,4 @@ mv natives/org/sqlite/native/Linux-Android/x86/libsqlitejdbc.so com.io7m.exfilac
 mv natives/org/sqlite/native/Linux-Android/arm/libsqlitejdbc.so com.io7m.exfilac.main/src/main/jniLibs/armeabi/
 mv natives/org/sqlite/native/Linux-Android/aarch64/libsqlitejdbc.so com.io7m.exfilac.main/src/main/jniLibs/arm64-v8a/
 
+rm -rfv natives

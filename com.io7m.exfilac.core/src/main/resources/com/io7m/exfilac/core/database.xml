@@ -28,6 +28,7 @@ CREATE TABLE schema_version (
     <Statement><![CDATA[
 CREATE TABLE buckets (
   bucket_id            INTEGER NOT NULL PRIMARY KEY,
+  bucket_ref_name      TEXT    NOT NULL,
   bucket_name          TEXT    NOT NULL,
   bucket_region        TEXT    NOT NULL,
   bucket_access_key    TEXT    NOT NULL,
@@ -35,8 +36,8 @@ CREATE TABLE buckets (
   bucket_access_style  TEXT    NOT NULL,
   bucket_endpoint      TEXT    NOT NULL,
 
-  CONSTRAINT bucket_name_unique
-    UNIQUE (bucket_name)
+  CONSTRAINT bucket_ref_name_unique
+    UNIQUE (bucket_ref_name)
 
 ) STRICT
 ]]></Statement>
@@ -51,7 +52,7 @@ CREATE TABLE buckets (
 CREATE TABLE upload_configurations (
   upload_configuration_id   INTEGER NOT NULL PRIMARY KEY,
   upload_name               TEXT    NOT NULL,
-  upload_device_path        TEXT    NOT NULL,
+  upload_device_source      TEXT    NOT NULL,
   upload_bucket_id          INTEGER NOT NULL,
   upload_policy             BLOB    NOT NULL,
 
@@ -65,28 +66,61 @@ CREATE TABLE upload_configurations (
 
 ) STRICT
 ]]></Statement>
+  </Schema>
+
+  <Schema versionCurrent="2">
+    <Comment>
+      The upload_records table stores records of upload attempts. The tables are denormalized
+      because we want to capture the information as it was when the upload was performed, not
+      the information (such as the bucket configuration) as it is _now_.
+    </Comment>
 
     <Comment>
-      The upload_files table stores the set of files that either have been uploaded, or need
-      to be uploaded. A file is only removed from the table when it ceases to exist on the
-      device locally.
+      All "time"-based columns are specified as milliseconds since the Unix epoch, in UTC.
     </Comment>
 
     <Statement><![CDATA[
-CREATE TABLE upload_files (
-  upload_file_configuration  INTEGER NOT NULL,
-  upload_file_path           TEXT    NOT NULL,
-  upload_file_status         TEXT    NOT NULL,
+CREATE TABLE upload_records (
+  upload_record_id          INTEGER NOT NULL PRIMARY KEY,
+  upload_record_time_start  INTEGER NOT NULL,
+  upload_record_time_end    INTEGER,
+  upload_name               TEXT    NOT NULL,
+  upload_bucket             TEXT,
+  upload_reason             TEXT    NOT NULL,
+  upload_files_required     INTEGER NOT NULL,
+  upload_files_skipped      INTEGER NOT NULL,
+  upload_files_uploaded     INTEGER NOT NULL,
+  upload_files_failed       INTEGER NOT NULL,
+  upload_result             TEXT
+)
+]]></Statement>
 
-  CONSTRAINT upload_files_unique
-    UNIQUE (upload_file_configuration, upload_file_path),
+    <Comment>
+      The upload_events table stores the events associated with an upload.
+    </Comment>
 
-  CONSTRAINT upload_files_configuration_exists
-    FOREIGN KEY (upload_file_configuration)
-      REFERENCES upload_configurations (upload_configuration_id)
+    <Comment>
+      All "time"-based columns are specified as milliseconds since the Unix epoch, in UTC.
+    </Comment>
+
+    <Statement><![CDATA[
+CREATE TABLE upload_events (
+  upload_event_id          INTEGER PRIMARY KEY NOT NULL,
+  upload_event_record_id   INTEGER             NOT NULL,
+  upload_event_time        INTEGER             NOT NULL,
+  upload_event_message     TEXT                NOT NULL,
+  upload_event_file        TEXT,
+  upload_event_exception   TEXT,
+  upload_event_failed      INTEGER             NOT NULL,
+
+  CONSTRAINT upload_event_unique
+    UNIQUE (upload_event_id, upload_event_record_id),
+
+  CONSTRAINT upload_events_upload_exists
+    FOREIGN KEY (upload_event_record_id)
+      REFERENCES upload_records (upload_record_id)
         ON DELETE CASCADE
-
-) STRICT
+)
 ]]></Statement>
   </Schema>
 </Schemas>

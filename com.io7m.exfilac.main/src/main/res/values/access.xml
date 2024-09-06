@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
+  <!-- Must match com.io7m.exfilac.core.EFBucketAccessStyle -->
   <string-array name="bucketAccessStyles">
-    <item>VIRTUALHOST_STYLE</item>
-    <item>PATH_STYLE</item>
+    <item>Virtual host style (Amazon, etc)</item>
+    <item>Path style (MinIO, etc)</item>
   </string-array>
 </resources>
