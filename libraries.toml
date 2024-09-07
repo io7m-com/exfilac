@@ -1,12 +1,12 @@
 [versions]
-darco            = "1.0.1-SNAPSHOT"
+darco            = "2.0.0"
 opentelemetry    = "1.41.0"
 slf4j            = "2.0.16"
 logback_android  = "3.0.0"
-trasco           = "3.0.0-SNAPSHOT"
+trasco           = "3.0.0"
 anethum          = "1.1.1"
 jlexing          = "3.2.0"
-jxe              = "2.0.0-SNAPSHOT"
+jxe              = "2.0.0"
 junreachable     = "4.0.2"
 blackthorne      = "2.0.2"
 xerces           = "2.12.2"
@@ -44,7 +44,7 @@ io7m_jade_api            = { module = "com.io7m.jade:com.io7m.jade.api", version
 io7m_jade_spi            = { module = "com.io7m.jade:com.io7m.jade.spi", version.ref = "jade" }
 io7m_jade_vanilla        = { module = "com.io7m.jade:com.io7m.jade.vanilla", version.ref = "jade" }
 io7m_jaffirm_core        = { module = "com.io7m.jaffirm:com.io7m.jaffirm.core", version = "4.0.1" }
-io7m_jattribute_core     = { module = "com.io7m.jattribute:com.io7m.jattribute.core", version = "1.0.1-SNAPSHOT" }
+io7m_jattribute_core     = { module = "com.io7m.jattribute:com.io7m.jattribute.core", version = "1.0.1" }
 io7m_jdeferthrow_core    = { module = "com.io7m.jdeferthrow:com.io7m.jdeferthrow.core", version = "1.3.0" }
 io7m_jlexing_core        = { module = "com.io7m.jlexing:com.io7m.jlexing.core", version.ref = "jlexing" }
 io7m_jmulticlose_core    = { module = "com.io7m.jmulticlose:com.io7m.jmulticlose.core", version = "1.1.3" }
@@ -75,40 +75,6 @@ google_material = { module = "com.google.android.material:material", version = "
 
 apache_commons_io    = { module = "commons-io:commons-io", version = "2.16.1" }
 apache_commons_lang3 = { module = "org.apache.commons:commons-lang3", version = "3.17.0" }
-
-org_reactivestreams_reactive_streams             = { module = "org.reactivestreams:reactive-streams", version                     = "1.0.4" }
-software_amazon_awssdk_annotations               = { module = "software.amazon.awssdk:annotations", version.ref                   = "amazon_aws" }
-software_amazon_awssdk_apache_client             = { module = "software.amazon.awssdk:apache-client", version.ref                 = "amazon_aws" }
-software_amazon_awssdk_arns                      = { module = "software.amazon.awssdk:arns", version.ref                          = "amazon_aws" }
-software_amazon_awssdk_auth                      = { module = "software.amazon.awssdk:auth", version.ref                          = "amazon_aws" }
-software_amazon_awssdk_aws_core                  = { module = "software.amazon.awssdk:aws-core", version.ref                      = "amazon_aws" }
-software_amazon_awssdk_aws_query_protocol        = { module = "software.amazon.awssdk:aws-query-protocol", version.ref            = "amazon_aws" }
-software_amazon_awssdk_aws_xml_protocol          = { module = "software.amazon.awssdk:aws-xml-protocol", version.ref              = "amazon_aws" }
-software_amazon_awssdk_checksums                 = { module = "software.amazon.awssdk:checksums", version.ref                     = "amazon_aws" }
-software_amazon_awssdk_checksums_spi             = { module = "software.amazon.awssdk:checksums-spi", version.ref                 = "amazon_aws" }
-software_amazon_awssdk_crt_crt                   = { module = "software.amazon.awssdk.crt:crt", version.ref                       = "amazon_aws" }
-software_amazon_awssdk_crt_core                  = { module = "software.amazon.awssdk:crt-core", version.ref                      = "amazon_aws" }
-software_amazon_awssdk_endpoints_spi             = { module = "software.amazon.awssdk:endpoints-spi", version.ref                 = "amazon_aws" }
-software_amazon_awssdk_http_auth                 = { module = "software.amazon.awssdk:http-auth", version.ref                     = "amazon_aws" }
-software_amazon_awssdk_http_auth_aws             = { module = "software.amazon.awssdk:http-auth-aws", version.ref                 = "amazon_aws" }
-software_amazon_awssdk_http_auth_aws_eventstream = { module = "software.amazon.awssdk:http-auth-aws-eventstream", version.ref     = "amazon_aws" }
-software_amazon_awssdk_http_auth_spi             = { module = "software.amazon.awssdk:http-auth-spi", version.ref                 = "amazon_aws" }
-software_amazon_awssdk_http_client_spi           = { module = "software.amazon.awssdk:http-client-spi", version.ref               = "amazon_aws" }
-software_amazon_awssdk_identity_spi              = { module = "software.amazon.awssdk:identity-spi", version.ref                  = "amazon_aws" }
-software_amazon_awssdk_json_utils                = { module = "software.amazon.awssdk:json-utils", version.ref                    = "amazon_aws" }
-software_amazon_awssdk_metrics_spi               = { module = "software.amazon.awssdk:metrics-spi", version.ref                   = "amazon_aws" }
-software_amazon_awssdk_profiles                  = { module = "software.amazon.awssdk:profiles", version.ref                      = "amazon_aws" }
-software_amazon_awssdk_protocol_core             = { module = "software.amazon.awssdk:protocol-core", version.ref                 = "amazon_aws" }
-software_amazon_awssdk_regions                   = { module = "software.amazon.awssdk:regions", version.ref                       = "amazon_aws" }
-software_amazon_awssdk_retries                   = { module = "software.amazon.awssdk:retries", version.ref                       = "amazon_aws" }
-software_amazon_awssdk_retries_spi               = { module = "software.amazon.awssdk:retries-spi", version.ref                   = "amazon_aws" }
-software_amazon_awssdk_s3                        = { module = "software.amazon.awssdk:s3", version.ref                            = "amazon_aws" }
-software_amazon_awssdk_sdk_core                  = { module = "software.amazon.awssdk:sdk-core", version.ref                      = "amazon_aws" }
-software_amazon_awssdk_transfer_s3               = { module = "software.amazon.awssdk:s3-transfer-manager", version.ref           = "amazon_aws" }
-
-software_amazon_awssdk_third_party_jackson_core  = { module = "software.amazon.awssdk:third-party-jackson-core", version.ref      = "amazon_aws" }
-software_amazon_awssdk_utils                     = { module = "software.amazon.awssdk:utils", version.ref                         = "amazon_aws" }
-software_amazon_eventstream_eventstream          = { module = "software.amazon.eventstream:eventstream", version                  = "1.0.1" }
 
 androidx_activity                       = { module = "androidx.activity:activity", version                           = "1.9.1" }
 androidx_activity_ktx                   = { module = "androidx.activity:activity-ktx", version                       = "1.9.1" }
