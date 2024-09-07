@@ -22,53 +22,104 @@ import com.io7m.exfilac.s3_uploader.api.EFS3UploadType
 import com.io7m.peixoto.sdk.org.apache.commons.codec.binary.Base64
 import com.io7m.peixoto.sdk.software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import com.io7m.peixoto.sdk.software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import com.io7m.peixoto.sdk.software.amazon.awssdk.awscore.retry.AwsRetryStrategy
 import com.io7m.peixoto.sdk.software.amazon.awssdk.core.sync.RequestBody
 import com.io7m.peixoto.sdk.software.amazon.awssdk.http.apache.ApacheHttpClient
 import com.io7m.peixoto.sdk.software.amazon.awssdk.regions.Region
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.S3Client
-import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.ChecksumMode
+import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.AbortMultipartUploadRequest
+import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest
+import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.CompletedMultipartUpload
+import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.CompletedPart
+import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.HeadObjectRequest
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.NoSuchKeyException
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.PutObjectRequest
+import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.UploadPartRequest
 import org.apache.commons.io.input.BoundedInputStream
 import org.slf4j.LoggerFactory
 import java.security.MessageDigest
 import java.time.OffsetDateTime
-import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 class EFS3AMZUpload(
   private val upload: EFS3UploadRequest
 ) : EFS3UploadType {
-
   private val logger =
     LoggerFactory.getLogger(EFS3AMZUpload::class.java)
 
+  private val exfilacSHA256Header =
+    "exfilac-sha256"
+  private val multipartThreshold =
+    16_777_216L
+  private val minimumChunkSize =
+    8_388_608L
+
+  private lateinit var executor: ExecutorService
+
+  private val done =
+    AtomicBoolean()
+  private val streamSupervised: AtomicReference<BoundedInputStream> =
+    AtomicReference()
+
   @Volatile
-  private var octetsTransferred = 0L
+  private var octetsThen = 0L
 
   override fun execute() {
-    val credentials =
-      StaticCredentialsProvider.create(
-        AwsBasicCredentials.create(this.upload.accessKey, this.upload.secretKey)
-      )
-
-    val clientBuilder = S3Client.builder()
-    clientBuilder.credentialsProvider(credentials)
-    clientBuilder.httpClient(ApacheHttpClient.create())
-    clientBuilder.region(Region.of(this.upload.region))
-    clientBuilder.region(Region.of(this.upload.region))
-    clientBuilder.forcePathStyle(this.upload.pathStyle)
-    clientBuilder.endpointOverride(this.upload.endpoint)
-    val client = clientBuilder.build()
-
-    return client.use { c ->
-      if (this.upload.size >= 10_000_000L) {
-        this.executeUploadMultiPart(c)
-      } else {
-        this.executeUploadSimple(c)
+    this.executor =
+      Executors.newSingleThreadExecutor { r ->
+        val thread = Thread(r)
+        thread.name = "com.io7m.exfilac.s3.upload_supervisor[${thread.id}]"
+        thread.priority = Thread.MIN_PRIORITY
+        thread
       }
+
+    try {
+      this.executor.execute(this::executeStreamSupervisor)
+
+      val credentials =
+        StaticCredentialsProvider.create(
+          AwsBasicCredentials.create(this.upload.accessKey, this.upload.secretKey)
+        )
+
+      val httpClient =
+        ApacheHttpClient.builder()
+          .build()
+
+      val clientBuilder = S3Client.builder()
+      clientBuilder.credentialsProvider(credentials)
+      clientBuilder.httpClient(httpClient)
+      clientBuilder.region(Region.of(this.upload.region))
+      clientBuilder.region(Region.of(this.upload.region))
+      clientBuilder.forcePathStyle(this.upload.pathStyle)
+      clientBuilder.endpointOverride(this.upload.endpoint)
+
+      val strategy =
+        AwsRetryStrategy.standardRetryStrategy()
+          .toBuilder()
+          .maxAttempts(10)
+          .build()
+
+      clientBuilder.overrideConfiguration { o -> o.retryStrategy(strategy) }
+
+      return clientBuilder.build().use { c ->
+        if (this.upload.size >= this.multipartThreshold) {
+          this.executeUploadMultiPart(c)
+        } else {
+          this.executeUploadSimple(c)
+        }
+      }
+    } catch (e: Throwable) {
+      this.upload.onError(e)
+      throw e
+    } finally {
+      this.done.set(true)
+      this.executor.shutdown()
+      this.executor.awaitTermination(5L, TimeUnit.SECONDS)
     }
   }
 
@@ -79,73 +130,52 @@ class EFS3AMZUpload(
       .setInputStream(this.upload.streams.invoke())
       .get()
       .use { inputStream ->
-        val executor =
-          Executors.newCachedThreadPool { r ->
-            val thread = Thread(r)
-            thread.name = "com.io7m.exfilac.s3.upload[${thread.id}]"
-            thread.priority = Thread.MIN_PRIORITY
-            thread
-          }
+        this.streamSupervised.set(inputStream)
 
         /*
          * Start an upload thread and a supervisor thread. The supervisor thread observes
          * data passing through the input stream and uses it to determine transfer speeds.
          */
 
-        try {
-          val future = CompletableFuture<Unit>()
-          executor.execute {
-            this.executeIOThreadSuperviseStream(inputStream, future)
-          }
-          executor.execute {
-            try {
-              future.complete(this.executeIOThreadPutObject(inputStream, client))
-            } catch (e: Throwable) {
-              this.upload.onError(e)
-              future.completeExceptionally(e)
-            }
-          }
-          future.join()
-        } finally {
-          executor.shutdown()
-          executor.awaitTermination(5L, TimeUnit.SECONDS)
-        }
+        this.executePutObject(inputStream, client)
       }
   }
 
-  private fun executeIOThreadSuperviseStream(
-    inputStream: BoundedInputStream,
-    future: CompletableFuture<*>
-  ) {
-    while (true) {
-      if (future.isDone || future.isCancelled || future.isCompletedExceptionally) {
-        return
-      }
+  /*
+   * The stream supervisor function. This runs on a dedicated thread and periodically examines
+   * the current stream to see how much data is being transferred.
+   */
 
-      try {
-        val thisPeriod = inputStream.count
-        this.octetsTransferred += thisPeriod
-        this.upload.onStatistics.invoke(
-          EFS3TransferStatistics(
-            time = OffsetDateTime.now(),
-            octetsTransferred = this.octetsTransferred,
-            octetsExpected = this.upload.size,
-            octetsThisPeriod = thisPeriod
+  private fun executeStreamSupervisor() {
+    while (!this.done.get()) {
+      val stream = this.streamSupervised.get()
+      if (stream != null) {
+        try {
+          val octetsTransferredNow = stream.count
+          val octetsInPeriod = octetsTransferredNow - this.octetsThen
+          this.octetsThen += octetsInPeriod
+          this.upload.onStatistics.invoke(
+            EFS3TransferStatistics(
+              time = OffsetDateTime.now(),
+              octetsTransferred = this.octetsThen,
+              octetsExpected = this.upload.size,
+              octetsThisPeriod = octetsInPeriod
+            )
           )
-        )
-      } catch (e: Throwable) {
-        this.logger.debug("Uncaught statistics subscriber exception: ", e)
+        } catch (e: Throwable) {
+          this.logger.debug("Uncaught statistics subscriber exception: ", e)
+        }
       }
 
       try {
-        Thread.sleep(250L)
+        Thread.sleep(100L)
       } catch (e: InterruptedException) {
         Thread.currentThread().interrupt()
       }
     }
   }
 
-  private fun executeIOThreadPutObject(
+  private fun executePutObject(
     inputStream: BoundedInputStream,
     client: S3Client
   ) {
@@ -153,25 +183,12 @@ class EFS3AMZUpload(
     val contentSHA256 = this.sha256()
     this.upload.onInformativeEvent("Local content hash: $contentSHA256")
 
-    try {
-      this.upload.onInformativeEvent("Fetching remote content hash.")
-      val head =
-        HeadObjectRequest.builder()
-          .bucket(this.upload.bucket)
-          .key(this.upload.path)
-          .checksumMode(ChecksumMode.ENABLED)
-          .build()
-
-      val r = client.headObject(head)
-      this.upload.onInformativeEvent("Remote content hash: ${r.checksumSHA256()}")
-      if (r.checksumSHA256() == contentSHA256) {
-        this.upload.onInformativeEvent("Hashes match, no upload is required.")
-        this.upload.onFileSkipped()
-        return
-      }
-    } catch (e: NoSuchKeyException) {
-      this.upload.onInformativeEvent("Remote file does not exist. Upload is required.")
+    if (!this.isUploadNecessary(client, contentSHA256)) {
+      return
     }
+
+    val metadata =
+      mapOf(Pair(this.exfilacSHA256Header, this.sha256()))
 
     val put =
       PutObjectRequest.builder()
@@ -179,6 +196,7 @@ class EFS3AMZUpload(
         .checksumSHA256(contentSHA256)
         .contentLength(this.upload.size)
         .contentType(this.upload.contentType)
+        .metadata(metadata)
         .key(this.upload.path)
         .build()
 
@@ -187,6 +205,32 @@ class EFS3AMZUpload(
     client.putObject(put, body)
     this.upload.onInformativeEvent("Uploading completed.")
     this.upload.onFileSuccessfullyUploaded()
+  }
+
+  private fun isUploadNecessary(
+    client: S3Client,
+    contentSHA256: String
+  ): Boolean {
+    try {
+      this.upload.onInformativeEvent("Fetching remote content hash.")
+      val head =
+        HeadObjectRequest.builder()
+          .bucket(this.upload.bucket)
+          .key(this.upload.path)
+          .build()
+
+      val response = client.headObject(head)
+      val remoteHash = response.metadata()[this.exfilacSHA256Header]
+      this.upload.onInformativeEvent("Remote content hash: $remoteHash")
+      if (remoteHash == contentSHA256) {
+        this.upload.onInformativeEvent("Hashes match, no upload is required.")
+        this.upload.onFileSkipped()
+        return false
+      }
+    } catch (e: NoSuchKeyException) {
+      this.upload.onInformativeEvent("Remote file does not exist. Upload is required.")
+    }
+    return true
   }
 
   private fun sha256(): String {
@@ -206,13 +250,144 @@ class EFS3AMZUpload(
     return Base64.encodeBase64String(digest.digest())
   }
 
+  private data class Part(
+    val partNumber: Int,
+    val offset: Long,
+    val size: Long
+  )
+
   private fun executeUploadMultiPart(
     client: S3Client
   ) {
-    throw IllegalStateException("Not implemented.")
+    this.upload.onInformativeEvent("Calculating local content hash.")
+    val contentSHA256 = this.sha256()
+    this.upload.onInformativeEvent("Local content hash: $contentSHA256")
+
+    if (!this.isUploadNecessary(client, contentSHA256)) {
+      return
+    }
+
+    val chunks =
+      EFS3AMZChunkSizeCalculation.calculate(
+        size = this.upload.size,
+        minimumChunkSize = this.minimumChunkSize,
+        maximumChunkCount = 900
+      )
+
+    this.upload.onInformativeEvent(
+      "Uploading as ${chunks.chunkCount} chunks of size ${chunks.chunkSize} (with a trailing chunk of size ${chunks.chunkSizeLast})."
+    )
+
+    val metadata =
+      mapOf(Pair(this.exfilacSHA256Header, this.sha256()))
+
+    val upload =
+      CreateMultipartUploadRequest.builder()
+        .bucket(this.upload.bucket)
+        .contentType(this.upload.contentType)
+        .key(this.upload.path)
+        .metadata(metadata)
+        .build()
+
+    this.upload.onInformativeEvent("Requesting multi-part upload…")
+    val uploadResponse = client.createMultipartUpload(upload)
+
+    try {
+      val completedParts =
+        mutableMapOf<Int, CompletedPart>()
+      val chunkCount =
+        chunks.chunkCount.toInt()
+
+      val parts = this.createParts(chunkCount, chunks)
+      for (part in parts.values) {
+        this.upload.onInformativeEvent("Uploading part ${part.partNumber}…")
+        this.upload.streams.invoke()
+          .use { stream ->
+            stream.skip(part.offset)
+            BoundedInputStream.builder()
+              .setInputStream(stream)
+              .setMaxCount(part.size)
+              .get()
+              .use { boundedStream ->
+                this.streamSupervised.set(boundedStream)
+
+                val uploadPartResponse =
+                  client.uploadPart(
+                    UploadPartRequest.builder()
+                      .bucket(this.upload.bucket)
+                      .contentLength(part.size)
+                      .key(this.upload.path)
+                      .partNumber(part.partNumber)
+                      .uploadId(uploadResponse.uploadId())
+                      .build(),
+                    RequestBody.fromInputStream(
+                      boundedStream,
+                      part.size
+                    )
+                  )
+
+                completedParts[part.partNumber] =
+                  CompletedPart.builder()
+                    .partNumber(part.partNumber)
+                    .eTag(uploadPartResponse.eTag())
+                    .build()
+              }
+          }
+      }
+
+      this.upload.onInformativeEvent("Completing multi-part upload…")
+      val completedUpload =
+        CompletedMultipartUpload.builder()
+          .parts(completedParts.values.sortedBy { p -> p.partNumber() })
+          .build()
+
+      client.completeMultipartUpload(
+        CompleteMultipartUploadRequest.builder()
+          .multipartUpload(completedUpload)
+          .uploadId(uploadResponse.uploadId())
+          .bucket(this.upload.bucket)
+          .key(this.upload.path)
+          .build()
+      )
+    } catch (e: Throwable) {
+      client.abortMultipartUpload(
+        AbortMultipartUploadRequest.builder()
+          .bucket(this.upload.bucket)
+          .key(this.upload.path)
+          .uploadId(uploadResponse.uploadId())
+          .build()
+      )
+      throw e
+    }
+  }
+
+  private fun createParts(
+    chunkCount: Int,
+    chunks: EFS3AMZChunkSizes
+  ): MutableMap<Int, Part> {
+    val parts = mutableMapOf<Int, Part>()
+    var offset = 0L
+    for (part0Number in 0 until chunkCount) {
+      val partAMZNumber = part0Number + 1
+      if (partAMZNumber == chunkCount && chunks.chunkSizeLast != 0L) {
+        parts[partAMZNumber] = Part(
+          partNumber = partAMZNumber,
+          offset = offset,
+          size = chunks.chunkSizeLast
+        )
+        break
+      }
+      parts[partAMZNumber] = Part(
+        partNumber = partAMZNumber,
+        offset = offset,
+        size = chunks.chunkSize
+      )
+      offset += chunks.chunkSize
+    }
+    return parts
   }
 
   override fun close() {
-    // Nothing
+    this.done.set(true)
   }
 }

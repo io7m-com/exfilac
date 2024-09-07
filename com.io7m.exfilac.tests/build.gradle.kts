@@ -13,6 +13,8 @@ dependencies {
   testImplementation(libs.opentest4j)
   testImplementation(libs.logback.core)
   testImplementation(libs.logback.classic)
+  testImplementation(libs.jqwik.api)
+  testImplementation(libs.jqwik.engine)
 
   testImplementation(libs.io7m.anethum.api)
   testImplementation(libs.io7m.blackthorne.core)
@@ -42,6 +44,7 @@ dependencies {
 
   testImplementation(libs.apache.commons.io)
   testImplementation(libs.apache.commons.lang3)
+  testImplementation(libs.apache.commons.math3)
   testImplementation(libs.kotlin.stdlib)
   testImplementation(libs.logback.android)
   testImplementation(libs.opentelemetry.api)

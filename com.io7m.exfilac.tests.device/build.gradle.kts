@@ -22,6 +22,7 @@ dependencies {
   implementation(libs.io7m.trasco.xml.schemas)
 
   implementation(libs.apache.commons.io)
+  implementation(libs.apache.commons.math3)
   implementation(libs.kotlin.stdlib)
   implementation(libs.logback.android)
   implementation(libs.opentelemetry.api)

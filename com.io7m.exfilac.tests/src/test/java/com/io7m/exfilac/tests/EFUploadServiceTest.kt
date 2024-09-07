@@ -39,6 +39,8 @@ import com.io7m.exfilac.s3_uploader.amazon.EFS3AMZUploaders
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderType
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.jattribute.core.Attributes
+import org.apache.commons.io.input.BoundedInputStream
+import org.apache.commons.io.input.InfiniteCircularInputStream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
@@ -101,6 +103,17 @@ class EFUploadServiceTest {
       endpoint = URI.create("http://localhost:9000")
     )
 
+  private val BUCKET_3 =
+    EFBucketConfiguration(
+      referenceName = EFBucketReferenceName("bucket"),
+      name = EFBucketName("bucket3"),
+      region = EFRegion("us-east-1"),
+      accessKey = EFAccessKey("9aa1e66547ca16b7"),
+      secret = EFSecretKey("d4c73cd8dfe5532966f26cad3e397652394d8030"),
+      accessStyle = EFBucketAccessStyle.PATH_STYLE,
+      endpoint = URI.create("http://localhost:9000")
+    )
+
   private val UPLOAD_0 =
     EFUploadConfiguration(
       name = EFUploadName("upload-0"),
@@ -128,6 +141,17 @@ class EFUploadServiceTest {
       name = EFUploadName("upload-2"),
       source = EFDeviceSource(URI.create("content://example")),
       bucket = this.BUCKET_2.referenceName,
+      policy = EFUploadPolicy(
+        schedule = EFUploadSchedule.EVERY_HOUR,
+        triggers = setOf()
+      )
+    )
+
+  private val UPLOAD_3 =
+    EFUploadConfiguration(
+      name = EFUploadName("upload-3"),
+      source = EFDeviceSource(URI.create("content://example")),
+      bucket = this.BUCKET_3.referenceName,
       policy = EFUploadPolicy(
         schedule = EFUploadSchedule.EVERY_HOUR,
         triggers = setOf()
@@ -200,6 +224,24 @@ class EFUploadServiceTest {
         this.contentTrees,
         this.uploader
       )
+  }
+
+  class ContentTreeFileBig(
+    override val lastModified: OffsetDateTime,
+    override val path: EFContentPath,
+    override val contentURI: URI
+  ) : EFContentFileType {
+    override val parent: EFContentDirectoryType?
+      get() = null
+    override val size: Long
+      get() = (3 * 8_388_608L) + (8_388_608L / 8)
+
+    override fun read(): InputStream {
+      return BoundedInputStream.builder()
+        .setInputStream(InfiniteCircularInputStream("HELLO!".toByteArray()))
+        .setMaxCount(this.size)
+        .get()
+    }
   }
 
   class ContentTreeFile(
@@ -475,6 +517,82 @@ class EFUploadServiceTest {
 
     this.uploads.upload(this.UPLOAD_2.name, "Manually triggered.").get()
     this.uploads.upload(this.UPLOAD_2.name, "Manually triggered.").get()
+
+    val records = mutableListOf<EFUploadRecord>()
+    val events = mutableListOf<EFUploadEventRecord>()
+    this.fetchUploadRecordsAndEvents(records, 1, events)
+
+    assertEquals("Manually triggered.", records.get(0).reason)
+    assertEquals(1, records.get(1).filesRequired)
+    assertEquals(0, records.get(1).filesFailed)
+    assertEquals(1, records.get(1).filesSkipped)
+    assertEquals(0, records.get(1).filesUploaded)
+    assertEquals(EFUploadResult.SUCCEEDED, records.get(1).result)
+
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Calculating local content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Local content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Fetching remote content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Remote content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Hashes match, no upload is required"))
+    }
+  }
+
+  /**
+   * If remote already contains a given file, it is not uploaded twice.
+   */
+
+  @Test
+  @Timeout(value = 10L, unit = TimeUnit.SECONDS)
+  fun testOneFileRedundantMultiPart() {
+    minio.createUser(
+      "someone",
+      "12345678",
+      this.BUCKET_3.accessKey,
+      this.BUCKET_3.secret
+    )
+    minio.createBucket(BUCKET_3.name)
+
+    val directory =
+      ContentTreeDirectory(
+        OffsetDateTime.now(),
+        EFContentPath(URI.create("content://xyx"), listOf("Example"))
+      )
+    val file =
+      ContentTreeFileBig(
+        OffsetDateTime.now(),
+        EFContentPath(URI.create("content://xyx"), listOf("Example", "File.txt")),
+        URI.create("content://xyx/File.txt")
+      )
+    directory.childrenField.add(file)
+    this.contentTrees.next = directory
+
+    this.database.openTransaction().use { t ->
+      t.query(EFQBucketPutType::class.java).execute(this.BUCKET_3)
+      t.query(EFQUploadConfigurationPutType::class.java).execute(this.UPLOAD_3)
+      t.commit()
+    }
+
+    this.uploads.upload(this.UPLOAD_3.name, "Manually triggered.").get()
+    this.uploads.upload(this.UPLOAD_3.name, "Manually triggered.").get()
 
     val records = mutableListOf<EFUploadRecord>()
     val events = mutableListOf<EFUploadEventRecord>()

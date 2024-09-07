@@ -288,6 +288,8 @@ class EFUploadTask(
     path: EFContentPath,
     message: String
   ) {
+    this.logger.debug("{}", message)
+
     val e = EFUploadEventRecord(
       eventID = EFUploadEventID(ULong.MIN_VALUE),
       uploadID = this.uploadRecord.get().id,
