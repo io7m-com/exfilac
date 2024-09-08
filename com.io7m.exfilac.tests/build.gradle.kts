@@ -1,4 +1,5 @@
 dependencies {
+  testImplementation(project(":com.io7m.exfilac.clock.api"))
   testImplementation(project(":com.io7m.exfilac.content_tree.api"))
   testImplementation(project(":com.io7m.exfilac.core"))
   testImplementation(project(":com.io7m.exfilac.s3_uploader.amazon"))

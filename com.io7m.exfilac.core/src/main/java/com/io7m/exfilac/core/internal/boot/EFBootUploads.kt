@@ -16,6 +16,7 @@
 
 package com.io7m.exfilac.core.internal.boot
 
+import com.io7m.exfilac.clock.api.EFClockServiceType
 import com.io7m.exfilac.content_tree.api.EFContentTreeFactoryType
 import com.io7m.exfilac.core.EFUploadStatusChanged
 import com.io7m.exfilac.core.internal.database.EFDatabaseType
@@ -36,7 +37,8 @@ class EFBootUploads(
       database = context.services.requireService(EFDatabaseType::class.java),
       contentTrees = this.contentTrees,
       statusChangedSource = this.statusChangedSource,
-      uploader = context.services.requireService(EFS3UploaderType::class.java)
+      uploader = context.services.requireService(EFS3UploaderType::class.java),
+      clock = context.services.requireService(EFClockServiceType::class.java)
     )
   }
 

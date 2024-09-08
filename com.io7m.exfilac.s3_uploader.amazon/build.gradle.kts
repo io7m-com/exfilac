@@ -1,4 +1,5 @@
 dependencies {
+  implementation(project(":com.io7m.exfilac.clock.api"))
   implementation(project(":com.io7m.exfilac.s3_uploader.api"))
   implementation(project(":com.io7m.exfilac.service.api"))
 

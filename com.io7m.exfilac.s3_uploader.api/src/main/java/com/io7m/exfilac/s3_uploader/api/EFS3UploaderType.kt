@@ -16,9 +16,13 @@
 
 package com.io7m.exfilac.s3_uploader.api
 
+import com.io7m.exfilac.clock.api.EFClockServiceType
 import com.io7m.exfilac.service.api.RPServiceType
 
 interface EFS3UploaderType : RPServiceType, AutoCloseable {
 
-  fun create(upload: EFS3UploadRequest): EFS3UploadType
+  fun create(
+    upload: EFS3UploadRequest,
+    clock: EFClockServiceType
+  ): EFS3UploadType
 }

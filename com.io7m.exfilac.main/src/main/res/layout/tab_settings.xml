@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:orientation="vertical"
-  android:background="#00ffff"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
@@ -29,4 +29,72 @@
       android:background="?android:attr/listDivider" />
   </com.google.android.material.appbar.AppBarLayout>
 
-</LinearLayout>
+  <ScrollView
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/settingsAppBarLayout">
+
+    <LinearLayout
+      android:id="@+id/settingsControlsTop"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+      <!-- Bucket name. -->
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/settingsNetworking"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/settingsUploadCellular"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/settingsNetworkingUploadCellular" />
+
+      <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/settingsUploadWIFI"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/settingsNetworkingUploadWifi" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/settingsPrivacyPolicy"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+    </LinearLayout>
+  </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

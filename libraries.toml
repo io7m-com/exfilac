@@ -171,3 +171,4 @@ androidx_viewbinding                    = { module = "androidx.databinding:viewb
 androidx_viewpager                      = { module = "androidx.viewpager:viewpager", version                         = "1.0.0" }
 androidx_viewpager2                     = { module = "androidx.viewpager2:viewpager2", version                       = "1.1.0" }
 androidx_webkit                         = { module = "androidx.webkit:webkit", version                               = "1.11.0" }
+androidx_work_runtime                   = { module = "androidx.work:work-runtime", version                           = "2.9.1" }

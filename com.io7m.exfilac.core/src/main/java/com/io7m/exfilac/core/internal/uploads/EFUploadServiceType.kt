@@ -17,6 +17,7 @@
 package com.io7m.exfilac.core.internal.uploads
 
 import com.io7m.exfilac.core.EFUploadName
+import com.io7m.exfilac.core.EFUploadReason
 import com.io7m.exfilac.core.EFUploadStatus
 import com.io7m.exfilac.core.EFUploadStatusChanged
 import com.io7m.exfilac.service.api.RPServiceType
@@ -29,7 +30,7 @@ interface EFUploadServiceType : RPServiceType, AutoCloseable {
 
   fun upload(
     name: EFUploadName,
-    reason: String
+    reason: EFUploadReason
   ): CompletableFuture<*>
 
   fun cancel(name: EFUploadName)

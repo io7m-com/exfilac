@@ -18,6 +18,8 @@ package com.io7m.exfilac.main
 
 import com.io7m.exfilac.core.EFBucketConfiguration
 import com.io7m.exfilac.core.EFBucketReferenceName
+import com.io7m.exfilac.core.EFNetworkStatus
+import com.io7m.exfilac.core.EFSettings
 import com.io7m.exfilac.core.EFState
 import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFUploadConfiguration
@@ -62,6 +64,7 @@ class ExfilacOnUI(
 
   private val logger =
     LoggerFactory.getLogger(ExfilacOnUI::class.java)
+
   private val attributes =
     Attributes.create { e -> this.logger.debug("Uncaught attribute exception: ", e) }
 
@@ -79,6 +82,10 @@ class ExfilacOnUI(
     this.attributes.withValue(EFUploadStatusChanged())
   private val stateUI: AttributeType<EFState> =
     this.attributes.withValue(EFStateBooting("", 0.0))
+  private val networkStatusUI: AttributeType<EFNetworkStatus> =
+    this.attributes.withValue(EFNetworkStatus.NETWORK_STATUS_UNAVAILABLE)
+  private val settingsUI: AttributeType<EFSettings> =
+    this.attributes.withValue(EFSettings.defaults())
 
   companion object {
     private fun <T> wrap(
@@ -96,6 +103,8 @@ class ExfilacOnUI(
     this.subscriptions.add(wrap(this.delegate.uploadStatus, this.uploadsStatusUI))
     this.subscriptions.add(wrap(this.delegate.uploads, this.uploadsUI))
     this.subscriptions.add(wrap(this.delegate.uploadsSelected, this.uploadsSelectedUI))
+    this.subscriptions.add(wrap(this.delegate.networkStatus, this.networkStatusUI))
+    this.subscriptions.add(wrap(this.delegate.settings, this.settingsUI))
   }
 
   override fun close() {
@@ -120,4 +129,10 @@ class ExfilacOnUI(
 
   override val state: AttributeReadableType<EFState> =
     this.stateUI
+
+  override val networkStatus: AttributeReadableType<EFNetworkStatus> =
+    this.networkStatusUI
+
+  override val settings: AttributeReadableType<EFSettings> =
+    this.settingsUI
 }

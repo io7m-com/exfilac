@@ -36,13 +36,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.io7m.exfilac.core.EFBucketEditModel
-import com.io7m.exfilac.core.EFBucketEditModel.EditOperation.CREATE
-import com.io7m.exfilac.core.EFBucketEditModel.EditOperation.MODIFY
 import com.io7m.exfilac.core.EFBucketName
 import com.io7m.exfilac.core.EFDeviceSource
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadEditModel
+import com.io7m.exfilac.core.EFUploadEditModel.EditOperation.CREATE
+import com.io7m.exfilac.core.EFUploadEditModel.EditOperation.MODIFY
 import com.io7m.exfilac.core.EFUploadName
 import com.io7m.exfilac.core.EFUploadPolicy
 import com.io7m.exfilac.core.EFUploadSchedule
@@ -193,7 +192,7 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
           bucket = EFUploadEditModel.bucket!!,
           policy = EFUploadPolicy(
             EFUploadEditModel.schedule,
-            EFUploadEditModel.triggers
+            EFUploadEditModel.triggers.toSet()
           )
         )
       )
@@ -270,7 +269,7 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
   }
 
   private fun validateName(): Boolean {
-    return when (EFBucketEditModel.editOperation) {
+    return when (EFUploadEditModel.editOperation) {
       CREATE -> {
         try {
           this.validateNameNonexistent(EFUploadName(this.name.text.toString().trim()))

@@ -88,4 +88,13 @@
   <string name="statusCancelling">Cancelling…</string>
   <string name="statusFailed">Failed at %s.</string>
 
+  <string name="settingsNetworking">Networking</string>
+  <string name="settingsNetworkingUploadWifi">Allow uploads on WiFi.</string>
+  <string name="settingsNetworkingUploadCellular">Allow uploads on cellular connections.</string>
+  <string name="settingsPrivacyPolicy">Privacy Policy</string>
+
+  <string name="networkStatusUnavailable">Network connectivity currently appears to be unavailable.</string>
+  <string name="networkStatusCellular">Networking is currently provided by a cellular connection.</string>
+  <string name="networkStatusWifi">Networking is currently provided by a Wi-Fi connection.</string>
+
 </resources>

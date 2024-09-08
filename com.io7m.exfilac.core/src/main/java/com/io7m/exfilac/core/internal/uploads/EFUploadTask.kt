@@ -17,6 +17,7 @@
 package com.io7m.exfilac.core.internal.uploads
 
 import com.io7m.darco.api.DDatabaseUnit
+import com.io7m.exfilac.clock.api.EFClockServiceType
 import com.io7m.exfilac.content_tree.api.EFContentDirectoryType
 import com.io7m.exfilac.content_tree.api.EFContentFileType
 import com.io7m.exfilac.content_tree.api.EFContentPath
@@ -26,6 +27,10 @@ import com.io7m.exfilac.core.EFBucketAccessStyle
 import com.io7m.exfilac.core.EFBucketConfiguration
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadName
+import com.io7m.exfilac.core.EFUploadReason
+import com.io7m.exfilac.core.EFUploadReasonManual
+import com.io7m.exfilac.core.EFUploadReasonTime
+import com.io7m.exfilac.core.EFUploadReasonTrigger
 import com.io7m.exfilac.core.EFUploadResult
 import com.io7m.exfilac.core.EFUploadStatus
 import com.io7m.exfilac.core.EFUploadStatusCancelled
@@ -34,6 +39,7 @@ import com.io7m.exfilac.core.EFUploadStatusChanged
 import com.io7m.exfilac.core.EFUploadStatusFailed
 import com.io7m.exfilac.core.EFUploadStatusRunning
 import com.io7m.exfilac.core.EFUploadStatusSucceeded
+import com.io7m.exfilac.core.EFUploadTrigger
 import com.io7m.exfilac.core.internal.EFUploadEventID
 import com.io7m.exfilac.core.internal.EFUploadEventRecord
 import com.io7m.exfilac.core.internal.EFUploadRecord
@@ -55,7 +61,6 @@ import org.slf4j.LoggerFactory
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.nio.file.Paths
-import java.time.OffsetDateTime
 import java.util.Optional
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -67,8 +72,9 @@ class EFUploadTask(
   val contentTrees: EFContentTreeFactoryType,
   val s3Uploader: EFS3UploaderType,
   val name: EFUploadName,
-  val reason: String,
-  val onStatusChanged: (EFUploadStatus) -> Unit
+  val reason: EFUploadReason,
+  val onStatusChanged: (EFUploadStatus) -> Unit,
+  val clock: EFClockServiceType,
 ) {
 
   private val uploadRecord: AtomicReference<EFUploadRecord> = AtomicReference()
@@ -116,9 +122,9 @@ class EFUploadTask(
             transaction.query(EFQUploadRecordCreateType::class.java)
               .execute(
                 EFQUploadRecordCreateParameters(
-                  timeStart = OffsetDateTime.now(),
+                  timeStart = this.clock.now(),
                   uploadName = this.name,
-                  reason = this.reason
+                  reason = reasonTextOf(this.reason)
                 )
               )
           )
@@ -130,6 +136,29 @@ class EFUploadTask(
       step.setStepFailed(this.exceptionMessage(e), e)
       this.failed.set(true)
       throw e
+    }
+  }
+
+  private fun reasonTextOf(
+    reason: EFUploadReason
+  ): String {
+    return when (reason) {
+      EFUploadReasonManual -> "Upload was triggered manually."
+      EFUploadReasonTime -> "Upload was triggered due to the time-based schedule."
+      is EFUploadReasonTrigger ->
+        when (reason.trigger) {
+          EFUploadTrigger.TRIGGER_WHEN_PHONE_CALL_ENDED -> {
+            "Upload was triggered because a phone call ended."
+          }
+
+          EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN -> {
+            "Upload was triggered because a photo was taken."
+          }
+
+          EFUploadTrigger.TRIGGER_WHEN_NETWORK_AVAILABLE -> {
+            "Upload was triggered because the network became available."
+          }
+        }
     }
   }
 
@@ -199,7 +228,7 @@ class EFUploadTask(
           }
         )
 
-      this.s3Uploader.create(uploadInfo).use { upload -> upload.execute() }
+      this.s3Uploader.create(uploadInfo, this.clock).use { upload -> upload.execute() }
       step.setStepSucceeded("OK")
     } catch (e: Throwable) {
       step.setStepFailed(this.exceptionMessage(e), e)
@@ -215,7 +244,7 @@ class EFUploadTask(
     val e = EFUploadEventRecord(
       eventID = EFUploadEventID(ULong.MIN_VALUE),
       uploadID = this.uploadRecord.get().id,
-      time = OffsetDateTime.now(),
+      time = this.clock.now(),
       message = "File was successfully uploaded.",
       file = path.asS3Path(),
       exceptionTrace = null,
@@ -237,7 +266,7 @@ class EFUploadTask(
     val e = EFUploadEventRecord(
       eventID = EFUploadEventID(ULong.MIN_VALUE),
       uploadID = this.uploadRecord.get().id,
-      time = OffsetDateTime.now(),
+      time = this.clock.now(),
       message = "File has already been uploaded and so will not be uploaded again.",
       file = path.asS3Path(),
       exceptionTrace = null,
@@ -260,7 +289,7 @@ class EFUploadTask(
     val e = EFUploadEventRecord(
       eventID = EFUploadEventID(ULong.MIN_VALUE),
       uploadID = this.uploadRecord.get().id,
-      time = OffsetDateTime.now(),
+      time = this.clock.now(),
       message = exception.message ?: exception.javaClass.name,
       file = path.asS3Path(),
       exceptionTrace = this.exceptionTextOf(exception),
@@ -293,7 +322,7 @@ class EFUploadTask(
     val e = EFUploadEventRecord(
       eventID = EFUploadEventID(ULong.MIN_VALUE),
       uploadID = this.uploadRecord.get().id,
-      time = OffsetDateTime.now(),
+      time = this.clock.now(),
       message = message,
       file = path.asS3Path(),
       exceptionTrace = null,
@@ -460,7 +489,7 @@ class EFUploadTask(
   private fun finish() {
     if (this.failed.get()) {
       this.uploadRecord.getAndUpdate { r ->
-        r.copy(result = EFUploadResult.FAILED, timeEnd = OffsetDateTime.now())
+        r.copy(result = EFUploadResult.FAILED, timeEnd = this.clock.now())
       }
       this.database.openTransaction().use { transaction ->
         transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
@@ -472,7 +501,7 @@ class EFUploadTask(
         EFUploadStatusFailed(
           name = this.name,
           result = this.taskRecorder.toTask(),
-          failedAt = OffsetDateTime.now()
+          failedAt = this.clock.now()
         )
       )
       this.statusChangedSource.set(EFUploadStatusChanged())
@@ -480,7 +509,7 @@ class EFUploadTask(
     }
 
     this.uploadRecord.getAndUpdate { r ->
-      r.copy(result = EFUploadResult.SUCCEEDED, timeEnd = OffsetDateTime.now())
+      r.copy(result = EFUploadResult.SUCCEEDED, timeEnd = this.clock.now())
     }
     this.database.openTransaction().use { transaction ->
       transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
@@ -491,7 +520,7 @@ class EFUploadTask(
     this.onStatusChanged(
       EFUploadStatusSucceeded(
         name = this.name,
-        completedAt = OffsetDateTime.now()
+        completedAt = this.clock.now()
       )
     )
     this.statusChangedSource.set(EFUploadStatusChanged())
@@ -501,7 +530,7 @@ class EFUploadTask(
     this.taskRecorder.setTaskSucceeded("Cancelled", TRNoResult.NO_RESULT)
 
     this.uploadRecord.getAndUpdate { r ->
-      r.copy(result = EFUploadResult.CANCELLED, timeEnd = OffsetDateTime.now())
+      r.copy(result = EFUploadResult.CANCELLED, timeEnd = this.clock.now())
     }
     this.database.openTransaction().use { transaction ->
       transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
@@ -511,7 +540,7 @@ class EFUploadTask(
     this.onStatusChanged(
       EFUploadStatusCancelled(
         name = this.name,
-        cancelledAt = OffsetDateTime.now()
+        cancelledAt = this.clock.now()
       )
     )
     this.statusChangedSource.set(EFUploadStatusChanged())
@@ -521,7 +550,7 @@ class EFUploadTask(
     this.taskRecorder.setTaskFailed(this.exceptionMessage(e), Optional.of(e))
 
     this.uploadRecord.getAndUpdate { r ->
-      r.copy(result = EFUploadResult.FAILED, timeEnd = OffsetDateTime.now())
+      r.copy(result = EFUploadResult.FAILED, timeEnd = this.clock.now())
     }
     this.database.openTransaction().use { transaction ->
       transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
@@ -532,7 +561,7 @@ class EFUploadTask(
       EFUploadStatusFailed(
         name = this.name,
         result = this.taskRecorder.toTask(),
-        failedAt = OffsetDateTime.now()
+        failedAt = this.clock.now()
       )
     )
     this.statusChangedSource.set(EFUploadStatusChanged())

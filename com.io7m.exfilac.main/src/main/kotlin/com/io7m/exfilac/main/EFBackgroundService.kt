@@ -1,0 +1,70 @@
+/*
+ * Copyright © 2024 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+ * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+package com.io7m.exfilac.main
+
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
+import com.io7m.exfilac.core.EFUploadReasonTime
+import org.slf4j.LoggerFactory
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+
+class EFBackgroundService : Service() {
+
+  private val logger =
+    LoggerFactory.getLogger(EFBackgroundService::class.java)
+
+  private val executor =
+    Executors.newSingleThreadScheduledExecutor { r ->
+      val thread = Thread(r)
+      thread.isDaemon = true
+      thread.name = "com.io7m.exfilac.main.background_service[${thread.id}]"
+      thread.priority = Thread.MIN_PRIORITY
+      thread
+    }
+
+  private val started =
+    AtomicBoolean(false)
+
+  override fun onStartCommand(
+    intent: Intent?,
+    flags: Int,
+    startId: Int
+  ): Int {
+    if (this.started.compareAndSet(false, true)) {
+      this.logger.debug("Starting background service…")
+      this.executor.scheduleWithFixedDelay(this::tick, 5L, 5L, TimeUnit.MINUTES)
+    } else {
+      this.logger.debug("Ignoring redundant request to start background service.")
+    }
+    return super.onStartCommand(intent, flags, startId)
+  }
+
+  private fun tick() {
+    try {
+      EFApplication.application.exfilac.uploadStartAllAsNecessary(EFUploadReasonTime)
+    } catch (e: Throwable) {
+      this.logger.error("Background service error: ", e)
+    }
+  }
+
+  override fun onBind(intent: Intent?): IBinder? {
+    return null
+  }
+}

@@ -20,6 +20,8 @@ import com.io7m.exfilac.core.EFSecretKey
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadName
 import com.io7m.exfilac.core.EFUploadPolicy
+import com.io7m.exfilac.core.EFUploadReason
+import com.io7m.exfilac.core.EFUploadReasonManual
 import com.io7m.exfilac.core.EFUploadResult
 import com.io7m.exfilac.core.EFUploadSchedule
 import com.io7m.exfilac.core.EFUploadStatusChanged
@@ -219,10 +221,11 @@ class EFUploadServiceTest {
 
     this.uploads =
       EFUploadService(
-        this.database,
-        this.status,
-        this.contentTrees,
-        this.uploader
+        database = this.database,
+        statusChangedSource = this.status,
+        contentTrees = this.contentTrees,
+        uploader = this.uploader,
+        clock = EFClockMock
       )
   }
 
@@ -289,7 +292,7 @@ class EFUploadServiceTest {
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testUploadConfigurationDoesNotExist() {
     val ex = assertThrows<Exception> {
-      this.uploads.upload(EFUploadName("nonexistent"), "Manually triggered.")
+      this.uploads.upload(EFUploadName("nonexistent"), EFUploadReasonManual)
         .get()
     }
     assertTrue(ex.message!!.contains("No such upload configuration"))
@@ -310,13 +313,13 @@ class EFUploadServiceTest {
       t.commit()
     }
 
-    this.uploads.upload(this.UPLOAD_0.name, "Manually triggered.").get()
+    this.uploads.upload(this.UPLOAD_0.name, EFUploadReasonManual).get()
 
     val records = mutableListOf<EFUploadRecord>()
     val events = mutableListOf<EFUploadEventRecord>()
     this.fetchUploadRecordsAndEvents(records, 0, events)
 
-    assertEquals("Manually triggered.", records.get(0).reason)
+    assertEquals("Upload was triggered manually.", records.get(0).reason)
     assertEquals(0, records.get(0).filesRequired)
     assertEquals(0, records.get(0).filesFailed)
     assertEquals(0, records.get(0).filesSkipped)
@@ -360,13 +363,13 @@ class EFUploadServiceTest {
       t.commit()
     }
 
-    this.uploads.upload(this.UPLOAD_0.name, "Manually triggered.").get()
+    this.uploads.upload(this.UPLOAD_0.name, EFUploadReasonManual).get()
 
     val records = mutableListOf<EFUploadRecord>()
     val events = mutableListOf<EFUploadEventRecord>()
     this.fetchUploadRecordsAndEvents(records, 0, events)
 
-    assertEquals("Manually triggered.", records.get(0).reason)
+    assertEquals("Upload was triggered manually.", records.get(0).reason)
     assertEquals(1, records.get(0).filesRequired)
     assertEquals(1, records.get(0).filesFailed)
     assertEquals(0, records.get(0).filesSkipped)
@@ -430,13 +433,13 @@ class EFUploadServiceTest {
       t.commit()
     }
 
-    this.uploads.upload(this.UPLOAD_1.name, "Manually triggered.").get()
+    this.uploads.upload(this.UPLOAD_1.name, EFUploadReasonManual).get()
 
     val records = mutableListOf<EFUploadRecord>()
     val events = mutableListOf<EFUploadEventRecord>()
     this.fetchUploadRecordsAndEvents(records, 0, events)
 
-    assertEquals("Manually triggered.", records.get(0).reason)
+    assertEquals("Upload was triggered manually.", records.get(0).reason)
     assertEquals(1, records.get(0).filesRequired)
     assertEquals(0, records.get(0).filesFailed)
     assertEquals(0, records.get(0).filesSkipped)
@@ -515,14 +518,14 @@ class EFUploadServiceTest {
       t.commit()
     }
 
-    this.uploads.upload(this.UPLOAD_2.name, "Manually triggered.").get()
-    this.uploads.upload(this.UPLOAD_2.name, "Manually triggered.").get()
+    this.uploads.upload(this.UPLOAD_2.name, EFUploadReasonManual).get()
+    this.uploads.upload(this.UPLOAD_2.name, EFUploadReasonManual).get()
 
     val records = mutableListOf<EFUploadRecord>()
     val events = mutableListOf<EFUploadEventRecord>()
     this.fetchUploadRecordsAndEvents(records, 1, events)
 
-    assertEquals("Manually triggered.", records.get(0).reason)
+    assertEquals("Upload was triggered manually.", records.get(0).reason)
     assertEquals(1, records.get(1).filesRequired)
     assertEquals(0, records.get(1).filesFailed)
     assertEquals(1, records.get(1).filesSkipped)
@@ -591,14 +594,14 @@ class EFUploadServiceTest {
       t.commit()
     }
 
-    this.uploads.upload(this.UPLOAD_3.name, "Manually triggered.").get()
-    this.uploads.upload(this.UPLOAD_3.name, "Manually triggered.").get()
+    this.uploads.upload(this.UPLOAD_3.name, EFUploadReasonManual).get()
+    this.uploads.upload(this.UPLOAD_3.name, EFUploadReasonManual).get()
 
     val records = mutableListOf<EFUploadRecord>()
     val events = mutableListOf<EFUploadEventRecord>()
     this.fetchUploadRecordsAndEvents(records, 1, events)
 
-    assertEquals("Manually triggered.", records.get(0).reason)
+    assertEquals("Upload was triggered manually.", records.get(0).reason)
     assertEquals(1, records.get(1).filesRequired)
     assertEquals(0, records.get(1).filesFailed)
     assertEquals(1, records.get(1).filesSkipped)
@@ -642,7 +645,7 @@ class EFUploadServiceTest {
         t.query(EFQUploadRecordListType::class.java)
           .execute(
             EFQUploadRecordListParameters(
-              OffsetDateTime.now().minusYears(1),
+              EFClockMock.now().minusYears(1),
               1000
             )
           )
@@ -652,7 +655,7 @@ class EFUploadServiceTest {
           .execute(
             EFQUploadEventRecordListParameters(
               records.get(recordForEvents).id,
-              OffsetDateTime.now().minusYears(1),
+              EFClockMock.now().minusYears(1),
               1000
             )
           )

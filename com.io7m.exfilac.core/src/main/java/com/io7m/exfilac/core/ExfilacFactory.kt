@@ -16,6 +16,7 @@
 
 package com.io7m.exfilac.core
 
+import com.io7m.exfilac.clock.api.EFClockServiceType
 import com.io7m.exfilac.content_tree.api.EFContentTreeFactoryType
 import com.io7m.exfilac.core.internal.Exfilac
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderFactoryType
@@ -25,11 +26,13 @@ object ExfilacFactory : ExfilacFactoryType {
   override fun open(
     contentTrees: EFContentTreeFactoryType,
     s3Uploaders: EFS3UploaderFactoryType,
+    clock: EFClockServiceType,
     dataDirectory: Path
   ): ExfilacType {
     return Exfilac.open(
       contentTrees = contentTrees,
       s3Uploaders = s3Uploaders,
+      clock = clock,
       dataDirectory = dataDirectory
     )
   }

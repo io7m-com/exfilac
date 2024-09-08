@@ -17,9 +17,12 @@
 package com.io7m.exfilac.core.internal
 
 import com.io7m.darco.api.DDatabaseUnit
+import com.io7m.exfilac.clock.api.EFClockServiceType
 import com.io7m.exfilac.content_tree.api.EFContentTreeFactoryType
 import com.io7m.exfilac.core.EFBucketConfiguration
 import com.io7m.exfilac.core.EFBucketReferenceName
+import com.io7m.exfilac.core.EFNetworkStatus
+import com.io7m.exfilac.core.EFSettings
 import com.io7m.exfilac.core.EFState
 import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFStateBucketEditing
@@ -27,9 +30,15 @@ import com.io7m.exfilac.core.EFStateReady
 import com.io7m.exfilac.core.EFStateUploadConfigurationEditing
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadName
+import com.io7m.exfilac.core.EFUploadReason
+import com.io7m.exfilac.core.EFUploadReasonManual
+import com.io7m.exfilac.core.EFUploadReasonTime
+import com.io7m.exfilac.core.EFUploadReasonTrigger
+import com.io7m.exfilac.core.EFUploadSchedule
 import com.io7m.exfilac.core.EFUploadStatus
 import com.io7m.exfilac.core.EFUploadStatusChanged
 import com.io7m.exfilac.core.EFUploadStatusNone
+import com.io7m.exfilac.core.EFUploadTrigger
 import com.io7m.exfilac.core.ExfilacType
 import com.io7m.exfilac.core.internal.boot.EFBootContextType
 import com.io7m.exfilac.core.internal.boot.EFBootS3Uploader
@@ -40,11 +49,14 @@ import com.io7m.exfilac.core.internal.database.EFDatabaseType
 import com.io7m.exfilac.core.internal.database.EFQBucketDeleteType
 import com.io7m.exfilac.core.internal.database.EFQBucketListType
 import com.io7m.exfilac.core.internal.database.EFQBucketPutType
+import com.io7m.exfilac.core.internal.database.EFQSettingsGetType
+import com.io7m.exfilac.core.internal.database.EFQSettingsPutType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationDeleteType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationListType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationPutType
 import com.io7m.exfilac.core.internal.uploads.EFUploadServiceType
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderFactoryType
+import com.io7m.exfilac.service.api.RPServiceDirectory
 import com.io7m.exfilac.service.api.RPServiceType
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
@@ -56,8 +68,12 @@ import com.io7m.taskrecorder.core.TRNoResult
 import com.io7m.taskrecorder.core.TRTaskRecorder
 import org.slf4j.LoggerFactory
 import java.nio.file.Path
+import java.time.Duration
+import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
@@ -69,6 +85,7 @@ internal class Exfilac private constructor(
   private val dataDirectory: Path,
   private val contentTrees: EFContentTreeFactoryType,
   private val s3Uploaders: EFS3UploaderFactoryType,
+  private val clock: EFClockServiceType
 ) : ExfilacType {
 
   private val attributes =
@@ -85,6 +102,20 @@ internal class Exfilac private constructor(
     this.attributes.withValue(setOf())
   private val statusChangedSource: AttributeType<EFUploadStatusChanged> =
     this.attributes.withValue(EFUploadStatusChanged())
+  private val uploadsLastRan =
+    ConcurrentHashMap<EFUploadName, OffsetDateTime>()
+  private val networkStatusSource: AttributeType<EFNetworkStatus> =
+    this.attributes.withValue(EFNetworkStatus.NETWORK_STATUS_UNAVAILABLE)
+  private val settingsSource: AttributeType<EFSettings> =
+    this.attributes.withValue(EFSettings.defaults())
+
+  init {
+    this.resources.add(
+      this.networkStatusSource.subscribe { oldValue, newValue ->
+        this.onNetworkStatusChanged(oldValue, newValue)
+      }
+    )
+  }
 
   @Volatile
   private var uploadService: EFUploadServiceType? = null
@@ -93,7 +124,7 @@ internal class Exfilac private constructor(
   private var database: EFDatabaseType? = null
 
   @Volatile
-  private var serviceDirectory: com.io7m.exfilac.service.api.RPServiceDirectory? = null
+  private var serviceDirectory: RPServiceDirectory? = null
 
   companion object {
 
@@ -103,6 +134,7 @@ internal class Exfilac private constructor(
     fun open(
       contentTrees: EFContentTreeFactoryType,
       s3Uploaders: EFS3UploaderFactoryType,
+      clock: EFClockServiceType,
       dataDirectory: Path,
     ): ExfilacType {
       val resources =
@@ -133,7 +165,8 @@ internal class Exfilac private constructor(
         commandExecutor = commandExecutor,
         dataDirectory = dataDirectory,
         contentTrees = contentTrees,
-        s3Uploaders = s3Uploaders
+        s3Uploaders = s3Uploaders,
+        clock = clock
       )
 
       commandExecutor.execute { controller.boot() }
@@ -148,7 +181,9 @@ internal class Exfilac private constructor(
     val progress =
       AtomicReference(0.0)
     val services =
-      com.io7m.exfilac.service.api.RPServiceDirectory()
+      RPServiceDirectory()
+
+    services.register(EFClockServiceType::class.java, this.clock)
 
     val bootContext =
       object : EFBootContextType {
@@ -205,6 +240,10 @@ internal class Exfilac private constructor(
       this.uploadsSource.set(
         transaction.query(EFQUploadConfigurationListType::class.java)
           .execute(DDatabaseUnit.UNIT),
+      )
+      this.settingsSource.set(
+        transaction.query(EFQSettingsGetType::class.java)
+          .execute(DDatabaseUnit.UNIT)
       )
     }
   }
@@ -440,12 +479,172 @@ internal class Exfilac private constructor(
 
   override fun uploadStart(
     name: EFUploadName,
-    reason: String
+    reason: EFUploadReason
   ): CompletableFuture<*> {
-    return this.uploadService?.upload(name, reason) ?: CompletableFuture.completedFuture(Unit)
+    val future =
+      this.uploadService?.upload(name, reason)
+        ?: CompletableFuture.completedFuture(Unit)
+
+    future.thenRun { this.uploadsLastRan[name] = this.clock.now() }
+    return future
   }
 
   override fun uploadCancel(name: EFUploadName) {
     this.uploadService?.cancel(name)
+  }
+
+  override fun uploadStartAllAsNecessary(
+    reason: EFUploadReason
+  ): CompletableFuture<*> {
+    return this.executeCommand {
+      for (upload in this.uploads.get()) {
+        if (this.uploadShouldRun(upload, reason, this.uploadsLastRan[upload.name])) {
+          this.uploadStart(upload.name, reason)
+        }
+      }
+    }
+  }
+
+  override val networkStatus: AttributeReadableType<EFNetworkStatus>
+    get() = this.networkStatusSource
+
+  override fun networkStatusSet(status: EFNetworkStatus) {
+    this.networkStatusSource.set(status)
+  }
+
+  override val settings: AttributeReadableType<EFSettings>
+    get() = this.settingsSource
+
+  override fun settingsUpdate(settings: EFSettings): CompletableFuture<*> {
+    return this.executeDatabase {
+      this.database?.openTransaction()?.use { transaction ->
+        transaction.query(EFQSettingsPutType::class.java).execute(settings)
+        transaction.commit()
+        this.settingsSource.set(settings)
+      }
+    }
+  }
+
+  private fun uploadPermittedByNetworkStatus(): Boolean {
+    val networkNow =
+      this.networkStatus.get()
+    val settingsNow =
+      this.settings.get()
+
+    return when (networkNow) {
+      EFNetworkStatus.NETWORK_STATUS_UNAVAILABLE -> {
+        false
+      }
+
+      EFNetworkStatus.NETWORK_STATUS_CELLULAR -> {
+        settingsNow.networking.uploadOnCellular
+      }
+
+      EFNetworkStatus.NETWORK_STATUS_WIFI -> {
+        settingsNow.networking.uploadOnWifi
+      }
+    }
+  }
+
+  private fun uploadShouldRun(
+    upload: EFUploadConfiguration,
+    reason: EFUploadReason,
+    timeLast: OffsetDateTime?
+  ): Boolean {
+    if (reason == EFUploadReasonManual) {
+      return true
+    }
+
+    if (!uploadPermittedByNetworkStatus()) {
+      return false
+    }
+
+    return when (reason) {
+      EFUploadReasonManual -> true
+      EFUploadReasonTime -> {
+        when (upload.policy.schedule) {
+          EFUploadSchedule.EVERY_FIVE_MINUTES ->
+            this.timeSatisfies(timeLast, Duration.of(5L, ChronoUnit.MINUTES))
+
+          EFUploadSchedule.EVERY_TEN_MINUTES ->
+            this.timeSatisfies(timeLast, Duration.of(10L, ChronoUnit.MINUTES))
+
+          EFUploadSchedule.EVERY_TWENTY_MINUTES ->
+            this.timeSatisfies(timeLast, Duration.of(20L, ChronoUnit.MINUTES))
+
+          EFUploadSchedule.EVERY_THIRTY_MINUTES ->
+            this.timeSatisfies(timeLast, Duration.of(30L, ChronoUnit.MINUTES))
+
+          EFUploadSchedule.EVERY_HOUR ->
+            this.timeSatisfies(timeLast, Duration.of(60L, ChronoUnit.MINUTES))
+
+          EFUploadSchedule.ONLY_ON_TRIGGERS,
+          EFUploadSchedule.ONLY_MANUALLY -> false
+        }
+      }
+
+      is EFUploadReasonTrigger -> {
+        upload.policy.triggers.contains(reason.trigger)
+      }
+    }
+  }
+
+  private fun timeSatisfies(
+    timeLast: OffsetDateTime?,
+    duration: Duration
+  ): Boolean {
+    if (timeLast != null) {
+      val timeNow = this.clock.now()
+      return timeLast.isBefore(timeNow.minus(duration))
+    }
+    return true
+  }
+
+  private fun onNetworkStatusChanged(
+    oldValue: EFNetworkStatus,
+    newValue: EFNetworkStatus
+  ) {
+    when (oldValue) {
+      /*
+       * If the network was unavailable, then moving to any network type is considered
+       * "becoming available".
+       */
+
+      EFNetworkStatus.NETWORK_STATUS_UNAVAILABLE -> {
+        when (newValue) {
+          EFNetworkStatus.NETWORK_STATUS_UNAVAILABLE -> Unit
+          EFNetworkStatus.NETWORK_STATUS_CELLULAR,
+          EFNetworkStatus.NETWORK_STATUS_WIFI -> {
+            this.uploadStartAllAsNecessary(
+              EFUploadReasonTrigger(EFUploadTrigger.TRIGGER_WHEN_NETWORK_AVAILABLE)
+            )
+          }
+        }
+      }
+
+      /*
+       * If the network was cellular, then moving to wifi is considered "becoming available".
+       */
+
+      EFNetworkStatus.NETWORK_STATUS_CELLULAR -> {
+        when (newValue) {
+          EFNetworkStatus.NETWORK_STATUS_UNAVAILABLE -> Unit
+          EFNetworkStatus.NETWORK_STATUS_CELLULAR -> Unit
+          EFNetworkStatus.NETWORK_STATUS_WIFI -> {
+            this.uploadStartAllAsNecessary(
+              EFUploadReasonTrigger(EFUploadTrigger.TRIGGER_WHEN_NETWORK_AVAILABLE)
+            )
+          }
+        }
+      }
+
+      /*
+       * If the network was wifi, then there are no state changes considered "becoming available".
+       */
+
+      EFNetworkStatus.NETWORK_STATUS_WIFI -> {
+        Unit
+      }
+    }
   }
 }

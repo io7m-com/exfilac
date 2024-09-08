@@ -16,6 +16,7 @@
 
 package com.io7m.exfilac.s3_uploader.amazon
 
+import com.io7m.exfilac.clock.api.EFClockServiceType
 import com.io7m.exfilac.s3_uploader.api.EFS3TransferStatistics
 import com.io7m.exfilac.s3_uploader.api.EFS3UploadRequest
 import com.io7m.exfilac.s3_uploader.api.EFS3UploadType
@@ -39,7 +40,6 @@ import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.UploadPartR
 import org.apache.commons.io.input.BoundedInputStream
 import org.slf4j.LoggerFactory
 import java.security.MessageDigest
-import java.time.OffsetDateTime
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -47,7 +47,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 class EFS3AMZUpload(
-  private val upload: EFS3UploadRequest
+  private val upload: EFS3UploadRequest,
+  private val clock: EFClockServiceType,
 ) : EFS3UploadType {
   private val logger =
     LoggerFactory.getLogger(EFS3AMZUpload::class.java)
@@ -156,7 +157,7 @@ class EFS3AMZUpload(
           this.octetsThen += octetsInPeriod
           this.upload.onStatistics.invoke(
             EFS3TransferStatistics(
-              time = OffsetDateTime.now(),
+              time = this.clock.now(),
               octetsTransferred = this.octetsThen,
               octetsExpected = this.upload.size,
               octetsThisPeriod = octetsInPeriod
@@ -275,7 +276,7 @@ class EFS3AMZUpload(
       )
 
     this.upload.onInformativeEvent(
-      "Uploading as ${chunks.chunkCount} chunks of size ${chunks.chunkSize} (with a trailing chunk of size ${chunks.chunkSizeLast})."
+      "Uploading as ${chunks.chunkCount} chunks of size ${chunks.chunkSize}."
     )
 
     val metadata =
@@ -369,14 +370,6 @@ class EFS3AMZUpload(
     var offset = 0L
     for (part0Number in 0 until chunkCount) {
       val partAMZNumber = part0Number + 1
-      if (partAMZNumber == chunkCount && chunks.chunkSizeLast != 0L) {
-        parts[partAMZNumber] = Part(
-          partNumber = partAMZNumber,
-          offset = offset,
-          size = chunks.chunkSizeLast
-        )
-        break
-      }
       parts[partAMZNumber] = Part(
         partNumber = partAMZNumber,
         offset = offset,

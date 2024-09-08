@@ -18,6 +18,5 @@ package com.io7m.exfilac.s3_uploader.amazon
 
 data class EFS3AMZChunkSizes(
   val chunkCount: Long,
-  val chunkSize: Long,
-  val chunkSizeLast: Long
+  val chunkSize: Long
 )

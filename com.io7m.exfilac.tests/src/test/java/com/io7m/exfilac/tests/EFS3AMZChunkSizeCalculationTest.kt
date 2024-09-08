@@ -149,9 +149,5 @@ class EFS3AMZChunkSizeCalculationTest {
       r.chunkCount <= maxChunkCount,
       "Chunk count ${r.chunkCount} must be <= $maxChunkCount"
     )
-    assertTrue(
-      (r.chunkCount * r.chunkSize) + r.chunkSizeLast == size,
-      "(${r.chunkCount} * ${r.chunkSize}) + ${r.chunkSizeLast} == $size"
-    )
   }
 }

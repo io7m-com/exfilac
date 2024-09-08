@@ -16,6 +16,7 @@
 
 package com.io7m.exfilac.core
 
+import com.io7m.exfilac.clock.api.EFClockServiceType
 import com.io7m.exfilac.content_tree.api.EFContentTreeFactoryType
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderFactoryType
 import java.nio.file.Path
@@ -24,6 +25,7 @@ interface ExfilacFactoryType {
   fun open(
     contentTrees: EFContentTreeFactoryType,
     s3Uploaders: EFS3UploaderFactoryType,
+    clock: EFClockServiceType,
     dataDirectory: Path
   ): ExfilacType
 }

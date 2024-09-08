@@ -50,6 +50,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "com.io7m.exfilac"
 
+include(":com.io7m.exfilac.clock.api")
 include(":com.io7m.exfilac.content_tree.api")
 include(":com.io7m.exfilac.content_tree.device")
 include(":com.io7m.exfilac.core")

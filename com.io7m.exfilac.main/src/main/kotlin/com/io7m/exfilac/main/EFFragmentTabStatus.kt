@@ -20,12 +20,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.MaterialToolbar
+import com.io7m.exfilac.core.EFNetworkStatus
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
@@ -36,9 +39,11 @@ class EFFragmentTabStatus : Fragment() {
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
-  private lateinit var emptyView: ViewGroup
   private lateinit var adapter: EFStatusAdapter
+  private lateinit var emptyView: ViewGroup
   private lateinit var listView: RecyclerView
+  private lateinit var statusIcon: ImageView
+  private lateinit var statusText: TextView
   private lateinit var toolbar: MaterialToolbar
 
   override fun onCreateView(
@@ -54,6 +59,10 @@ class EFFragmentTabStatus : Fragment() {
       view.findViewById(R.id.statusListView)
     this.emptyView =
       view.findViewById(R.id.statusListEmpty)
+    this.statusIcon =
+      view.findViewById(R.id.statusNetworkIcon)
+    this.statusText =
+      view.findViewById(R.id.statusNetworkText)
 
     this.listView.layoutManager = LinearLayoutManager(view.context)
     this.listView.setHasFixedSize(true)
@@ -80,6 +89,31 @@ class EFFragmentTabStatus : Fragment() {
         this.onUploadStatusChanged()
       }
     )
+    this.subscriptions.add(
+      EFApplication.application.exfilac.networkStatus.subscribe { _, newValue ->
+        this.onNetworkStatusChanged(newValue)
+      }
+    )
+  }
+
+  @UiThread
+  private fun onNetworkStatusChanged(newValue: EFNetworkStatus) {
+    EFUIThread.checkIsUIThread()
+
+    when (newValue) {
+      EFNetworkStatus.NETWORK_STATUS_UNAVAILABLE -> {
+        this.statusIcon.setImageResource(R.drawable.network_none_16)
+        this.statusText.setText(R.string.networkStatusUnavailable)
+      }
+      EFNetworkStatus.NETWORK_STATUS_CELLULAR -> {
+        this.statusIcon.setImageResource(R.drawable.network_cellular_16)
+        this.statusText.setText(R.string.networkStatusCellular)
+      }
+      EFNetworkStatus.NETWORK_STATUS_WIFI -> {
+        this.statusIcon.setImageResource(R.drawable.network_wifi_16)
+        this.statusText.setText(R.string.networkStatusWifi)
+      }
+    }
   }
 
   @UiThread

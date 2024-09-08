@@ -24,6 +24,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.io7m.exfilac.core.EFUploadName
+import com.io7m.exfilac.core.EFUploadReasonManual
 import com.io7m.exfilac.core.EFUploadStatusCancelled
 import com.io7m.exfilac.core.EFUploadStatusCancelling
 import com.io7m.exfilac.core.EFUploadStatusFailed
@@ -110,10 +111,7 @@ class EFStatusAdapter(
     private fun executeStartOrCancel() {
       when (this.onClick) {
         OnClick.START -> {
-          EFApplication.application.exfilac.uploadStart(
-            this.uploadName,
-            EFApplication.application.getString(R.string.uploadStartedManually)
-          )
+          EFApplication.application.exfilac.uploadStart(this.uploadName, EFUploadReasonManual)
         }
 
         OnClick.CANCEL -> {
@@ -161,10 +159,7 @@ class EFStatusAdapter(
           this.onClick = OnClick.START
 
           this.startCancel.setOnClickListener {
-            EFApplication.application.exfilac.uploadStart(
-              status.name,
-              EFApplication.application.getString(R.string.uploadStartedManually)
-            )
+            EFApplication.application.exfilac.uploadStart(status.name, EFUploadReasonManual)
           }
 
           this.description.text =
@@ -210,10 +205,7 @@ class EFStatusAdapter(
           this.onClick = OnClick.START
 
           this.startCancel.setOnClickListener {
-            EFApplication.application.exfilac.uploadStart(
-              status.name,
-              EFApplication.application.getString(R.string.uploadStartedManually)
-            )
+            EFApplication.application.exfilac.uploadStart(status.name, EFUploadReasonManual)
           }
 
           this.description.text =

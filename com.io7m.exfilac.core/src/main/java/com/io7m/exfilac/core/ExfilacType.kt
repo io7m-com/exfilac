@@ -73,8 +73,20 @@ interface ExfilacType : AutoCloseable {
 
   fun uploadStart(
     name: EFUploadName,
-    reason: String
+    reason: EFUploadReason
   ): CompletableFuture<*>
 
   fun uploadCancel(name: EFUploadName)
+
+  fun uploadStartAllAsNecessary(
+    reason: EFUploadReason
+  ): CompletableFuture<*>
+
+  val networkStatus: AttributeReadableType<EFNetworkStatus>
+
+  fun networkStatusSet(status: EFNetworkStatus)
+
+  val settings: AttributeReadableType<EFSettings>
+
+  fun settingsUpdate(settings: EFSettings): CompletableFuture<*>
 }

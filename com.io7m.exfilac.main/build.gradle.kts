@@ -1,4 +1,5 @@
 dependencies {
+  implementation(project(":com.io7m.exfilac.clock.api"))
   implementation(project(":com.io7m.exfilac.content_tree.api"))
   implementation(project(":com.io7m.exfilac.content_tree.device"))
   implementation(project(":com.io7m.exfilac.core"))
@@ -26,7 +27,6 @@ dependencies {
   implementation(libs.io7m.trasco.xml.schemas)
 
   implementation(libs.apache.commons.io)
-  implementation(libs.apache.commons.math3)
   implementation(libs.kotlin.stdlib)
   implementation(libs.logback.android)
   implementation(libs.opentelemetry.api)

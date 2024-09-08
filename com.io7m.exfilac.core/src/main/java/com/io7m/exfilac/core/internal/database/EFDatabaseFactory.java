@@ -80,6 +80,8 @@ public final class EFDatabaseFactory extends DSDatabaseFactory<
       EFQBucketDelete.provider(),
       EFQBucketList.provider(),
       EFQBucketPut.provider(),
+      EFQSettingsGet.provider(),
+      EFQSettingsPut.provider(),
       EFQUploadConfigurationDelete.provider(),
       EFQUploadConfigurationList.provider(),
       EFQUploadConfigurationPut.provider(),

@@ -16,12 +16,6 @@
 
 package com.io7m.exfilac.s3_uploader.amazon
 
-import org.apache.commons.math3.optim.MaxEval
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType
-import org.apache.commons.math3.optim.univariate.BrentOptimizer
-import org.apache.commons.math3.optim.univariate.SearchInterval
-import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction
-
 object EFS3AMZChunkSizeCalculation {
 
   fun calculate(
@@ -36,39 +30,14 @@ object EFS3AMZChunkSizeCalculation {
       "Minimum chunk size $minimumChunkSize must be <= size $size"
     }
 
-    fun chunkSize(chunkCount: Long): Long {
-      return size / chunkCount
-    }
-    fun chunkSizeReal(chunkCount: Double): Double {
-      return chunkSize(chunkCount.toLong()).toDouble()
-    }
-
-    val optimizer = BrentOptimizer(1.0, 1.0)
-
-    val upperBound = Math.min(size.toDouble() / minimumChunkSize.toDouble(), maximumChunkCount.toDouble())
-    val lowerBound =
-      if (upperBound == 1.0) {
-        0.9999
-      } else {
-        1.0
-      }
-
-    val o = optimizer.optimize(
-      GoalType.MINIMIZE,
-      MaxEval(1000),
-      SearchInterval(lowerBound, upperBound, upperBound),
-      UnivariateObjectiveFunction { x -> chunkSizeReal(x) }
-    )
-
-    val resultChunkCount =
-      o.point.toLong()
-    val resultChunkSize =
-      size / resultChunkCount
+    val chunkSize =
+      Math.max(size / maximumChunkCount, minimumChunkSize)
+    val chunkCount =
+      size / chunkSize
 
     return EFS3AMZChunkSizes(
-      chunkCount = resultChunkCount,
-      chunkSize = resultChunkSize,
-      chunkSizeLast = size - (resultChunkSize * resultChunkCount)
+      chunkCount = chunkCount,
+      chunkSize = chunkSize
     )
   }
 }

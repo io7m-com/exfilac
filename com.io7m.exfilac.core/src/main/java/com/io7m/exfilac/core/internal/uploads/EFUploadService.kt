@@ -16,8 +16,10 @@
 
 package com.io7m.exfilac.core.internal.uploads
 
+import com.io7m.exfilac.clock.api.EFClockServiceType
 import com.io7m.exfilac.content_tree.api.EFContentTreeFactoryType
 import com.io7m.exfilac.core.EFUploadName
+import com.io7m.exfilac.core.EFUploadReason
 import com.io7m.exfilac.core.EFUploadStatus
 import com.io7m.exfilac.core.EFUploadStatusCancelling
 import com.io7m.exfilac.core.EFUploadStatusChanged
@@ -39,7 +41,8 @@ class EFUploadService(
   val database: EFDatabaseType,
   val statusChangedSource: AttributeType<EFUploadStatusChanged>,
   val contentTrees: EFContentTreeFactoryType,
-  val uploader: EFS3UploaderType
+  val uploader: EFS3UploaderType,
+  val clock: EFClockServiceType,
 ) : EFUploadServiceType {
 
   private val logger =
@@ -66,7 +69,7 @@ class EFUploadService(
 
   override fun upload(
     name: EFUploadName,
-    reason: String
+    reason: EFUploadReason
   ): CompletableFuture<*> {
     val future = CompletableFuture<Unit>()
 
@@ -84,7 +87,8 @@ class EFUploadService(
         contentTrees = this.contentTrees,
         s3Uploader = this.uploader,
         reason = reason,
-        name = name
+        name = name,
+        clock = this.clock
       )
 
       this.tasks.put(name, task)

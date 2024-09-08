@@ -16,12 +16,16 @@
 
 package com.io7m.exfilac.tests
 
+import com.io7m.exfilac.clock.api.EFClockServiceType
 import com.io7m.exfilac.s3_uploader.api.EFS3UploadRequest
 import com.io7m.exfilac.s3_uploader.api.EFS3UploadType
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderType
 
 class EFS3UploaderNull : EFS3UploaderType {
-  override fun create(upload: EFS3UploadRequest): EFS3UploadType {
+  override fun create(
+    upload: EFS3UploadRequest,
+    clock: EFClockServiceType
+  ): EFS3UploadType {
     return EFS3UploadNull()
   }
 

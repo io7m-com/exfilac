@@ -17,12 +17,18 @@
 package com.io7m.exfilac.main
 
 import android.app.Application
+import android.content.Intent
+import com.io7m.exfilac.clock.api.EFClockSystem
 import com.io7m.exfilac.content_tree.device.EFContentTreeDevice
 import com.io7m.exfilac.core.ExfilacFactory
 import com.io7m.exfilac.core.ExfilacType
 import com.io7m.exfilac.s3_uploader.amazon.EFS3AMZUploaders
+import org.slf4j.LoggerFactory
 
 class EFApplication : Application() {
+
+  private val logger =
+    LoggerFactory.getLogger(EFApplication::class.java)
 
   private lateinit var exfilacField: ExfilacType
 
@@ -41,13 +47,23 @@ class EFApplication : Application() {
     super.onCreate()
     INSTANCE = this
 
+    this.logger.info("Start")
+
     this.exfilacField =
       ExfilacOnUI(
         ExfilacFactory.open(
           contentTrees = EFContentTreeDevice(this, this.contentResolver),
           s3Uploaders = EFS3AMZUploaders(),
-          dataDirectory = application.dataDir.toPath()
+          dataDirectory = application.dataDir.toPath(),
+          clock = EFClockSystem
         )
       )
+
+    this.startPeriodicWorker()
+  }
+
+  private fun startPeriodicWorker() {
+    this.startService(Intent(this, EFBackgroundService::class.java))
+    this.startService(Intent(this, EFNetworkConnectivityService::class.java))
   }
 }

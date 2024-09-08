@@ -2,6 +2,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
@@ -15,11 +16,11 @@
 
     <com.google.android.material.appbar.MaterialToolbar
       android:id="@+id/statusAppBar"
+      android:layout_width="match_parent"
+      android:layout_height="48dp"
       app:logo="@drawable/io7m_24"
       app:title="@string/app_name"
-      app:titleMarginStart="@dimen/appBarTitleMarginStart"
-      android:layout_width="match_parent"
-      android:layout_height="48dp" />
+      app:titleMarginStart="@dimen/appBarTitleMarginStart" />
 
     <View
       android:layout_width="match_parent"
@@ -62,9 +63,48 @@
     android:id="@+id/statusListView"
     android:layout_width="0dp"
     android:layout_height="0dp"
-    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/statusIndicator"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@id/statusAppBarLayout" />
-  
+
+  <View
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/statusListView"
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="?android:attr/listDivider" />
+
+  <LinearLayout
+    android:id="@+id/statusIndicator"
+    android:layout_width="0dp"
+    android:layout_height="32dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:gravity="center"
+    android:orientation="horizontal"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/statusListView">
+
+    <ImageView
+      android:id="@+id/statusNetworkIcon"
+      android:layout_width="16dp"
+      android:layout_height="16dp"
+      android:layout_gravity="center"
+      android:src="@drawable/network_cellular_16" />
+
+    <TextView
+      android:id="@+id/statusNetworkText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:layout_marginStart="8dp"
+      tools:text="The network is currently experiencing difficulties." />
+
+  </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
