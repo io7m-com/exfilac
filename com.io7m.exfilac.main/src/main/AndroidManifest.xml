@@ -3,8 +3,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools">
 
+  <!-- Self-explanatory. -->
   <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+
+  <!-- Required to allow the application to *read* the network state. -->
+  <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+  <!-- Required to allow the application to start on boot. -->
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
   <application
     android:name="com.io7m.exfilac.main.EFApplication"
@@ -14,14 +20,24 @@
     tools:ignore="GoogleAppIndexingWarning"
     tools:replace="android:label,android:allowBackup">
 
-    <meta-data
-      android:name="android.max_aspect"
-      android:value="2.1" />
+    <!-- The boot receiver. Starts the application in the background when booting is completed. -->
+    <receiver
+      android:name="com.io7m.exfilac.main.EFBootReceiver"
+      android:enabled="true"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </receiver>
 
-    <service android:name="com.io7m.exfilac.main.EFBackgroundService" />
+    <!-- The background scheduler service. -->
+    <service android:name="com.io7m.exfilac.main.EFSchedulerService" />
 
+    <!-- The network connectivity service. -->
     <service android:name="com.io7m.exfilac.main.EFNetworkConnectivityService" />
 
+    <!-- The one and only activity. -->
     <activity
       android:name="com.io7m.exfilac.main.EFActivity"
       android:exported="true">

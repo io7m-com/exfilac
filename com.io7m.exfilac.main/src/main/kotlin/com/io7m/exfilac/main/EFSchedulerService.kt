@@ -25,31 +25,33 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
-class EFBackgroundService : Service() {
+class EFSchedulerService : Service() {
 
   private val logger =
-    LoggerFactory.getLogger(EFBackgroundService::class.java)
+    LoggerFactory.getLogger(EFSchedulerService::class.java)
 
-  private val executor =
-    Executors.newSingleThreadScheduledExecutor { r ->
-      val thread = Thread(r)
-      thread.isDaemon = true
-      thread.name = "com.io7m.exfilac.main.background_service[${thread.id}]"
-      thread.priority = Thread.MIN_PRIORITY
-      thread
-    }
+  companion object {
+    private val executor =
+      Executors.newSingleThreadScheduledExecutor { r ->
+        val thread = Thread(r)
+        thread.isDaemon = true
+        thread.name = "com.io7m.exfilac.main.scheduler_service[${thread.id}]"
+        thread.priority = Thread.MIN_PRIORITY
+        thread
+      }
 
-  private val started =
-    AtomicBoolean(false)
+    private val started =
+      AtomicBoolean(false)
+  }
 
   override fun onStartCommand(
     intent: Intent?,
     flags: Int,
     startId: Int
   ): Int {
-    if (this.started.compareAndSet(false, true)) {
+    if (started.compareAndSet(false, true)) {
       this.logger.debug("Starting background service…")
-      this.executor.scheduleWithFixedDelay(this::tick, 5L, 5L, TimeUnit.MINUTES)
+      executor.scheduleWithFixedDelay(this::tick, 5L, 5L, TimeUnit.MINUTES)
     } else {
       this.logger.debug("Ignoring redundant request to start background service.")
     }

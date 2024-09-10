@@ -48,7 +48,7 @@
   <string name="bucketName">Name</string>
   <string name="bucketNameDescription">The name of the bucket on the server.</string>
   <string name="bucketRegion">Region</string>
-  <string name="bucketRegionDescription">The name of the region within this bucket resides.</string>
+  <string name="bucketRegionDescription">The name of the region within which this bucket resides.</string>
   <string name="bucketRemove">Remove bucket(s)</string>
   <string name="bucketSecret">Secret Key</string>
   <string name="bucketSecretDescription">The secret key used to access the bucket.</string>

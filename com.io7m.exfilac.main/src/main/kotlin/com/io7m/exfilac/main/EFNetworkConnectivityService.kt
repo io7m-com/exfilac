@@ -35,15 +35,17 @@ class EFNetworkConnectivityService : Service() {
   private val logger =
     LoggerFactory.getLogger(EFNetworkConnectivityService::class.java)
 
-  private val started =
-    AtomicBoolean(false)
+  companion object {
+    private val started =
+      AtomicBoolean(false)
+  }
 
   override fun onStartCommand(
     intent: Intent?,
     flags: Int,
     startId: Int
   ): Int {
-    if (this.started.compareAndSet(false, true)) {
+    if (started.compareAndSet(false, true)) {
       this.logger.debug("Starting network service…")
 
       val networkRequest =

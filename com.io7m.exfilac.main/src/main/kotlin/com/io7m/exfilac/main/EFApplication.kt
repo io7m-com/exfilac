@@ -17,6 +17,7 @@
 package com.io7m.exfilac.main
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import com.io7m.exfilac.clock.api.EFClockSystem
 import com.io7m.exfilac.content_tree.device.EFContentTreeDevice
@@ -38,9 +39,28 @@ class EFApplication : Application() {
   companion object {
     private lateinit var INSTANCE: EFApplication
 
+    private val logger =
+      LoggerFactory.getLogger(EFApplication::class.java)
+
     @JvmStatic
     val application: EFApplication
       get() = this.INSTANCE
+
+    fun startServices(
+      context: Context
+    ) {
+      try {
+        context.startService(Intent(context, EFSchedulerService::class.java))
+      } catch (e: Throwable) {
+        this.logger.error("Failed to start service: ", e)
+      }
+
+      try {
+        context.startService(Intent(context, EFNetworkConnectivityService::class.java))
+      } catch (e: Throwable) {
+        this.logger.error("Failed to start service: ", e)
+      }
+    }
   }
 
   override fun onCreate() {
@@ -59,11 +79,6 @@ class EFApplication : Application() {
         )
       )
 
-    this.startPeriodicWorker()
-  }
-
-  private fun startPeriodicWorker() {
-    this.startService(Intent(this, EFBackgroundService::class.java))
-    this.startService(Intent(this, EFNetworkConnectivityService::class.java))
+    startServices(this)
   }
 }

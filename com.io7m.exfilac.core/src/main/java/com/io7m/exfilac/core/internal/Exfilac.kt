@@ -67,6 +67,8 @@ import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import com.io7m.taskrecorder.core.TRNoResult
 import com.io7m.taskrecorder.core.TRTaskRecorder
 import org.slf4j.LoggerFactory
+import org.sqlite.SQLiteErrorCode
+import org.sqlite.SQLiteException
 import java.nio.file.Path
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -279,11 +281,21 @@ internal class Exfilac private constructor(
   ): CompletableFuture<*> {
     val cf = CompletableFuture<Unit>()
     this.databaseExecutor.execute {
-      try {
-        cf.complete(f.invoke())
-      } catch (e: Throwable) {
-        logger.debug("executeDatabase: ", e)
-        cf.completeExceptionally(e)
+      for (attempt in 1..5) {
+        try {
+          cf.complete(f.invoke())
+          return@execute
+        } catch (e: SQLiteException) {
+          logger.debug("executeDatabase: ", e)
+          if (e.resultCode != SQLiteErrorCode.SQLITE_BUSY || attempt == 5) {
+            cf.completeExceptionally(e)
+          }
+          Thread.sleep(250L)
+        } catch (e: Throwable) {
+          logger.debug("executeDatabase: ", e)
+          cf.completeExceptionally(e)
+          return@execute
+        }
       }
     }
     return cf
