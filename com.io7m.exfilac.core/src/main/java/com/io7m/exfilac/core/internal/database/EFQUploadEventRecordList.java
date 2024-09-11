@@ -18,7 +18,6 @@ package com.io7m.exfilac.core.internal.database;
 
 import static java.time.ZoneOffset.UTC;
 
-import com.io7m.darco.api.DDatabaseUnit;
 import com.io7m.exfilac.core.internal.EFUploadEventID;
 import com.io7m.exfilac.core.internal.EFUploadEventRecord;
 import com.io7m.exfilac.core.internal.EFUploadID;

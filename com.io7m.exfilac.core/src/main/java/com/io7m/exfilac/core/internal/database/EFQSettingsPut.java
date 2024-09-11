@@ -17,19 +17,24 @@
 package com.io7m.exfilac.core.internal.database;
 
 import com.io7m.darco.api.DDatabaseUnit;
-import com.io7m.exfilac.core.EFBucketConfiguration;
 import com.io7m.exfilac.core.EFSettings;
 
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
+
+import java.io.IOException;
 import java.sql.SQLException;
 
 public final class EFQSettingsPut
   extends EFDatabaseQueryAbstract<EFSettings, DDatabaseUnit>
   implements EFQSettingsPutType {
 
-  private static final String QUERY = """
-    UPDATE settings SET
-      settings_network_upload_wifi     = ?,
-      settings_network_upload_cellular = ?
+  private static final String QUERY_INSERT = """
+    INSERT OR REPLACE INTO settings (settings_text) VALUES (?)
+    """;
+
+  private static final String QUERY_UPDATE = """
+    UPDATE settings SET settings_text = ?
     """;
 
   EFQSettingsPut(
@@ -55,10 +60,28 @@ public final class EFQSettingsPut
     final EFSettings settings)
     throws SQLException {
     var connection = transaction.connection();
-    try (var st = connection.prepareStatement(QUERY)) {
-      st.setBoolean(1, settings.getNetworking().getUploadOnWifi());
-      st.setBoolean(2, settings.getNetworking().getUploadOnCellular());
-      st.execute();
+
+    byte[] settingsText;
+    try {
+      settingsText = EFSettingsTexts.INSTANCE.serializeToBytes(settings);
+    } catch (IOException e) {
+      throw new SQLException(e);
+    }
+
+    try (var sti = connection.prepareStatement(QUERY_INSERT)) {
+      sti.setBytes(1, settingsText);
+      try {
+        sti.execute();
+      } catch (SQLiteException e) {
+        if (e.getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_CHECK) {
+          try (var stu = connection.prepareStatement(QUERY_UPDATE)) {
+            stu.setBytes(1, settingsText);
+            stu.execute();
+          }
+        } else {
+          throw e;
+        }
+      }
     }
     return DDatabaseUnit.UNIT;
   }

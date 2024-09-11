@@ -87,7 +87,7 @@ class EFFragmentBucketEditing : EFFragment() {
     this.accessKey.setText(EFBucketEditModel.accessKey)
     this.secret.setText(EFBucketEditModel.secret)
     this.endpoint.setText(EFBucketEditModel.endpoint.toString())
-    this.accessStyle.setSelection(this.accessStyleIndexOf(EFBucketEditModel.accessStyle))
+    this.accessStyle.setSelection(EFBucketEditModel.accessStyle.ordinal)
 
     this.name.addTextChangedListener {
       EFBucketEditModel.name = this.name.text.toString().trim()
@@ -171,28 +171,6 @@ class EFFragmentBucketEditing : EFFragment() {
 
     this.validate()
     return view
-  }
-
-  /**
-   * Spinners are weakly typed. In order to set the value of the spinner correctly, we need
-   * to search the spinner for the string value that corresponds to the enum value that we
-   * want to set. This is yet another problem that systems that aren't Android solved long ago.
-   */
-
-  private fun accessStyleIndexOf(
-    accessStyle: EFBucketAccessStyle
-  ): Int {
-    for (index in 0 until this.accessStyle.adapter.count) {
-      try {
-        val style = this.accessStyle.adapter.getItem(index)
-        if (EFBucketAccessStyle.valueOf(style.toString()) == accessStyle) {
-          return index
-        }
-      } catch (e: Exception) {
-        // Nothing we can do about it.
-      }
-    }
-    return 0
   }
 
   private fun validate() {

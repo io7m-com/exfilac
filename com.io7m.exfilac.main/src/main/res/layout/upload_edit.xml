@@ -148,7 +148,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginStart="@dimen/settingsMarginHorizontal"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="@dimen/settingsMarginHorizontal"
         android:entries="@array/uploadSchedules" />
 
@@ -185,7 +185,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginStart="@dimen/settingsMarginHorizontal"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="@dimen/settingsMarginHorizontal" />
 
       <View
@@ -218,7 +218,7 @@
       <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/uploadTriggerPhoneCallEnded"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="48dp"
         android:layout_marginStart="@dimen/settingsMarginHorizontal"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="@dimen/settingsMarginHorizontal"
@@ -227,7 +227,7 @@
       <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/uploadTriggerPhotoTaken"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="48dp"
         android:layout_marginStart="@dimen/settingsMarginHorizontal"
         android:layout_marginEnd="@dimen/settingsMarginHorizontal"
         android:text="@string/uploadTriggerOnPhoto" />
@@ -235,7 +235,7 @@
       <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/uploadTriggerNetworkAvailable"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="48dp"
         android:layout_marginStart="@dimen/settingsMarginHorizontal"
         android:layout_marginEnd="@dimen/settingsMarginHorizontal"
         android:text="@string/uploadTriggerOnWifi" />

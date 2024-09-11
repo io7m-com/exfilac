@@ -30,8 +30,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import kotlin.ULong;
-
 public final class EFQUploadRecordList
   extends EFDatabaseQueryAbstract<EFQUploadRecordListParameters, List<EFUploadRecord>>
   implements EFQUploadRecordListType {

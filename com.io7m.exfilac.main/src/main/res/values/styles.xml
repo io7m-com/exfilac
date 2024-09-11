@@ -2,18 +2,66 @@
 
 <resources>
   <!-- A no-op theme used on devices that are on less than API 31. -->
-  <style name="ExTheme.Splash" parent="ExTheme.WithoutActionBar" />
+  <style name="Exfilac.Splash" parent="Exfilac.WithoutActionBar" />
 
-  <style name="ExTheme.WithoutActionBar" parent="Theme.Material3.DayNight.NoActionBar">
-    <item name="colorPrimary">#0000ff</item>
-    <item name="colorPrimaryVariant">#0055ff</item>
+  <style name="Exfilac.WithoutActionBar" parent="Theme.Material3.Light.NoActionBar">
+    <item name="colorPrimary">#28546C</item>
+    <item name="colorPrimaryVariant">#477187</item>
     <item name="colorOnPrimary">#ffffff</item>
-    <item name="colorSurface">#ffffff</item>
-    <item name="colorSecondary">#008800</item>
-    <item name="colorSecondaryVariant">#008855</item>
+    <item name="colorSurface">#28546C</item>
+    <item name="colorOnSurface">#ffffff</item>
+    <item name="colorSecondary">#28546C</item>
+    <item name="colorSecondaryVariant">#477187</item>
     <item name="colorOnSecondary">#ffffff</item>
     <item name="colorOnBackground">#000000</item>
     <item name="colorError">#ff0000</item>
     <item name="colorOnError">#ffffff</item>
+
+    <item name="android:buttonStyle">@style/Exfilac.Button.Contained.Medium</item>
+    <item name="android:windowBackground">#ffffff</item>
+    <item name="materialButtonOutlinedStyle">@style/Exfilac.Button.Contained</item>
+    <item name="materialButtonStyle">@style/Exfilac.Button.Contained</item>
+    <item name="tabStyle">@style/Exfilac.App.TabLayout</item>
+    <item name="toolbarStyle">@style/Widget.Material3.Toolbar.OnSurface</item>
+    <item name="switchStyle">@style/Exfilac.Switch</item>
+    <item name="spinnerStyle">@style/Exfilac.Spinner</item>
   </style>
+
+  <style name="Exfilac.App.TabLayout" parent="Widget.Material3.TabLayout">
+    <item name="materialThemeOverlay">@style/Exfilac.Overlay.TabLayout</item>
+    <item name="tabRippleColor">#477187</item>
+  </style>
+
+  <style name="Exfilac.Overlay.TabLayout" parent="">
+    <item name="colorSurface">#00000000</item>
+  </style>
+
+  <style name="Exfilac.Button.Contained" parent="Widget.Material3.Button.UnelevatedButton">
+    <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.None</item>
+    <item name="strokeColor">#032436</item>
+    <item name="strokeWidth">1dp</item>
+  </style>
+
+  <style name="Exfilac.Button.Contained.Medium" parent="Exfilac.Button.Contained">
+  </style>
+
+  <style name="Exfilac.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+    <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.None</item>
+  </style>
+
+  <style name="Exfilac.Button.Outlined.Medium" parent="Exfilac.Button.Outlined">
+  </style>
+
+  <style name="Exfilac.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+    <item name="materialThemeOverlay">@style/Exfilac.Overlay.Switch</item>
+  </style>
+
+  <style name="Exfilac.Overlay.Switch" parent="">
+
+  </style>
+
+  <style name="Exfilac.Spinner" parent="Widget.AppCompat.Spinner">
+    <item name="android:background">@drawable/spinner_border</item>
+  </style>
+
 </resources>

@@ -18,8 +18,8 @@ package com.io7m.exfilac.core.internal.database;
 
 import com.io7m.darco.api.DDatabaseUnit;
 import com.io7m.exfilac.core.EFSettings;
-import com.io7m.exfilac.core.EFSettingsNetworking;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public final class EFQSettingsGet
@@ -28,8 +28,7 @@ public final class EFQSettingsGet
 
   private static final String QUERY = """
     SELECT
-      settings_network_upload_wifi,
-      settings_network_upload_cellular
+      settings_text
     FROM
       settings
     """;
@@ -59,13 +58,16 @@ public final class EFQSettingsGet
     var connection = transaction.connection();
     try (var st = connection.prepareStatement(QUERY)) {
       try (var rs = st.executeQuery()) {
-        return new EFSettings(
-          new EFSettingsNetworking(
-            rs.getBoolean("settings_network_upload_wifi"),
-            rs.getBoolean("settings_network_upload_cellular")
-          )
-        );
+        if (rs.next()) {
+          return EFSettingsTexts.INSTANCE.deserializeFromBytes(
+            rs.getBytes("settings_text")
+          );
+        } else {
+          return EFSettings.Companion.defaults();
+        }
       }
+    } catch (final IOException e) {
+      throw new SQLException(e);
     }
   }
 }

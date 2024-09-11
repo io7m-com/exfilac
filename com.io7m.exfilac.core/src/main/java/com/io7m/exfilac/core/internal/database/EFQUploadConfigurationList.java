@@ -17,7 +17,6 @@
 package com.io7m.exfilac.core.internal.database;
 
 import com.io7m.darco.api.DDatabaseUnit;
-import com.io7m.exfilac.core.EFBucketName;
 import com.io7m.exfilac.core.EFBucketReferenceName;
 import com.io7m.exfilac.core.EFDeviceSource;
 import com.io7m.exfilac.core.EFUploadConfiguration;

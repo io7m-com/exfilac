@@ -16,16 +16,12 @@
 
 package com.io7m.exfilac.core.internal.database;
 
-import com.io7m.darco.api.DDatabaseException;
-import com.io7m.exfilac.core.EFUploadReason;
 import com.io7m.exfilac.core.internal.EFUploadID;
 import com.io7m.exfilac.core.internal.EFUploadRecord;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.Optional;
 
 public final class EFQUploadRecordCreate
   extends EFDatabaseQueryAbstract<EFQUploadRecordCreateParameters, EFUploadRecord>
