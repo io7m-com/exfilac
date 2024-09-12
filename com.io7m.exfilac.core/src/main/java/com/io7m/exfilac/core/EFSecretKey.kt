@@ -25,6 +25,6 @@ data class EFSecretKey(val value: String) {
   }
 
   override fun toString(): String {
-    return this.value
+    return "[EFSecretKey REDACTED]"
   }
 }

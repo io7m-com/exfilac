@@ -14,18 +14,15 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.exfilac.core
+package com.io7m.exfilac.core.internal.database;
 
-data class EFSettings(
-  val networking: EFSettingsNetworking,
-  val paused: Boolean
-) {
-  companion object {
-    fun defaults(): EFSettings {
-      return EFSettings(
-        networking = EFSettingsNetworking.defaults(),
-        paused = false
-      )
-    }
-  }
+import com.io7m.darco.api.DDatabaseQueryType;
+import com.io7m.exfilac.core.EFUploadName;
+import com.io7m.exfilac.core.internal.EFUploadRecord;
+
+import java.util.Optional;
+
+public interface EFQUploadRecordMostRecentType
+  extends DDatabaseQueryType<EFUploadName, Optional<EFUploadRecord>> {
+
 }

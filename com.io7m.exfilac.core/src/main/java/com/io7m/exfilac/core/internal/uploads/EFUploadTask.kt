@@ -60,6 +60,7 @@ import com.io7m.taskrecorder.core.TRTaskRecorderType
 import org.slf4j.LoggerFactory
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.net.URI
 import java.nio.file.Paths
 import java.util.Optional
 import java.util.concurrent.atomic.AtomicBoolean
@@ -131,6 +132,10 @@ class EFUploadTask(
           transaction.commit()
         }
 
+      this.onUploadInformativeEvent(
+        EFContentPath(URI.create("urn:unused"), listOf()),
+        "Upload started."
+      )
       step.setStepSucceeded("OK")
     } catch (e: Throwable) {
       step.setStepFailed(this.exceptionMessage(e), e)
@@ -478,6 +483,7 @@ class EFUploadTask(
     this.onStatusChanged(
       EFUploadStatusRunning(
         name = this.name,
+        id = this.uploadRecord.get()?.id,
         description = this.taskRecorder.stepCurrent().toStep().description,
         progressMajor = progressMajor,
         progressMinor = progressMinor
@@ -500,6 +506,7 @@ class EFUploadTask(
       this.onStatusChanged(
         EFUploadStatusFailed(
           name = this.name,
+          id = this.uploadRecord.get()?.id,
           result = this.taskRecorder.toTask(),
           failedAt = this.clock.now()
         )
@@ -520,6 +527,7 @@ class EFUploadTask(
     this.onStatusChanged(
       EFUploadStatusSucceeded(
         name = this.name,
+        id = this.uploadRecord.get()?.id,
         completedAt = this.clock.now()
       )
     )
@@ -540,6 +548,7 @@ class EFUploadTask(
     this.onStatusChanged(
       EFUploadStatusCancelled(
         name = this.name,
+        id = this.uploadRecord.get()?.id,
         cancelledAt = this.clock.now()
       )
     )
@@ -560,6 +569,7 @@ class EFUploadTask(
     this.onStatusChanged(
       EFUploadStatusFailed(
         name = this.name,
+        id = this.uploadRecord.get()?.id,
         result = this.taskRecorder.toTask(),
         failedAt = this.clock.now()
       )
@@ -569,7 +579,7 @@ class EFUploadTask(
 
   fun cancel() {
     this.cancelled.set(true)
-    this.onStatusChanged(EFUploadStatusCancelling(this.name))
+    this.onStatusChanged(EFUploadStatusCancelling(this.name, id = this.uploadRecord.get()?.id))
     this.statusChangedSource.set(EFUploadStatusChanged())
   }
 }

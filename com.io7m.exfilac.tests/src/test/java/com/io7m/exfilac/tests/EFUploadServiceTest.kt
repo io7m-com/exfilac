@@ -325,7 +325,7 @@ class EFUploadServiceTest {
     assertEquals(0, records.get(0).filesSkipped)
     assertEquals(0, records.get(0).filesUploaded)
     assertEquals(EFUploadResult.SUCCEEDED, records.get(0).result)
-    assertEquals(mutableListOf<EFUploadEventRecord>(), events)
+    assertEquals(1, events.size)
   }
 
   /**
@@ -376,6 +376,11 @@ class EFUploadServiceTest {
     assertEquals(0, records.get(0).filesUploaded)
     assertEquals(EFUploadResult.FAILED, records.get(0).result)
 
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Upload started"))
+    }
     run {
       val e = events.removeAt(0)
       logger.debug("{}", e)
@@ -446,6 +451,11 @@ class EFUploadServiceTest {
     assertEquals(1, records.get(0).filesUploaded)
     assertEquals(EFUploadResult.SUCCEEDED, records.get(0).result)
 
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Upload started"))
+    }
     run {
       val e = events.removeAt(0)
       logger.debug("{}", e)
@@ -535,6 +545,11 @@ class EFUploadServiceTest {
     run {
       val e = events.removeAt(0)
       logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Upload started"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
       assertTrue(e.message.startsWith("Calculating local content hash"))
     }
     run {
@@ -611,6 +626,11 @@ class EFUploadServiceTest {
     run {
       val e = events.removeAt(0)
       logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Upload started"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
       assertTrue(e.message.startsWith("Calculating local content hash"))
     }
     run {
@@ -645,8 +665,9 @@ class EFUploadServiceTest {
         t.query(EFQUploadRecordListType::class.java)
           .execute(
             EFQUploadRecordListParameters(
-              EFClockMock.now().minusYears(1),
-              1000
+              newerThan = EFClockMock.now().minusYears(1),
+              limit = 1000,
+              onlyIncludeForName = null
             )
           )
       )

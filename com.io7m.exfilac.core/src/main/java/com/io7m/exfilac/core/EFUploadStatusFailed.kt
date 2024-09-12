@@ -16,11 +16,13 @@
 
 package com.io7m.exfilac.core
 
+import com.io7m.exfilac.core.internal.EFUploadID
 import com.io7m.taskrecorder.core.TRTask
 import java.time.OffsetDateTime
 
 data class EFUploadStatusFailed(
   override val name: EFUploadName,
+  override val id: EFUploadID?,
   val failedAt: OffsetDateTime,
   val result: TRTask<*>
 ) : EFUploadStatus()

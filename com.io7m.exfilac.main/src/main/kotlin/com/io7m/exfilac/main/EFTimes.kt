@@ -14,18 +14,25 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.exfilac.core
+package com.io7m.exfilac.main
 
-data class EFSettings(
-  val networking: EFSettingsNetworking,
-  val paused: Boolean
-) {
-  companion object {
-    fun defaults(): EFSettings {
-      return EFSettings(
-        networking = EFSettingsNetworking.defaults(),
-        paused = false
-      )
-    }
-  }
+import java.time.format.DateTimeFormatterBuilder
+
+object EFTimes {
+
+  val dateTimeFormatter =
+    DateTimeFormatterBuilder()
+      .appendPattern("YYYY")
+      .appendLiteral('-')
+      .appendPattern("MM")
+      .appendLiteral('-')
+      .appendPattern("dd")
+      .appendLiteral(' ')
+      .appendPattern("HH")
+      .appendLiteral(':')
+      .appendPattern("mm")
+      .appendLiteral(':')
+      .appendPattern("ss")
+      .appendPattern("Z")
+      .toFormatter()
 }

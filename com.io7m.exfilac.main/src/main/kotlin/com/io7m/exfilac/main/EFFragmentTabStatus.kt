@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.MaterialToolbar
 import com.io7m.exfilac.core.EFNetworkStatus
+import com.io7m.exfilac.core.EFSettings
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
@@ -39,6 +40,7 @@ class EFFragmentTabStatus : Fragment() {
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
+  private lateinit var statusPaused: ViewGroup
   private lateinit var adapter: EFStatusAdapter
   private lateinit var emptyView: ViewGroup
   private lateinit var listView: RecyclerView
@@ -63,6 +65,8 @@ class EFFragmentTabStatus : Fragment() {
       view.findViewById(R.id.statusNetworkIcon)
     this.statusText =
       view.findViewById(R.id.statusNetworkText)
+    this.statusPaused =
+      view.findViewById(R.id.statusPaused)
 
     this.listView.layoutManager = LinearLayoutManager(view.context)
     this.listView.setHasFixedSize(true)
@@ -94,6 +98,23 @@ class EFFragmentTabStatus : Fragment() {
         this.onNetworkStatusChanged(newValue)
       }
     )
+    this.subscriptions.add(
+      EFApplication.application.exfilac.settings.subscribe { _, newValue ->
+        this.onSettingsChanged(newValue)
+      }
+    )
+  }
+
+  @UiThread
+  private fun onSettingsChanged(
+    newValue: EFSettings
+  ) {
+    EFUIThread.checkIsUIThread()
+
+    when (newValue.paused) {
+      true -> this.statusPaused.visibility = View.VISIBLE
+      false -> this.statusPaused.visibility = View.GONE
+    }
   }
 
   @UiThread

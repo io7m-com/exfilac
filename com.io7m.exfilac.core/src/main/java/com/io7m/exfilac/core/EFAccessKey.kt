@@ -25,6 +25,6 @@ data class EFAccessKey(val value: String) {
   }
 
   override fun toString(): String {
-    return this.value
+    return "[EFAccessKey REDACTED]"
   }
 }

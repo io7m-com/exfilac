@@ -16,16 +16,10 @@
 
 package com.io7m.exfilac.core
 
-data class EFSettings(
-  val networking: EFSettingsNetworking,
-  val paused: Boolean
-) {
-  companion object {
-    fun defaults(): EFSettings {
-      return EFSettings(
-        networking = EFSettingsNetworking.defaults(),
-        paused = false
-      )
-    }
-  }
+import com.io7m.jattribute.core.AttributeReadableType
+import java.util.concurrent.CompletableFuture
+
+interface ExfilacSettingsType {
+  val settings: AttributeReadableType<EFSettings>
+  fun settingsUpdate(settings: EFSettings): CompletableFuture<*>
 }

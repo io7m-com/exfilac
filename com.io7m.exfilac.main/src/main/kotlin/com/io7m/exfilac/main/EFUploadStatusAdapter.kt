@@ -19,20 +19,19 @@ package com.io7m.exfilac.main
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.io7m.exfilac.core.EFBucketConfiguration
-import com.io7m.exfilac.core.EFBucketEditModel
+import com.io7m.exfilac.core.internal.EFUploadEventRecord
 
-class EFBucketsAdapter(
-  private var items: List<EFBucketConfiguration>,
+class EFUploadStatusAdapter(
+  private var items: List<EFUploadEventRecord>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-  fun setBuckets(
-    bucketsList: List<EFBucketConfiguration>
+  fun setStatusEvents(
+    newList: List<EFUploadEventRecord>
   ) {
-    this.items = bucketsList
+    this.items = newList
     this.notifyDataSetChanged()
   }
 
@@ -42,46 +41,43 @@ class EFBucketsAdapter(
   ): RecyclerView.ViewHolder {
     val view =
       LayoutInflater.from(parent.context)
-        .inflate(R.layout.bucket_item, parent, false)
+        .inflate(R.layout.status_detail_item, parent, false)
 
-    return this.BucketViewHolder(view)
+    return this.StatusViewHolder(view)
   }
 
   override fun onBindViewHolder(
     holder: RecyclerView.ViewHolder,
     position: Int
   ) {
-    (holder as? BucketViewHolder)?.bind(this.items[position])
+    (holder as? StatusViewHolder)?.bind(this.items[position])
   }
 
   override fun getItemCount(): Int {
     return this.items.size
   }
 
-  inner class BucketViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-    private val name: TextView =
-      this.itemView.findViewById(R.id.bucketName)
-    private val selected: CheckBox =
-      this.itemView.findViewById(R.id.bucketCheckBox)
+  inner class StatusViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+
+    private val message: TextView =
+      this.itemView.findViewById(R.id.statusDetailMessage)
+    private val file: TextView =
+      this.itemView.findViewById(R.id.statusDetailFile)
+    private val time: TextView =
+      this.itemView.findViewById(R.id.statusDetailTime)
+    private val icon: ImageView =
+      this.itemView.findViewById(R.id.statusDetailIcon)
 
     fun bind(
-      configuration: EFBucketConfiguration
+      event: EFUploadEventRecord
     ) {
-      this.name.text = configuration.referenceName.value
-      this.selected.isChecked =
-        EFApplication.application.exfilac.bucketSelectionContains(configuration.referenceName)
+      this.message.text = event.message
+      this.file.text = event.file ?: ""
+      this.time.text = event.time.format(EFTimes.dateTimeFormatter)
 
-      this.selected.setOnCheckedChangeListener { _, isChecked ->
-        if (isChecked) {
-          EFApplication.application.exfilac.bucketSelectionAdd(configuration.referenceName)
-        } else {
-          EFApplication.application.exfilac.bucketSelectionRemove(configuration.referenceName)
-        }
-      }
-
-      this.view.setOnClickListener {
-        EFBucketEditModel.setBucket(configuration)
-        EFApplication.application.exfilac.bucketEditBegin()
+      when (event.failed) {
+        true -> this.icon.setImageResource(R.drawable.error_24)
+        false -> this.icon.setImageResource(R.drawable.status_upload_item_ok)
       }
     }
   }

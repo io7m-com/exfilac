@@ -2,6 +2,7 @@ package com.io7m.exfilac.tests
 
 import com.io7m.exfilac.core.EFSecretKey
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.assertThrows
@@ -22,7 +23,7 @@ class EFSecretKeyTest {
   ): DynamicTest {
     return DynamicTest.dynamicTest("testValid_$name") {
       assertEquals(name, EFSecretKey(name).value)
-      assertEquals(name, EFSecretKey(name).toString())
+      assertNotEquals(name, EFSecretKey(name).toString())
     }
   }
 

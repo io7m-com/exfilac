@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -27,19 +28,19 @@ import com.io7m.exfilac.core.EFSettings
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
-import org.slf4j.LoggerFactory
 
 class EFFragmentTabSettings : Fragment() {
-
-  private val logger =
-    LoggerFactory.getLogger(EFFragmentTabSettings::class.java)
 
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
-  private lateinit var uploadWifi: SwitchMaterial
-  private lateinit var uploadCellular: SwitchMaterial
+  private lateinit var commit: TextView
+  private lateinit var paused: SwitchMaterial
+  private lateinit var privacyPolicy: TextView
   private lateinit var toolbar: MaterialToolbar
+  private lateinit var uploadCellular: SwitchMaterial
+  private lateinit var uploadWifi: SwitchMaterial
+  private lateinit var version: TextView
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -54,6 +55,14 @@ class EFFragmentTabSettings : Fragment() {
       view.findViewById(R.id.settingsUploadCellular)
     this.uploadWifi =
       view.findViewById(R.id.settingsUploadWIFI)
+    this.privacyPolicy =
+      view.findViewById(R.id.settingsPrivacyPolicy)
+    this.paused =
+      view.findViewById(R.id.settingsUploadsPaused)
+    this.commit =
+      view.findViewById(R.id.settingsCommit)
+    this.version =
+      view.findViewById(R.id.settingsVersion)
 
     this.uploadCellular.setOnCheckedChangeListener { _, isChecked ->
       this.updateSettings { settings: EFSettings ->
@@ -65,7 +74,17 @@ class EFFragmentTabSettings : Fragment() {
         settings.copy(settings.networking.copy(uploadOnWifi = isChecked))
       }
     }
+    this.paused.setOnCheckedChangeListener { _, isChecked ->
+      this.updateSettings { settings: EFSettings ->
+        settings.copy(paused = isChecked)
+      }
+    }
+    this.privacyPolicy.setOnClickListener {
+      // Not implemented yet
+    }
 
+    this.commit.text = BuildConfig.EXFILAC_GIT_COMMIT
+    this.version.text = BuildConfig.EXFILAC_VERSION
     return view
   }
 
@@ -96,11 +115,11 @@ class EFFragmentTabSettings : Fragment() {
   private fun onSettingsChanged(
     newSettings: EFSettings
   ) {
-    this.logger.debug("Settings changed.")
-
     this.uploadCellular.isChecked =
       newSettings.networking.uploadOnCellular
     this.uploadWifi.isChecked =
       newSettings.networking.uploadOnWifi
+    this.paused.isChecked =
+      newSettings.paused
   }
 }

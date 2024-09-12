@@ -76,6 +76,9 @@ class EFFragmentBucketEditing : EFFragment() {
       view.findViewById(R.id.bucketEditAppBar)
 
     this.toolbar.setNavigationIcon(R.drawable.back_24)
+    this.toolbar.setNavigationOnClickListener {
+      EFApplication.application.exfilac.bucketEditCancel()
+    }
     this.toolbar.menu.clear()
     val activity = this.requireActivity()
     activity.menuInflater.inflate(R.menu.buckets_edit_save, this.toolbar.menu)

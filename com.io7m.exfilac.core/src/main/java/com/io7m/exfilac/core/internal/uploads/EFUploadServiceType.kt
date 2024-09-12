@@ -20,6 +20,7 @@ import com.io7m.exfilac.core.EFUploadName
 import com.io7m.exfilac.core.EFUploadReason
 import com.io7m.exfilac.core.EFUploadStatus
 import com.io7m.exfilac.core.EFUploadStatusChanged
+import com.io7m.exfilac.core.internal.EFUploadRecord
 import com.io7m.exfilac.service.api.RPServiceType
 import com.io7m.jattribute.core.AttributeReadableType
 import java.util.concurrent.CompletableFuture
@@ -36,4 +37,6 @@ interface EFUploadServiceType : RPServiceType, AutoCloseable {
   fun cancel(name: EFUploadName)
 
   fun status(name: EFUploadName): EFUploadStatus
+
+  fun mostRecent(name: EFUploadName): EFUploadRecord?
 }

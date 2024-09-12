@@ -489,6 +489,33 @@ rootProject.afterEvaluate {
   formatTask.dependsOn.add(ktlintDownloadTask)
 }
 
+/**
+ * A task to unpack native libraries from the SQLite package.
+ */
+
+fun createSQLiteUnpackTask(project: Project): Task {
+  val commandLineArguments: List<String> = arrayListOf(
+    "java",
+    "UnpackSQLite.java",
+    libs.xerial.sqlite.get().version!!,
+  )
+
+  return project.task("UnpackSQLite", Exec::class) {
+    commandLine = commandLineArguments
+  }
+}
+
+/*
+ * Create a task in the root project that unpacks SQLite.
+ */
+
+lateinit var sqliteUnpackTask: Task
+
+rootProject.afterEvaluate {
+  sqliteUnpackTask = createSQLiteUnpackTask(this)
+  cleanTask.dependsOn.add(sqliteUnpackTask)
+}
+
 allprojects {
 
   /*

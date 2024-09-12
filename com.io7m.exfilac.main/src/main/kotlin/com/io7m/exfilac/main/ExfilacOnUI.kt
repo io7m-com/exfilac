@@ -26,12 +26,15 @@ import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadName
 import com.io7m.exfilac.core.EFUploadStatusChanged
 import com.io7m.exfilac.core.ExfilacType
+import com.io7m.exfilac.core.internal.EFUploadEventRecord
+import com.io7m.exfilac.core.internal.EFUploadRecord
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeSubscriptionType
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.jattribute.core.Attributes
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.slf4j.LoggerFactory
+import java.util.Optional
 
 /**
  * An Exfilac proxy that republishes attributes on the UI thread.
@@ -86,6 +89,10 @@ class ExfilacOnUI(
     this.attributes.withValue(EFNetworkStatus.NETWORK_STATUS_UNAVAILABLE)
   private val settingsUI: AttributeType<EFSettings> =
     this.attributes.withValue(EFSettings.defaults())
+  private val uploadViewEventsUI: AttributeType<List<EFUploadEventRecord>> =
+    this.attributes.withValue(listOf())
+  private val uploadViewRecordUI: AttributeType<Optional<EFUploadRecord>> =
+    this.attributes.withValue(Optional.empty())
 
   companion object {
     private fun <T> wrap(
@@ -105,12 +112,20 @@ class ExfilacOnUI(
     this.subscriptions.add(wrap(this.delegate.uploadsSelected, this.uploadsSelectedUI))
     this.subscriptions.add(wrap(this.delegate.networkStatus, this.networkStatusUI))
     this.subscriptions.add(wrap(this.delegate.settings, this.settingsUI))
+    this.subscriptions.add(wrap(this.delegate.uploadViewEvents, this.uploadViewEventsUI))
+    this.subscriptions.add(wrap(this.delegate.uploadViewRecord, this.uploadViewRecordUI))
   }
 
   override fun close() {
     this.subscriptions.close()
     this.delegate.close()
   }
+
+  override val uploadViewEvents: AttributeReadableType<List<EFUploadEventRecord>> =
+    this.uploadViewEventsUI
+
+  override val uploadViewRecord: AttributeReadableType<Optional<EFUploadRecord>> =
+    this.uploadViewRecordUI
 
   override val uploadStatus: AttributeReadableType<EFUploadStatusChanged> =
     this.uploadsStatusUI

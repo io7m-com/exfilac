@@ -81,20 +81,51 @@
   <string name="uploadTriggersDescription">The events that will trigger this upload.</string>
   <string name="uploadBucketNotSpecified">No bucket was specified.</string>
   <string name="uploadStartedManually">Upload started manually.</string>
+  <string name="uploadStatusDetails">Most recent upload</string>
+  <string name="uploadStatusEventCount">%d events logged.</string>
 
+  <string name="statusRunning">Running…</string>
   <string name="statusNotRunning">Not currently running.</string>
   <string name="statusCompleted">Completed successfully at %s.</string>
   <string name="statusCancelled">Cancelled at %s.</string>
   <string name="statusCancelling">Cancelling…</string>
   <string name="statusFailed">Failed at %s.</string>
 
+  <string name="statusPaused">Uploads are currently paused (see Settings).</string>
+
   <string name="settingsNetworking">Networking</string>
-  <string name="settingsNetworkingUploadWifi">Allow uploads on WiFi.</string>
   <string name="settingsNetworkingUploadCellular">Allow uploads on cellular connections.</string>
+  <string name="settingsNetworkingUploadWifi">Allow uploads on WiFi.</string>
+  <string name="settingsPause">Pause uploads.</string>
   <string name="settingsPrivacyPolicy">Privacy Policy</string>
+  <string name="settingsUploads">Uploads</string>
+  <string name="settingsVersion">Version</string>
+  <string name="settingsBuild">Commit</string>
 
   <string name="networkStatusUnavailable">Network connectivity currently appears to be unavailable.</string>
   <string name="networkStatusCellular">Networking is currently provided by a cellular connection.</string>
   <string name="networkStatusWifi">Networking is currently provided by a Wi-Fi connection.</string>
 
+  <string name="time">Time</string>
+  <string name="file">File</string>
+  <string name="message">Message</string>
+  <string name="loremIpsum">
+    Nulla in tempor enim. Quisque condimentum augue lectus, in condimentum metus porttitor ac.
+    Mauris lacus tortor, imperdiet vel lacus eget, condimentum sodales ligula. Fusce pulvinar magna
+    ante, et vehicula tortor placerat sit amet. Vivamus feugiat tempus sem, ut convallis magna
+    viverra at. Duis lacus metus, tempus ac sodales id, ultrices at eros. Fusce gravida odio
+    ultricies lorem euismod, ac aliquam lectus ullamcorper. Suspendisse in porta elit, et luctus
+    elit. Nulla at metus elementum, efficitur nisl eget, sagittis orci. Vestibulum mollis velit a
+    mollis tincidunt. Etiam nec condimentum nunc.
+  </string>
+  <string name="reason">Reason</string>
+  <string name="filesRequired">Files (Required)</string>
+  <string name="filesSkipped">Files (Skipped)</string>
+  <string name="filesUploaded">Files (Uploaded)</string>
+  <string name="filesFailed">Files (Failed)</string>
+  <string name="uploadId">Upload ID</string>
+  <string name="timeStarted">Time Started</string>
+  <string name="timeEnded">Time Ended</string>
+  <string name="timeDuration">Duration</string>
+  <string name="bucket">Bucket</string>
 </resources>

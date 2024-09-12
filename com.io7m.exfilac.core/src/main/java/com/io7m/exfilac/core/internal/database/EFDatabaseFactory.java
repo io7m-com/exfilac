@@ -88,7 +88,10 @@ public final class EFDatabaseFactory extends DSDatabaseFactory<
       EFQUploadEventRecordAdd.provider(),
       EFQUploadEventRecordList.provider(),
       EFQUploadRecordCreate.provider(),
+      EFQUploadRecordDeleteByAge.provider(),
+      EFQUploadRecordGet.provider(),
       EFQUploadRecordList.provider(),
+      EFQUploadRecordMostRecent.provider(),
       EFQUploadRecordUpdate.provider()
     );
   }

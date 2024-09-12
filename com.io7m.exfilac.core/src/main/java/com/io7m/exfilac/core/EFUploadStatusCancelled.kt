@@ -16,9 +16,11 @@
 
 package com.io7m.exfilac.core
 
+import com.io7m.exfilac.core.internal.EFUploadID
 import java.time.OffsetDateTime
 
 data class EFUploadStatusCancelled(
   override val name: EFUploadName,
+  override val id: EFUploadID?,
   val cancelledAt: OffsetDateTime
 ) : EFUploadStatus()

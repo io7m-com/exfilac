@@ -46,7 +46,7 @@ public final class EFQUploadEventRecordList
       upload_events
     WHERE
       upload_event_record_id = ? AND upload_event_time >= ?
-    ORDER BY upload_event_time, upload_event_id ASC
+    ORDER BY upload_event_time ASC, upload_event_id ASC
     LIMIT ?
     """;
 

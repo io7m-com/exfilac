@@ -25,6 +25,8 @@ import com.io7m.exfilac.core.EFBucketReferenceName
 import com.io7m.exfilac.core.EFDeviceSource
 import com.io7m.exfilac.core.EFRegion
 import com.io7m.exfilac.core.EFSecretKey
+import com.io7m.exfilac.core.EFSettings
+import com.io7m.exfilac.core.EFSettingsNetworking
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadName
 import com.io7m.exfilac.core.EFUploadPolicy
@@ -33,20 +35,26 @@ import com.io7m.exfilac.core.EFUploadSchedule
 import com.io7m.exfilac.core.EFUploadTrigger
 import com.io7m.exfilac.core.internal.EFUploadEventID
 import com.io7m.exfilac.core.internal.EFUploadEventRecord
+import com.io7m.exfilac.core.internal.EFUploadRecord
 import com.io7m.exfilac.core.internal.database.EFDatabaseConfiguration
 import com.io7m.exfilac.core.internal.database.EFDatabaseFactory
 import com.io7m.exfilac.core.internal.database.EFDatabaseType
 import com.io7m.exfilac.core.internal.database.EFQBucketDeleteType
 import com.io7m.exfilac.core.internal.database.EFQBucketListType
 import com.io7m.exfilac.core.internal.database.EFQBucketPutType
+import com.io7m.exfilac.core.internal.database.EFQSettingsGetType
+import com.io7m.exfilac.core.internal.database.EFQSettingsPutType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationDeleteType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationListType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationPutType
 import com.io7m.exfilac.core.internal.database.EFQUploadEventRecordAddType
 import com.io7m.exfilac.core.internal.database.EFQUploadRecordCreateParameters
 import com.io7m.exfilac.core.internal.database.EFQUploadRecordCreateType
+import com.io7m.exfilac.core.internal.database.EFQUploadRecordDeleteByAgeType
+import com.io7m.exfilac.core.internal.database.EFQUploadRecordGetType
 import com.io7m.exfilac.core.internal.database.EFQUploadRecordListParameters
 import com.io7m.exfilac.core.internal.database.EFQUploadRecordListType
+import com.io7m.exfilac.core.internal.database.EFQUploadRecordMostRecentType
 import com.io7m.exfilac.core.internal.database.EFQUploadRecordUpdateType
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -56,9 +64,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.io.TempDir
 import java.net.URI
 import java.nio.file.Path
-import java.time.Duration
 import java.time.OffsetDateTime
-import java.time.Period
 import java.util.Optional
 import java.util.concurrent.TimeUnit
 
@@ -260,37 +266,43 @@ class EFDatabaseTest {
       assertEquals(null, ui.result)
 
       t.query(EFQUploadEventRecordAddType::class.java)
-        .execute(EFUploadEventRecord(
-          eventID = EFUploadEventID(ULong.MIN_VALUE),
-          uploadID = ui.id,
-          time = OffsetDateTime.parse("2010-01-01T00:00:01+00:00"),
-          message = "Message 1",
-          file = "file1.txt",
-          exceptionTrace = null,
-          failed = false
-        ))
+        .execute(
+          EFUploadEventRecord(
+            eventID = EFUploadEventID(ULong.MIN_VALUE),
+            uploadID = ui.id,
+            time = OffsetDateTime.parse("2010-01-01T00:00:01+00:00"),
+            message = "Message 1",
+            file = "file1.txt",
+            exceptionTrace = null,
+            failed = false
+          )
+        )
 
       t.query(EFQUploadEventRecordAddType::class.java)
-        .execute(EFUploadEventRecord(
-          eventID = EFUploadEventID(ULong.MIN_VALUE),
-          uploadID = ui.id,
-          time = OffsetDateTime.parse("2010-01-01T00:00:02+00:00"),
-          message = "Message 2",
-          file = "file1.txt",
-          exceptionTrace = null,
-          failed = false
-        ))
+        .execute(
+          EFUploadEventRecord(
+            eventID = EFUploadEventID(ULong.MIN_VALUE),
+            uploadID = ui.id,
+            time = OffsetDateTime.parse("2010-01-01T00:00:02+00:00"),
+            message = "Message 2",
+            file = "file1.txt",
+            exceptionTrace = null,
+            failed = false
+          )
+        )
 
       t.query(EFQUploadEventRecordAddType::class.java)
-        .execute(EFUploadEventRecord(
-          eventID = EFUploadEventID(ULong.MIN_VALUE),
-          uploadID = ui.id,
-          time = OffsetDateTime.parse("2010-01-01T00:00:03+00:00"),
-          message = "Message 3",
-          file = "file1.txt",
-          exceptionTrace = null,
-          failed = false
-        ))
+        .execute(
+          EFUploadEventRecord(
+            eventID = EFUploadEventID(ULong.MIN_VALUE),
+            uploadID = ui.id,
+            time = OffsetDateTime.parse("2010-01-01T00:00:03+00:00"),
+            message = "Message 3",
+            file = "file1.txt",
+            exceptionTrace = null,
+            failed = false
+          )
+        )
 
       val ui1 = ui.copy(
         timeEnd = OffsetDateTime.parse("2010-01-01T00:00:05+00:00"),
@@ -308,10 +320,101 @@ class EFDatabaseTest {
       assertEquals(
         listOf(ui1),
         t.query(EFQUploadRecordListType::class.java)
-          .execute(EFQUploadRecordListParameters(
-            OffsetDateTime.parse("2010-01-01T00:00:00+00:00").minusDays(1),
-            1000
-          ))
+          .execute(
+            EFQUploadRecordListParameters(
+              newerThan = OffsetDateTime.parse("2010-01-01T00:00:00+00:00").minusDays(1),
+              limit = 1000,
+              onlyIncludeForName = null
+            )
+          )
+      )
+      assertEquals(
+        listOf(ui1),
+        t.query(EFQUploadRecordListType::class.java)
+          .execute(
+            EFQUploadRecordListParameters(
+              newerThan = OffsetDateTime.parse("2010-01-01T00:00:00+00:00").minusDays(1),
+              limit = 1000,
+              onlyIncludeForName = ui.configuration
+            )
+          )
+      )
+      assertEquals(
+        Optional.of(ui1),
+        t.query(EFQUploadRecordMostRecentType::class.java)
+          .execute(ui.configuration)
+      )
+      assertEquals(
+        Optional.of(ui1),
+        t.query(EFQUploadRecordGetType::class.java)
+          .execute(ui.id)
+      )
+
+      /*
+       * Delete all records that are older than a year into the "future". That should
+       * mean every record.
+       */
+
+      t.query(EFQUploadRecordDeleteByAgeType::class.java)
+        .execute(OffsetDateTime.parse("2010-01-01T00:00:00+00:00").plusYears(1L))
+      t.commit()
+
+      assertEquals(
+        listOf<EFUploadRecord>(),
+        t.query(EFQUploadRecordListType::class.java)
+          .execute(
+            EFQUploadRecordListParameters(
+              newerThan = OffsetDateTime.parse("2010-01-01T00:00:00+00:00").minusDays(1),
+              limit = 1000,
+              onlyIncludeForName = null
+            )
+          )
+      )
+    }
+  }
+
+  @Test
+  @Timeout(value = 10L, unit = TimeUnit.SECONDS)
+  fun testSettings() {
+    this.database.openTransaction().use { t ->
+      assertEquals(
+        EFSettings.defaults(),
+        t.query(EFQSettingsGetType::class.java)
+          .execute(DDatabaseUnit.UNIT)
+      )
+
+      val newSettings0 =
+        EFSettings.defaults()
+        .copy(
+          networking = EFSettingsNetworking(
+            uploadOnCellular = true,
+            uploadOnWifi = false
+          )
+        )
+
+      t.query(EFQSettingsPutType::class.java).execute(newSettings0)
+      t.commit()
+
+      assertEquals(
+        newSettings0,
+        t.query(EFQSettingsGetType::class.java).execute(DDatabaseUnit.UNIT)
+      )
+
+      val newSettings1 =
+        EFSettings.defaults()
+          .copy(
+            networking = EFSettingsNetworking(
+              uploadOnCellular = true,
+              uploadOnWifi = true
+            )
+          )
+
+      t.query(EFQSettingsPutType::class.java).execute(newSettings1)
+      t.commit()
+
+      assertEquals(
+        newSettings1,
+        t.query(EFQSettingsGetType::class.java).execute(DDatabaseUnit.UNIT)
       )
     }
   }

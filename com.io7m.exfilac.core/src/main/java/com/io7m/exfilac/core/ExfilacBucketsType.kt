@@ -17,13 +17,18 @@
 package com.io7m.exfilac.core
 
 import com.io7m.jattribute.core.AttributeReadableType
+import java.util.concurrent.CompletableFuture
 
-interface ExfilacType :
-  AutoCloseable,
-  ExfilacBucketsType,
-  ExfilacUploadsType,
-  ExfilacNetworkStatusType,
-  ExfilacSettingsType {
-
-  val state: AttributeReadableType<EFState>
+interface ExfilacBucketsType {
+  val buckets: AttributeReadableType<List<EFBucketConfiguration>>
+  val bucketsSelected: AttributeReadableType<Set<EFBucketReferenceName>>
+  fun bucketEditBegin(): CompletableFuture<*>
+  fun bucketEditCancel(): CompletableFuture<*>
+  fun bucketEditConfirm(bucket: EFBucketConfiguration): CompletableFuture<*>
+  fun bucketsDelete(names: Set<EFBucketReferenceName>): CompletableFuture<*>
+  fun bucketExists(name: EFBucketReferenceName): Boolean
+  fun bucketSelectionAdd(name: EFBucketReferenceName): CompletableFuture<*>
+  fun bucketSelectionRemove(name: EFBucketReferenceName): CompletableFuture<*>
+  fun bucketSelectionClear(): CompletableFuture<*>
+  fun bucketSelectionContains(name: EFBucketReferenceName): Boolean
 }

@@ -16,9 +16,11 @@
 
 package com.io7m.exfilac.core.internal.database
 
+import com.io7m.exfilac.core.EFUploadName
 import java.time.OffsetDateTime
 
 data class EFQUploadRecordListParameters(
   val newerThan: OffsetDateTime,
-  val limit: Int
+  val limit: Int,
+  val onlyIncludeForName: EFUploadName?
 )

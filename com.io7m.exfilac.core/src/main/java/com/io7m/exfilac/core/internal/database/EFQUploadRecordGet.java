@@ -24,17 +24,15 @@ import com.io7m.exfilac.core.EFUploadResult;
 import com.io7m.exfilac.core.internal.EFUploadID;
 import com.io7m.exfilac.core.internal.EFUploadRecord;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
-public final class EFQUploadRecordList
-  extends EFDatabaseQueryAbstract<EFQUploadRecordListParameters, List<EFUploadRecord>>
-  implements EFQUploadRecordListType {
+public final class EFQUploadRecordGet
+  extends EFDatabaseQueryAbstract<EFUploadID, Optional<EFUploadRecord>>
+  implements EFQUploadRecordGetType {
 
   private static final String QUERY = """
     SELECT
@@ -52,33 +50,11 @@ public final class EFQUploadRecordList
     FROM
       upload_records
     WHERE
-      upload_record_time_start >= ?
-    ORDER BY upload_record_time_start, upload_record_id ASC
-    LIMIT ?
+      upload_record_id = ?
+    LIMIT 1
     """;
 
-  private static final String QUERY_WITH_NAME_FILTER = """
-    SELECT
-      upload_record_id,
-      upload_record_time_start,
-      upload_record_time_end,
-      upload_name,
-      upload_bucket,
-      upload_reason,
-      upload_files_required,
-      upload_files_skipped,
-      upload_files_uploaded,
-      upload_files_failed,
-      upload_result
-    FROM
-      upload_records
-    WHERE
-      upload_record_time_start >= ? AND upload_name = ?
-    ORDER BY upload_record_time_start, upload_record_id ASC
-    LIMIT ?
-    """;
-
-  EFQUploadRecordList(
+  EFQUploadRecordGet(
     final EFDatabaseTransactionType t) {
     super(t);
   }
@@ -87,49 +63,31 @@ public final class EFQUploadRecordList
    * @return The query provider
    */
 
-  public static EFDatabaseQueryProviderType<EFQUploadRecordListParameters, List<EFUploadRecord>, EFQUploadRecordListType>
+  public static EFDatabaseQueryProviderType<EFUploadID, Optional<EFUploadRecord>, EFQUploadRecordGetType>
   provider() {
     return EFDatabaseQueryProvider.provide(
-      EFQUploadRecordListType.class,
-      EFQUploadRecordList::new
+      EFQUploadRecordGetType.class,
+      EFQUploadRecordGet::new
     );
   }
 
   @Override
-  protected List<EFUploadRecord> onExecute(
+  protected Optional<EFUploadRecord> onExecute(
     final EFDatabaseTransactionType transaction,
-    final EFQUploadRecordListParameters parameters)
+    final EFUploadID parameters)
     throws SQLException {
     var connection = transaction.connection();
-    var results = new ArrayList<EFUploadRecord>();
 
-    if (parameters.getOnlyIncludeForName() != null) {
-      try (var st = connection.prepareStatement(QUERY_WITH_NAME_FILTER)) {
-        st.setLong(1, parameters.getNewerThan().toInstant().toEpochMilli());
-        st.setString(2, parameters.getOnlyIncludeForName().getValue());
-        st.setInt(3, parameters.getLimit());
-        readResults(st, results);
-      }
-    } else {
-      try (var st = connection.prepareStatement(QUERY)) {
-        st.setLong(1, parameters.getNewerThan().toInstant().toEpochMilli());
-        st.setInt(2, parameters.getLimit());
-        readResults(st, results);
+    try (var st = connection.prepareStatement(QUERY)) {
+      st.setLong(1, parameters.toLong());
+      try (var rs = st.executeQuery()) {
+        if (rs.next()) {
+          return Optional.of(mapRecord(rs));
+        }
       }
     }
 
-    return List.copyOf(results);
-  }
-
-  private static void readResults(
-    final PreparedStatement st,
-    final ArrayList<EFUploadRecord> results)
-    throws SQLException {
-    try (var rs = st.executeQuery()) {
-      while (rs.next()) {
-        results.add(mapRecord(rs));
-      }
-    }
+    return Optional.empty();
   }
 
   private static EFUploadRecord mapRecord(ResultSet rs) throws SQLException {

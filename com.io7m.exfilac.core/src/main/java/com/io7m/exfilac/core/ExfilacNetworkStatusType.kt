@@ -16,16 +16,9 @@
 
 package com.io7m.exfilac.core
 
-data class EFSettings(
-  val networking: EFSettingsNetworking,
-  val paused: Boolean
-) {
-  companion object {
-    fun defaults(): EFSettings {
-      return EFSettings(
-        networking = EFSettingsNetworking.defaults(),
-        paused = false
-      )
-    }
-  }
+import com.io7m.jattribute.core.AttributeReadableType
+
+interface ExfilacNetworkStatusType {
+  val networkStatus: AttributeReadableType<EFNetworkStatus>
+  fun networkStatusSet(status: EFNetworkStatus)
 }

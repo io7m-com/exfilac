@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <com.google.android.material.appbar.AppBarLayout
+    android:id="@+id/uploadStatusAppBarLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+      android:id="@+id/uploadStatusAppBar"
+      android:layout_width="match_parent"
+      android:layout_height="48dp"
+      app:title="@string/uploadStatusDetails" />
+
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="1dp"
+      android:background="?android:attr/listDivider" />
+  </com.google.android.material.appbar.AppBarLayout>
+
+  <LinearLayout
+    android:id="@+id/uploadStatusControlsTop"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:orientation="vertical"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/uploadStatusAppBarLayout">
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="16dp">
+
+      <ImageView
+        android:id="@+id/uploadStatusIcon"
+        android:src="@drawable/status_upload_item_ok"
+        android:layout_width="32dp"
+        android:layout_height="32dp"/>
+
+      <TextView
+        android:id="@+id/uploadStatusSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:lines="1"
+        android:ellipsize="end"
+        tools:text="@string/loremIpsum"/>
+
+    </LinearLayout>
+
+    <TableLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="16dp">
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/uploadId" />
+
+        <TextView
+          android:id="@+id/uploadID"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="1000" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/bucket" />
+
+        <TextView
+          android:id="@+id/uploadBucket"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="1000" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/reason" />
+
+        <TextView
+          android:id="@+id/uploadStatusReason"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="@string/uploadStartedManually" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/timeStarted" />
+
+        <TextView
+          android:id="@+id/uploadTimeStarted"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="1000" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/timeEnded" />
+
+        <TextView
+          android:id="@+id/uploadTimeEnded"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="1000" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/timeDuration" />
+
+        <TextView
+          android:id="@+id/uploadTimeDuration"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="1000" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/filesRequired" />
+
+        <TextView
+          android:id="@+id/uploadStatusRequired"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="1000" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/filesSkipped" />
+
+        <TextView
+          android:id="@+id/uploadStatusSkipped"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="1000" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/filesFailed" />
+
+        <TextView
+          android:id="@+id/uploadStatusFailed"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="1000" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="32dp"
+          android:text="@string/filesUploaded" />
+
+        <TextView
+          android:id="@+id/uploadStatusUploaded"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          tools:text="1000" />
+      </TableRow>
+    </TableLayout>
+
+    <TextView
+      android:id="@+id/uploadStatusEventCount"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="16dp"
+      android:clickable="false"
+      android:ellipsize="end"
+      android:gravity="top"
+      android:maxLines="1"
+      tools:text="@string/uploadStatusEventCount" />
+
+    <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/uploadsStatusListView"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_marginStart="16dp"
+      android:layout_marginTop="8dp"
+      android:layout_marginEnd="16dp"
+      android:layout_marginBottom="16dp"
+      android:layout_weight="1.0"
+      android:background="@drawable/border"
+      android:scrollIndicators="end"
+      android:scrollbarAlwaysDrawVerticalTrack="true"
+      android:scrollbarDefaultDelayBeforeFade="10000"
+      android:scrollbars="vertical" />
+  </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

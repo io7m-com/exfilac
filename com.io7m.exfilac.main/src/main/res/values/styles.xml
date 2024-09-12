@@ -5,31 +5,33 @@
   <style name="Exfilac.Splash" parent="Exfilac.WithoutActionBar" />
 
   <style name="Exfilac.WithoutActionBar" parent="Theme.Material3.Light.NoActionBar">
-    <item name="colorPrimary">#28546C</item>
-    <item name="colorPrimaryVariant">#477187</item>
+    <item name="colorPrimary">@color/primary2</item>
+    <item name="colorPrimaryVariant">@color/primary3</item>
     <item name="colorOnPrimary">#ffffff</item>
-    <item name="colorSurface">#28546C</item>
+    <item name="colorSurface">@color/primary2</item>
     <item name="colorOnSurface">#ffffff</item>
-    <item name="colorSecondary">#28546C</item>
-    <item name="colorSecondaryVariant">#477187</item>
+    <item name="colorSecondary">@color/primary2</item>
+    <item name="colorSecondaryVariant">@color/primary3</item>
     <item name="colorOnSecondary">#ffffff</item>
     <item name="colorOnBackground">#000000</item>
     <item name="colorError">#ff0000</item>
     <item name="colorOnError">#ffffff</item>
 
     <item name="android:buttonStyle">@style/Exfilac.Button.Contained.Medium</item>
+    <item name="android:statusBarColor">#113B51</item>
     <item name="android:windowBackground">#ffffff</item>
+    <item name="materialAlertDialogTheme">@style/Exfilac.MaterialAlertDialog</item>
     <item name="materialButtonOutlinedStyle">@style/Exfilac.Button.Contained</item>
     <item name="materialButtonStyle">@style/Exfilac.Button.Contained</item>
-    <item name="tabStyle">@style/Exfilac.App.TabLayout</item>
-    <item name="toolbarStyle">@style/Widget.Material3.Toolbar.OnSurface</item>
-    <item name="switchStyle">@style/Exfilac.Switch</item>
     <item name="spinnerStyle">@style/Exfilac.Spinner</item>
+    <item name="switchStyle">@style/Exfilac.Switch</item>
+    <item name="tabStyle">@style/Exfilac.TabLayout</item>
+    <item name="toolbarStyle">@style/Widget.Material3.Toolbar.OnSurface</item>
   </style>
 
-  <style name="Exfilac.App.TabLayout" parent="Widget.Material3.TabLayout">
+  <style name="Exfilac.TabLayout" parent="Widget.Material3.TabLayout">
     <item name="materialThemeOverlay">@style/Exfilac.Overlay.TabLayout</item>
-    <item name="tabRippleColor">#477187</item>
+    <item name="tabRippleColor">@color/primary3</item>
   </style>
 
   <style name="Exfilac.Overlay.TabLayout" parent="">
@@ -38,19 +40,17 @@
 
   <style name="Exfilac.Button.Contained" parent="Widget.Material3.Button.UnelevatedButton">
     <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.None</item>
-    <item name="strokeColor">#032436</item>
+    <item name="strokeColor">@color/primary0</item>
     <item name="strokeWidth">1dp</item>
   </style>
 
-  <style name="Exfilac.Button.Contained.Medium" parent="Exfilac.Button.Contained">
-  </style>
+  <style name="Exfilac.Button.Contained.Medium" parent="Exfilac.Button.Contained" />
 
   <style name="Exfilac.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
     <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.None</item>
   </style>
 
-  <style name="Exfilac.Button.Outlined.Medium" parent="Exfilac.Button.Outlined">
-  </style>
+  <style name="Exfilac.Button.Outlined.Medium" parent="Exfilac.Button.Outlined" />
 
   <style name="Exfilac.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
     <item name="materialThemeOverlay">@style/Exfilac.Overlay.Switch</item>
@@ -62,6 +62,20 @@
 
   <style name="Exfilac.Spinner" parent="Widget.AppCompat.Spinner">
     <item name="android:background">@drawable/spinner_border</item>
+  </style>
+
+  <style name="Exfilac.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <item name="buttonBarPositiveButtonStyle">@style/Exfilac.Button.Outlined</item>
+    <item name="buttonBarNegativeButtonStyle">@style/Exfilac.Button.Outlined</item>
+    <item name="alertDialogStyle">@style/Exfilac.AlertDialog</item>
+  </style>
+
+  <style name="Exfilac.AlertDialog" parent="MaterialAlertDialog.Material3">
+    <item name="shapeAppearance">@style/Exfilac.MediumComponent</item>
+  </style>
+
+  <style name="Exfilac.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+    <item name="cornerSize">0dp</item>
   </style>
 
 </resources>

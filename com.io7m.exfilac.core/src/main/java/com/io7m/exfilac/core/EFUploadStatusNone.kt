@@ -16,6 +16,9 @@
 
 package com.io7m.exfilac.core
 
+import com.io7m.exfilac.core.internal.EFUploadID
+
 data class EFUploadStatusNone(
-  override val name: EFUploadName
+  override val name: EFUploadName,
+  override val id: EFUploadID?
 ) : EFUploadStatus()

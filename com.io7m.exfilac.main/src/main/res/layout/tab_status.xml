@@ -59,6 +59,44 @@
       android:text="@string/statusEmptyMessage1" />
   </LinearLayout>
 
+  <LinearLayout
+    android:id="@+id/statusPaused"
+    android:layout_width="0dp"
+    android:layout_height="32dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:gravity="center"
+    android:orientation="horizontal"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/statusAppBarLayout">
+
+    <ImageView
+      android:id="@+id/statusPausedIcon"
+      android:layout_width="16dp"
+      android:layout_height="16dp"
+      android:layout_gravity="center"
+      android:src="@drawable/cancelled_24" />
+
+    <TextView
+      android:id="@+id/statusPausedText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:layout_marginStart="8dp"
+      android:lines="1"
+      android:text="@string/statusPaused" />
+
+  </LinearLayout>
+
+  <View
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/statusPaused"
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="?android:attr/listDivider" />
+
   <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/statusListView"
     android:layout_width="0dp"
@@ -66,7 +104,7 @@
     app:layout_constraintBottom_toTopOf="@id/statusIndicator"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/statusAppBarLayout" />
+    app:layout_constraintTop_toBottomOf="@id/statusPaused" />
 
   <View
     app:layout_constraintEnd_toEndOf="parent"
@@ -105,6 +143,5 @@
       tools:text="The network is currently experiencing difficulties." />
 
   </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

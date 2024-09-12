@@ -28,6 +28,7 @@ import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFStateBucketEditing
 import com.io7m.exfilac.core.EFStateReady
 import com.io7m.exfilac.core.EFStateUploadConfigurationEditing
+import com.io7m.exfilac.core.EFStateUploadStatusViewing
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
@@ -63,6 +64,7 @@ class EFFragmentBooting : EFFragment() {
       is EFStateBootFailed,
       is EFStateReady,
       is EFStateUploadConfigurationEditing,
+      is EFStateUploadStatusViewing,
       is EFStateBucketEditing -> {
         // Not relevant.
       }

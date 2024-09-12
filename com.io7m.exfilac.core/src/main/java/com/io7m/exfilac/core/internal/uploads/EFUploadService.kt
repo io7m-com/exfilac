@@ -24,7 +24,9 @@ import com.io7m.exfilac.core.EFUploadStatus
 import com.io7m.exfilac.core.EFUploadStatusCancelling
 import com.io7m.exfilac.core.EFUploadStatusChanged
 import com.io7m.exfilac.core.EFUploadStatusNone
+import com.io7m.exfilac.core.internal.EFUploadRecord
 import com.io7m.exfilac.core.internal.database.EFDatabaseType
+import com.io7m.exfilac.core.internal.database.EFQUploadRecordMostRecentType
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderType
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
@@ -36,6 +38,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import kotlin.jvm.optionals.getOrNull
 
 class EFUploadService(
   val database: EFDatabaseType,
@@ -110,7 +113,7 @@ class EFUploadService(
   }
 
   override fun cancel(name: EFUploadName) {
-    this.taskStatuses[name] = EFUploadStatusCancelling(name)
+    this.taskStatuses[name] = EFUploadStatusCancelling(name, null)
     this.taskLock.withLock { this.tasks.get(name) }?.cancel()
   }
 
@@ -118,7 +121,17 @@ class EFUploadService(
     name: EFUploadName
   ): EFUploadStatus {
     return this.taskLock.withLock { this.taskStatuses.get(name) }
-      ?: EFUploadStatusNone(name)
+      ?: EFUploadStatusNone(name, null)
+  }
+
+  override fun mostRecent(
+    name: EFUploadName
+  ): EFUploadRecord? {
+    return this.database.openTransaction().use { t ->
+      t.query(EFQUploadRecordMostRecentType::class.java)
+        .execute(name)
+        .getOrNull()
+    }
   }
 
   override fun description(): String {

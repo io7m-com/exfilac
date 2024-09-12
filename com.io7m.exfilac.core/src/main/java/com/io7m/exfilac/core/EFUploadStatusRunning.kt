@@ -16,8 +16,11 @@
 
 package com.io7m.exfilac.core
 
+import com.io7m.exfilac.core.internal.EFUploadID
+
 data class EFUploadStatusRunning(
   override val name: EFUploadName,
+  override val id: EFUploadID?,
   val description: String,
   val progressMajor: Double,
   val progressMinor: Double?

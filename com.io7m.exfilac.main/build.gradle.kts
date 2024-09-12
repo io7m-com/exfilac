@@ -1,3 +1,24 @@
+fun getGitHash(): String {
+  val proc = ProcessBuilder("git", "rev-parse", "--short", "HEAD")
+    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+    .redirectError(ProcessBuilder.Redirect.PIPE)
+    .start()
+
+  proc.waitFor(10L, TimeUnit.SECONDS)
+  return proc.inputStream.bufferedReader().readText().trim()
+}
+
+android {
+  buildFeatures {
+    buildConfig = true
+  }
+
+  defaultConfig {
+    buildConfigField("String", "EXFILAC_GIT_COMMIT", "\"${getGitHash()}\"")
+    buildConfigField("String", "EXFILAC_VERSION", "\"${rootProject.ext["VERSION_NAME"]}\"")
+  }
+}
+
 dependencies {
   implementation(project(":com.io7m.exfilac.clock.api"))
   implementation(project(":com.io7m.exfilac.content_tree.api"))

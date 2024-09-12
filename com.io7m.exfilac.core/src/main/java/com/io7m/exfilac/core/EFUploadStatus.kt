@@ -16,6 +16,9 @@
 
 package com.io7m.exfilac.core
 
+import com.io7m.exfilac.core.internal.EFUploadID
+
 sealed class EFUploadStatus {
   abstract val name: EFUploadName
+  abstract val id: EFUploadID?
 }

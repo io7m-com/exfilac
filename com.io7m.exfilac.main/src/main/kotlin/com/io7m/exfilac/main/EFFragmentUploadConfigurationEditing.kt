@@ -36,7 +36,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.io7m.exfilac.core.EFBucketName
+import com.io7m.exfilac.core.EFBucketReferenceName
 import com.io7m.exfilac.core.EFDeviceSource
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadEditModel
@@ -93,6 +93,9 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
       view.findViewById(R.id.uploadEditPathSelect)
 
     this.toolbar.setNavigationIcon(R.drawable.back_24)
+    this.toolbar.setNavigationOnClickListener {
+      EFApplication.application.exfilac.uploadEditCancel()
+    }
     this.toolbar.menu.clear()
     val activity = this.requireActivity()
     activity.menuInflater.inflate(R.menu.uploads_edit_save, this.toolbar.menu)
@@ -301,11 +304,11 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
   override fun onStart() {
     super.onStart()
 
-    val adapter: ArrayAdapter<EFBucketName> =
-      ArrayAdapter<EFBucketName>(
+    val adapter: ArrayAdapter<EFBucketReferenceName> =
+      ArrayAdapter<EFBucketReferenceName>(
         this.requireContext(),
         android.R.layout.simple_spinner_item,
-        EFApplication.application.exfilac.buckets.get().map { b -> b.name }
+        EFApplication.application.exfilac.buckets.get().map { b -> b.referenceName }
       )
 
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:orientation="vertical"
   android:layout_width="match_parent"
-  android:layout_height="match_parent">
+  android:layout_height="match_parent"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:orientation="vertical">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/settingsAppBarLayout"
@@ -17,11 +17,11 @@
 
     <com.google.android.material.appbar.MaterialToolbar
       android:id="@+id/settingsAppBar"
+      android:layout_width="match_parent"
+      android:layout_height="48dp"
       app:logo="@drawable/io7m_24"
       app:title="@string/app_name"
-      app:titleMarginStart="@dimen/appBarTitleMarginStart"
-      android:layout_width="match_parent"
-      android:layout_height="48dp" />
+      app:titleMarginStart="@dimen/appBarTitleMarginStart" />
 
     <View
       android:layout_width="match_parent"
@@ -43,13 +43,12 @@
       android:layout_height="wrap_content"
       android:orientation="vertical">
 
-      <!-- Bucket name. -->
-
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/settingsMarginHorizontal"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="@dimen/settingsMarginHorizontal"
         android:text="@string/settingsNetworking"
         android:textSize="@dimen/settingsHeaderTextSize"
@@ -59,17 +58,16 @@
         android:id="@+id/settingsUploadCellular"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginStart="@dimen/settingsMarginHorizontal"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:paddingStart="@dimen/settingsMarginHorizontal"
+        android:paddingEnd="@dimen/settingsMarginHorizontal"
         android:text="@string/settingsNetworkingUploadCellular" />
 
       <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/settingsUploadWIFI"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginStart="@dimen/settingsMarginHorizontal"
-        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:paddingStart="@dimen/settingsMarginHorizontal"
+        android:paddingEnd="@dimen/settingsMarginHorizontal"
         android:text="@string/settingsNetworkingUploadWifi" />
 
       <View
@@ -83,10 +81,19 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/settingsMarginHorizontal"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="@dimen/settingsMarginHorizontal"
-        android:text="@string/settingsPrivacyPolicy"
+        android:text="@string/settingsUploads"
         android:textSize="@dimen/settingsHeaderTextSize"
         android:textStyle="bold" />
+
+      <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/settingsUploadsPaused"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingStart="@dimen/settingsMarginHorizontal"
+        android:paddingEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/settingsPause" />
 
       <View
         android:layout_width="match_parent"
@@ -94,6 +101,78 @@
         android:layout_marginTop="16dp"
         android:background="?android:attr/listDivider" />
 
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/settingsBuild"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/settingsCommit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:layout_marginBottom="16dp"
+        tools:text="1793ac38ddb23a887e786f6cc9c6ed272ba5fd9f"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:typeface="monospace" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/settingsVersion"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/settingsVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/settingsMarginHorizontal"
+        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
+        android:layout_marginBottom="16dp"
+        tools:text="1.0.0"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:typeface="monospace" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+
+      <TextView
+        android:id="@+id/settingsPrivacyPolicy"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/settingsMarginHorizontal"
+        android:paddingEnd="@dimen/settingsMarginHorizontal"
+        android:text="@string/settingsPrivacyPolicy"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
     </LinearLayout>
   </ScrollView>
 

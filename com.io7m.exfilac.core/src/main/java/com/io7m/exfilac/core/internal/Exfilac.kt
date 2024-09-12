@@ -28,6 +28,7 @@ import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFStateBucketEditing
 import com.io7m.exfilac.core.EFStateReady
 import com.io7m.exfilac.core.EFStateUploadConfigurationEditing
+import com.io7m.exfilac.core.EFStateUploadStatusViewing
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadName
 import com.io7m.exfilac.core.EFUploadReason
@@ -54,6 +55,9 @@ import com.io7m.exfilac.core.internal.database.EFQSettingsPutType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationDeleteType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationListType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationPutType
+import com.io7m.exfilac.core.internal.database.EFQUploadEventRecordListParameters
+import com.io7m.exfilac.core.internal.database.EFQUploadEventRecordListType
+import com.io7m.exfilac.core.internal.database.EFQUploadRecordGetType
 import com.io7m.exfilac.core.internal.uploads.EFUploadServiceType
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderFactoryType
 import com.io7m.exfilac.service.api.RPServiceDirectory
@@ -110,6 +114,10 @@ internal class Exfilac private constructor(
     this.attributes.withValue(EFNetworkStatus.NETWORK_STATUS_UNAVAILABLE)
   private val settingsSource: AttributeType<EFSettings> =
     this.attributes.withValue(EFSettings.defaults())
+  private val uploadViewEventsSource: AttributeType<List<EFUploadEventRecord>> =
+    this.attributes.withValue(listOf())
+  private val uploadViewRecordSource: AttributeType<Optional<EFUploadRecord>> =
+    this.attributes.withValue(Optional.empty())
 
   init {
     this.resources.add(
@@ -231,6 +239,37 @@ internal class Exfilac private constructor(
     this.uploadService = services.requireService(EFUploadServiceType::class.java)
     this.stateSource.set(EFStateReady())
     this.executeDatabase { this.loadData() }
+
+    this@Exfilac.resources.add(
+      this@Exfilac.uploadStatus.subscribe { _, _ ->
+        this@Exfilac.onUploadStatusChanged()
+      }
+    )
+  }
+
+  private fun onUploadStatusChanged() {
+    val currentlyViewedOpt = this.uploadViewRecord.get()
+    if (currentlyViewedOpt.isPresent) {
+      val currentlyViewed = currentlyViewedOpt.get()
+      this.executeDatabase {
+        this.database?.openTransaction()?.use { t ->
+          this.uploadViewRecordSource.set(
+            t.query(EFQUploadRecordGetType::class.java)
+              .execute(currentlyViewed.id)
+          )
+          this.uploadViewEventsSource.set(
+            t.query(EFQUploadEventRecordListType::class.java)
+              .execute(
+                EFQUploadEventRecordListParameters(
+                  upload = currentlyViewed.id,
+                  timeStart = currentlyViewed.timeStart,
+                  limit = Integer.MAX_VALUE
+                )
+              )
+          )
+        }
+      }
+    }
   }
 
   private fun loadData() {
@@ -486,7 +525,7 @@ internal class Exfilac private constructor(
     this.statusChangedSource
 
   override fun uploadStatus(name: EFUploadName): EFUploadStatus {
-    return this.uploadService?.status(name) ?: EFUploadStatusNone(name)
+    return this.uploadService?.status(name) ?: EFUploadStatusNone(name, null)
   }
 
   override fun uploadStart(
@@ -517,8 +556,51 @@ internal class Exfilac private constructor(
     }
   }
 
-  override val networkStatus: AttributeReadableType<EFNetworkStatus>
-    get() = this.networkStatusSource
+  override fun uploadViewSelect(
+    uploadName: EFUploadName,
+    uploadId: EFUploadID?
+  ): CompletableFuture<*> {
+    return this.executeDatabase {
+      val mostRecent = this.uploadService?.mostRecent(uploadName)
+      val uploadIdActual = uploadId ?: mostRecent?.id
+      if (uploadIdActual == null) {
+        return@executeDatabase
+      }
+
+      this.database?.openTransaction()?.use { t ->
+        this.uploadViewRecordSource.set(Optional.of(mostRecent!!))
+        this.uploadViewEventsSource.set(
+          t.query(EFQUploadEventRecordListType::class.java)
+            .execute(
+              EFQUploadEventRecordListParameters(
+                upload = uploadIdActual,
+                timeStart = mostRecent.timeStart,
+                limit = Integer.MAX_VALUE
+              )
+            )
+        )
+      }
+
+      this.stateSource.set(EFStateUploadStatusViewing(uploadIdActual))
+    }
+  }
+
+  override fun uploadViewCancel(): CompletableFuture<*> {
+    return this.executeCommand {
+      this.stateSource.set(EFStateReady())
+      this.uploadViewRecordSource.set(Optional.empty())
+      this.uploadViewEventsSource.set(listOf())
+    }
+  }
+
+  override val uploadViewEvents: AttributeReadableType<List<EFUploadEventRecord>> =
+    this.uploadViewEventsSource
+
+  override val uploadViewRecord: AttributeReadableType<Optional<EFUploadRecord>> =
+    this.uploadViewRecordSource
+
+  override val networkStatus: AttributeReadableType<EFNetworkStatus> =
+    this.networkStatusSource
 
   override fun networkStatusSet(status: EFNetworkStatus) {
     this.networkStatusSource.set(status)
@@ -565,6 +647,10 @@ internal class Exfilac private constructor(
   ): Boolean {
     if (reason == EFUploadReasonManual) {
       return true
+    }
+
+    if (this.settings.get().paused) {
+      return false
     }
 
     if (!uploadPermittedByNetworkStatus()) {

@@ -31,27 +31,10 @@ import com.io7m.exfilac.core.EFUploadStatusFailed
 import com.io7m.exfilac.core.EFUploadStatusNone
 import com.io7m.exfilac.core.EFUploadStatusRunning
 import com.io7m.exfilac.core.EFUploadStatusSucceeded
-import java.time.format.DateTimeFormatterBuilder
 
 class EFStatusAdapter(
   private var items: List<EFUploadName>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-  private val dateTimeFormatter =
-    DateTimeFormatterBuilder()
-      .appendPattern("YYYY")
-      .appendLiteral('-')
-      .appendPattern("MM")
-      .appendLiteral('-')
-      .appendPattern("dd")
-      .appendLiteral(' ')
-      .appendPattern("HH")
-      .appendLiteral(':')
-      .appendPattern("mm")
-      .appendLiteral(':')
-      .appendPattern("ss")
-      .appendPattern("Z")
-      .toFormatter()
 
   fun setUploadNames(
     uploadList: List<EFUploadName>,
@@ -105,6 +88,9 @@ class EFStatusAdapter(
     init {
       this.startCancel.setOnClickListener {
         this.executeStartOrCancel()
+      }
+      this.view.setOnClickListener {
+        EFApplication.application.exfilac.uploadViewSelect(this.uploadName, uploadId = null)
       }
     }
 
@@ -165,7 +151,7 @@ class EFStatusAdapter(
           this.description.text =
             view.context.getString(
               R.string.statusCompleted,
-              dateTimeFormatter.format(status.completedAt)
+              EFTimes.dateTimeFormatter.format(status.completedAt)
             )
 
           this.progressMinor.isIndeterminate = false
@@ -180,7 +166,7 @@ class EFStatusAdapter(
           this.description.text =
             view.context.getString(
               R.string.statusCancelled,
-              dateTimeFormatter.format(status.cancelledAt)
+              EFTimes.dateTimeFormatter.format(status.cancelledAt)
             )
 
           this.progressMinor.isIndeterminate = false
@@ -211,7 +197,7 @@ class EFStatusAdapter(
           this.description.text =
             view.context.getString(
               R.string.statusFailed,
-              dateTimeFormatter.format(status.failedAt)
+              EFTimes.dateTimeFormatter.format(status.failedAt)
             )
 
           this.progressMinor.isIndeterminate = false

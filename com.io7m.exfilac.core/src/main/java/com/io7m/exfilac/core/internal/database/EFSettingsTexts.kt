@@ -65,12 +65,15 @@ object EFSettingsTexts {
       p.getProperty("networking.uploadOnWifi")?.toBoolean() ?: true
     val uploadOnCellular =
       p.getProperty("networking.uploadOnCellular")?.toBoolean() ?: true
+    val paused =
+      p.getProperty("paused")?.toBoolean() ?: false
 
     return EFSettings(
       EFSettingsNetworking(
         uploadOnWifi = uploadOnWifi,
         uploadOnCellular = uploadOnCellular,
-      )
+      ),
+      paused = paused
     )
   }
 
@@ -82,6 +85,7 @@ object EFSettingsTexts {
     p.setProperty("@version", "1")
     p.setProperty("networking.uploadOnWifi", u.networking.uploadOnWifi.toString())
     p.setProperty("networking.uploadOnCellular", u.networking.uploadOnCellular.toString())
+    p.setProperty("paused", u.paused.toString())
     return p
   }
 

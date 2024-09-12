@@ -25,6 +25,7 @@ import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFStateBucketEditing
 import com.io7m.exfilac.core.EFStateReady
 import com.io7m.exfilac.core.EFStateUploadConfigurationEditing
+import com.io7m.exfilac.core.EFStateUploadStatusViewing
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
@@ -72,6 +73,10 @@ class EFActivity : AppCompatActivity(R.layout.main_activity) {
       is EFStateUploadConfigurationEditing -> {
         this.switchFragment(EFFragmentUploadConfigurationEditing())
       }
+
+      is EFStateUploadStatusViewing -> {
+        this.switchFragment(EFFragmentUploadStatus())
+      }
     }
   }
 
@@ -90,6 +95,10 @@ class EFActivity : AppCompatActivity(R.layout.main_activity) {
       is EFStateBooting,
       is EFStateReady -> {
         super.onBackPressed()
+      }
+
+      is EFStateUploadStatusViewing -> {
+        EFApplication.application.exfilac.uploadViewCancel()
       }
     }
   }
