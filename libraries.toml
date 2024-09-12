@@ -82,8 +82,8 @@ apache_commons_io    = { module = "commons-io:commons-io", version = "2.16.1" }
 apache_commons_lang3 = { module = "org.apache.commons:commons-lang3", version = "3.17.0" }
 apache_commons_math3 = { module = "org.apache.commons:commons-math3", version = "3.6.1"}
 
-androidx_activity                       = { module = "androidx.activity:activity", version                           = "1.9.1" }
-androidx_activity_ktx                   = { module = "androidx.activity:activity-ktx", version                       = "1.9.1" }
+androidx_activity                       = { module = "androidx.activity:activity", version                           = "1.9.2" }
+androidx_activity_ktx                   = { module = "androidx.activity:activity-ktx", version                       = "1.9.2" }
 androidx_annotation                     = { module = "androidx.annotation:annotation", version                       = "1.8.2" }
 androidx_appcompat                      = { module = "androidx.appcompat:appcompat", version                         = "1.7.0" }
 androidx_appcompat_resources            = { module = "androidx.appcompat:appcompat-resources", version               = "1.7.0" }
