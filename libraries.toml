@@ -65,6 +65,9 @@ xerces                  = { module = "xerces:xercesImpl", version.ref = "xerces"
 stax_api                = { module = "javax.xml.stream:stax-api", version = "1.0-2" }
 stax                    = { module = "stax:stax", version = "1.2.0" }
 
+zxing_embedded = { module = "com.journeyapps:zxing-android-embedded", version = "4.3.0" }
+zxing_core     = { module = "com.google.zxing:core", version = "3.4.1" }
+
 slf4j           = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 logback_android = { module = "com.github.tony19:logback-android", version.ref = "logback_android" }
 logback_core    = { module = "ch.qos.logback:logback-core", version = "1.4.8" }

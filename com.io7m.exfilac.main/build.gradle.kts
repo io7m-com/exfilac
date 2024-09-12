@@ -58,6 +58,11 @@ dependencies {
   implementation(libs.xerces)
   implementation(libs.xerial.sqlite)
 
+  // QR code reader.
+  implementation(libs.zxing.embedded)
+  implementation(libs.zxing.core)
+
+  // Theme
   implementation(libs.google.material)
 
   implementation(libs.androidx.activity)

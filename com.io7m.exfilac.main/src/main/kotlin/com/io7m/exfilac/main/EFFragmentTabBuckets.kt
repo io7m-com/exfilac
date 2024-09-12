@@ -27,16 +27,31 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.io7m.exfilac.core.EFBucketAccessStyle
 import com.io7m.exfilac.core.EFBucketConfiguration
+import com.io7m.exfilac.core.EFBucketEditModel
 import com.io7m.exfilac.core.EFBucketReferenceName
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
+import java.io.StringReader
+import java.net.URI
+import java.util.Properties
 
 class EFFragmentTabBuckets : Fragment() {
 
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
+
+  private val barcodeLauncher =
+    this.registerForActivityResult(ScanContract()) { result ->
+      val data = result.contents
+      if (data != null) {
+        this.onQRCodeReceived(data)
+      }
+    }
 
   private lateinit var emptyView: ViewGroup
   private lateinit var adapter: EFBucketsAdapter
@@ -68,6 +83,11 @@ class EFFragmentTabBuckets : Fragment() {
           true
         }
 
+        R.id.bucketsMenuAddBucketQR -> {
+          this.onBucketMenuAddQRSelected()
+          true
+        }
+
         R.id.bucketsMenuRemoveBucket -> {
           this.onBucketMenuRemoveSelected()
           true
@@ -76,7 +96,6 @@ class EFFragmentTabBuckets : Fragment() {
         else -> false
       }
     }
-
     return view
   }
 
@@ -148,6 +167,13 @@ class EFFragmentTabBuckets : Fragment() {
   }
 
   @UiThread
+  private fun onBucketMenuAddQRSelected() {
+    EFUIThread.checkIsUIThread()
+    this.barcodeLauncher.launch(ScanOptions())
+    EFApplication.application.exfilac.bucketEditBegin()
+  }
+
+  @UiThread
   private fun onBucketMenuRemoveSelected() {
     EFUIThread.checkIsUIThread()
 
@@ -162,5 +188,40 @@ class EFFragmentTabBuckets : Fragment() {
       d.cancel()
     }
     builder.show()
+  }
+
+  @UiThread
+  private fun onQRCodeReceived(
+    data: String
+  ) {
+    EFUIThread.checkIsUIThread()
+
+    try {
+      val properties = Properties()
+      StringReader(data).use(properties::load)
+
+      EFBucketEditModel.referenceName =
+        properties.getProperty("Name") ?: ""
+      EFBucketEditModel.name =
+        properties.getProperty("Bucket") ?: ""
+      EFBucketEditModel.accessKey =
+        properties.getProperty("AccessKey") ?: ""
+      EFBucketEditModel.secret =
+        properties.getProperty("SecretKey") ?: ""
+      EFBucketEditModel.endpoint =
+        URI.create(properties.getProperty("Endpoint") ?: "")
+      EFBucketEditModel.region =
+        properties.getProperty("Region") ?: "us-east-1"
+
+      try {
+        EFBucketEditModel.accessStyle =
+          EFBucketAccessStyle.valueOf(properties.getProperty("Region"))
+      } catch (e: Throwable) {
+        EFBucketEditModel.accessStyle =
+          EFBucketAccessStyle.VIRTUALHOST_STYLE
+      }
+    } catch (e: Throwable) {
+      // ?
+    }
   }
 }

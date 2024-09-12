@@ -34,6 +34,7 @@
   <string name="bucketAccessStyle">Access Style</string>
   <string name="bucketAccessStyleDescription">The access style for the bucket.</string>
   <string name="bucketAdd">Add bucket</string>
+  <string name="bucketAddQR">Add bucket from QR code</string>
   <string name="bucketCreate">Create</string>
   <string name="bucketDeleteConfirm">Are you sure you want to delete the selected buckets?\n\nDeleting buckets will also delete any uploads associated with them.</string>
   <string name="bucketEditCreate">Create Bucket</string>
