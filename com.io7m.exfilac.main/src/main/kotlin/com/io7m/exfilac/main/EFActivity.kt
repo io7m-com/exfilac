@@ -23,6 +23,7 @@ import com.io7m.exfilac.core.EFStateBootFailed
 import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFStateBucketEditing
 import com.io7m.exfilac.core.EFStateReady
+import com.io7m.exfilac.core.EFStateSettingsReadingDocument
 import com.io7m.exfilac.core.EFStateUploadConfigurationEditing
 import com.io7m.exfilac.core.EFStateUploadStatusViewing
 import com.io7m.exfilac.main.EFScreenFragment.EFBackResult
@@ -76,6 +77,10 @@ class EFActivity : AppCompatActivity(R.layout.main_activity) {
 
       is EFStateUploadStatusViewing -> {
         this.switchFragment(EFFragmentUploadStatus())
+      }
+
+      is EFStateSettingsReadingDocument -> {
+        this.switchFragment(EFFragmentDocument())
       }
     }
   }

@@ -16,13 +16,8 @@
 
 package com.io7m.exfilac.core
 
-import com.io7m.jattribute.core.AttributeReadableType
 import java.net.URI
-import java.util.concurrent.CompletableFuture
 
-interface ExfilacSettingsType {
-  val settings: AttributeReadableType<EFSettings>
-  fun settingsUpdate(settings: EFSettings): CompletableFuture<*>
-  fun settingsDocumentOpen(uri: URI)
-  fun settingsDocumentClose()
-}
+class EFStateSettingsReadingDocument(
+  val target: URI
+) : EFState()

@@ -20,9 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
-import androidx.annotation.UiThread
-import com.io7m.exfilac.core.EFState
+import android.webkit.WebView
 import com.io7m.exfilac.core.EFStateBootFailed
 import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFStateBucketEditing
@@ -30,69 +28,45 @@ import com.io7m.exfilac.core.EFStateReady
 import com.io7m.exfilac.core.EFStateSettingsReadingDocument
 import com.io7m.exfilac.core.EFStateUploadConfigurationEditing
 import com.io7m.exfilac.core.EFStateUploadStatusViewing
-import com.io7m.jmulticlose.core.CloseableCollection
-import com.io7m.jmulticlose.core.CloseableCollectionType
-import com.io7m.jmulticlose.core.ClosingResourceFailedException
 
-class EFFragmentBooting : EFScreenFragment() {
+class EFFragmentDocument : EFScreenFragment() {
 
-  private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
-    CloseableCollection.create()
-
-  private lateinit var loadingProgress: ProgressBar
-
-  override fun onBackPressed(): EFBackResult {
-    return EFBackResult.BACK_PROPAGATE_UP
-  }
+  private lateinit var webView: WebView
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    val view =
-      inflater.inflate(R.layout.loading, container, false)
-
-    this.loadingProgress =
-      view.findViewById(R.id.loadingProgress)
-
+    val view = inflater.inflate(R.layout.web_view, container, false)
+    this.webView = view.findViewById(R.id.webView)
+    this.webView.settings.allowFileAccess = true
     return view
-  }
-
-  @UiThread
-  private fun onStateChanged(
-    newValue: EFState,
-  ) {
-    EFUIThread.checkIsUIThread()
-
-    when (newValue) {
-      is EFStateSettingsReadingDocument,
-      is EFStateBootFailed,
-      is EFStateReady,
-      is EFStateUploadConfigurationEditing,
-      is EFStateUploadStatusViewing,
-      is EFStateBucketEditing -> {
-        // Not relevant.
-      }
-
-      is EFStateBooting -> {
-        this.loadingProgress.progress = (newValue.progress * 100.0).toInt()
-      }
-    }
   }
 
   override fun onStart() {
     super.onStart()
-    this.subscriptions = CloseableCollection.create()
-    this.subscriptions.add(
-      EFApplication.application.exfilac.state.subscribe { _, newValue ->
-        this.onStateChanged(newValue)
+
+    if (this.webView.url == null) {
+      when (val state = EFApplication.application.exfilac.state.get()) {
+        is EFStateSettingsReadingDocument -> {
+          this.webView.loadUrl(state.target.toString())
+        }
+
+        is EFStateBootFailed,
+        is EFStateBooting,
+        is EFStateBucketEditing,
+        is EFStateReady,
+        is EFStateUploadConfigurationEditing,
+        is EFStateUploadStatusViewing -> {
+          // Nothing to do
+        }
       }
-    )
+    }
   }
 
-  override fun onStop() {
-    super.onStop()
-    this.subscriptions.close()
+  override fun onBackPressed(): EFBackResult {
+    EFApplication.application.exfilac.settingsDocumentClose()
+    return EFBackResult.BACK_HANDLED
   }
 }

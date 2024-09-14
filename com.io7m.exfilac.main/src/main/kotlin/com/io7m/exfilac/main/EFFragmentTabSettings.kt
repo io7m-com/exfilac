@@ -16,6 +16,8 @@
 
 package com.io7m.exfilac.main
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +30,7 @@ import com.io7m.exfilac.core.EFSettings
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import java.net.URI
 
 class EFFragmentTabSettings : Fragment() {
 
@@ -35,8 +38,10 @@ class EFFragmentTabSettings : Fragment() {
     CloseableCollection.create()
 
   private lateinit var commit: TextView
+  private lateinit var manual: TextView
   private lateinit var paused: SwitchMaterial
   private lateinit var privacyPolicy: TextView
+  private lateinit var support: TextView
   private lateinit var toolbar: MaterialToolbar
   private lateinit var uploadCellular: SwitchMaterial
   private lateinit var uploadWifi: SwitchMaterial
@@ -63,6 +68,10 @@ class EFFragmentTabSettings : Fragment() {
       view.findViewById(R.id.settingsCommit)
     this.version =
       view.findViewById(R.id.settingsVersion)
+    this.support =
+      view.findViewById(R.id.settingsSupport)
+    this.manual =
+      view.findViewById(R.id.settingsUserManual)
 
     this.uploadCellular.setOnCheckedChangeListener { _, isChecked ->
       this.updateSettings { settings: EFSettings ->
@@ -81,6 +90,16 @@ class EFFragmentTabSettings : Fragment() {
     }
     this.privacyPolicy.setOnClickListener {
       // Not implemented yet
+    }
+    this.support.setOnClickListener {
+      val i = Intent(Intent.ACTION_VIEW)
+      i.setData(Uri.parse("https://www.github.com/io7m-com/exfilac/discussions"))
+      this.startActivity(i)
+    }
+    this.manual.setOnClickListener {
+      EFApplication.application.exfilac.settingsDocumentOpen(
+        URI.create("file:///android_asset/manual/index.xhtml")
+      )
     }
 
     this.commit.text = BuildConfig.EXFILAC_GIT_COMMIT

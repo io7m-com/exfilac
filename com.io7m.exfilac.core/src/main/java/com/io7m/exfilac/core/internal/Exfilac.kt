@@ -27,6 +27,7 @@ import com.io7m.exfilac.core.EFState
 import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFStateBucketEditing
 import com.io7m.exfilac.core.EFStateReady
+import com.io7m.exfilac.core.EFStateSettingsReadingDocument
 import com.io7m.exfilac.core.EFStateUploadConfigurationEditing
 import com.io7m.exfilac.core.EFStateUploadStatusViewing
 import com.io7m.exfilac.core.EFUploadConfiguration
@@ -74,6 +75,7 @@ import com.io7m.taskrecorder.core.TRTaskRecorder
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteErrorCode
 import org.sqlite.SQLiteException
+import java.net.URI
 import java.nio.file.Path
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -640,6 +642,14 @@ internal class Exfilac private constructor(
         this.settingsSource.set(settings)
       }
     }
+  }
+
+  override fun settingsDocumentOpen(target: URI) {
+    this.stateSource.set(EFStateSettingsReadingDocument(target))
+  }
+
+  override fun settingsDocumentClose() {
+    this.stateSource.set(EFStateReady())
   }
 
   private fun uploadPermittedByNetworkStatus(): Boolean {
