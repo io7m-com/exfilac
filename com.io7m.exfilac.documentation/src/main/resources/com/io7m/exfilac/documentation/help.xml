@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         id="7b22aa57-1001-4d6a-b2d4-190cb8bac647"
+         title="Help!">
+
+  <Paragraph>
+    If you've run into an issue with the application, please feel free to ask questions in the
+    <LinkExternal target="https://www.github.com/io7m-com/exfilac/discussions">
+      discussions board on GitHub</LinkExternal>.
+  </Paragraph>
+
+</Section>

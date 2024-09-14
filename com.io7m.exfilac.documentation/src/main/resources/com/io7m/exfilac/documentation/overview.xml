@@ -35,7 +35,7 @@
         </Item>
         <Item>
           The application can be configured to upload files on a timed schedule, and/or in response to various
-          events occurring on the device such as a photo being taken, a phone call ending, and more.
+          events occurring on the device such as a photo being taken, or the network becoming available.
         </Item>
         <Item>
           The application vigorously respects the privacy of users: The application contains no telemetry or analytics

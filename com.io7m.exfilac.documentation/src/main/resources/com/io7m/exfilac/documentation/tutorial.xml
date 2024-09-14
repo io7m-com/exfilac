@@ -406,13 +406,6 @@ SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
             <Column>Meaning</Column>
           </Columns>
           <Row>
-            <Cell>A phone call ended.</Cell>
-            <Cell>
-              The upload will start when a phone call on the device ends. This can be useful for pushing phone call
-              recordings to the server.
-            </Cell>
-          </Row>
-          <Row>
             <Cell>
               A photo was taken.
             </Cell>

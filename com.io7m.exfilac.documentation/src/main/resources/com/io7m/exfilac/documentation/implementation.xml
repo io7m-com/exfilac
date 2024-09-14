@@ -16,19 +16,67 @@
     <Subsection title="Directories"
                 id="18647abb-0b23-49d7-93b9-a71021c6a9ce">
       <Paragraph>
-        Directories.
+        Android has ultimately removed access to the filesystem for applications. Instead, it has exposed a
+        rather poorly-designed and restrictive <Term type="term">Content Provider</Term> API that exposes an
+        essentially proprietary filesystem-like API. This, naturally, complicates both development and testing
+        because instead of being able to use ubiquitous and standardized APIs to access files, developers now have
+        to use a proprietary API that cannot be executed outside of real and/or emulated devices.
+      </Paragraph>
+      <Paragraph>
+        In order to ensure that as much code can be tested in an automated manner as possible without having to
+        involve excessively fragile and broken-more-often-than-not <Term type="term">instrumented device tests</Term>,
+        the application abstracts over the <Term type="term">Content Provider</Term> API.
+      </Paragraph>
+      <Paragraph>
+        Content providers are described via <Term type="term">content URIs</Term>. For example, the content URI
+        that describes the user's <Term type="constant">DCIM</Term> camera image directory on the average Samsung
+        device will look something like this:
+        <Term type="constant">content://com.android.externalstorage.documents/tree/primary%3ADCIM</Term>. Obviously,
+        asking users to enter the URIs of content providers directly would be unreasonable, so the application
+        tries to provide ways to allow users to select content providers sensibly. Currently, the application will
+        delegate to the device's file manager when the user wants to select a "directory" for uploads.
+      </Paragraph>
+      <Paragraph>
+        Additionally, the act of accessing a content provider requires the user to grant permission for the application
+        to do so. The application attempts to acquire a <Term type="term">persistent</Term> permission for each
+        content provider so that uploads can continue to run uninterrupted in the background after device and/or
+        application restarts. If it did not do this, uploads would simply fail when they attempted to scan the
+        filesystem for new files.
       </Paragraph>
     </Subsection>
     <Subsection title="Checksums"
                 id="1d3d85f0-05c0-4bf7-821a-c36a7fb63b5c">
       <Paragraph>
-        Checksums.
+        When the application attempts to upload any given file, it first checks to see if that file already exists
+        on the server. It does this because bandwidth tends to be a precious resource for many users, and redundantly
+        uploading large files over and over again would likely be unpopular.
       </Paragraph>
+      <Paragraph>
+        For a given file, the application computes the
+        <LinkExternal target="https://en.wikipedia.org/wiki/SHA-2">SHA-256</LinkExternal> checksum of the file
+        and then performs an S3 <Term type="constant">HEAD</Term> request for the file on the remote server. If
+        the file does exist on the server, the code looks for a metadata element named
+        <Term type="constant">X-Amz-Meta-Exfilac-Sha256</Term> on the object in storage. This
+        metadata element is set by the application when a file is uploaded, and contains the Base64-encoded
+        SHA-256 checksum of the file. If the file does exist on the server, and has an
+        <Term type="constant">X-Amz-Meta-Exfilac-Sha256</Term> value that matches the SHA-256 checksum that it
+        just computed, then the application can be confident that the file on the server has the exact same
+        content and the file can be skipped instead of being uploaded again. When using systems such as
+        <Term type="package">MinIO</Term>, this metadata can be observed in the admin interface:
+      </Paragraph>
+      <FormalItem title="X-Amz-Meta-Exfilac-Sha256">
+        <Image source="minio.png" type="screenImage">
+          A X-Amz-Meta-Exfilac-Sha256 value in MinIO's admin interface.
+        </Image>
+      </FormalItem>
     </Subsection>
     <Subsection title="Schedules"
                 id="3defdc93-1be4-4444-96c4-d438462f6bd3">
       <Paragraph>
-        Schedules.
+        The application registers a service in the background that, every five minutes, attempts to start every
+        time-based upload. Each upload will check to see if it is configured to run on a time-based schedule and,
+        if it is configured to do so, will check to see if enough time has elapsed between the current time and
+        the last time it ran. If the upload has <Term type="term">never</Term> run, then it will run now.
       </Paragraph>
     </Subsection>
     <Subsection title="Triggers"
@@ -36,17 +84,74 @@
       <Subsection title="Network Availability"
                   id="f6482692-5b3e-42ec-a3f5-17a85fbb7c1b">
         <Paragraph>
-          Network Availability.
+          The application registers a service in the background that observes changes in the network state.
+          Specifically, the service instructs the application core whenever the network state changes. The network state
+          is represented by one of three values: <Term type="constant">NETWORK_STATUS_UNAVAILABLE</Term>,
+          <Term type="constant">NETWORK_STATUS_CELLULAR</Term>, or
+          <Term type="constant">NETWORK_STATUS_WIFI</Term>.
+        </Paragraph>
+        <Paragraph>
+          The application core is then responsible for deciding what constitutes the network "becoming available". It
+          decides based on the given state transitions:
+        </Paragraph>
+        <FormalItem title="Network State Transitions">
+          <ListUnordered>
+            <Item>
+              If the current network state is <Term type="constant">NETWORK_STATUS_UNAVAILABLE</Term>, and the new
+              network state is <Term type="constant">NETWORK_STATUS_CELLULAR</Term> or
+              <Term type="constant">NETWORK_STATUS_WIFI</Term>, then this constitutes "becoming available".
+            </Item>
+            <Item>
+              If the current network state is <Term type="constant">NETWORK_STATUS_CELLULAR</Term>, and the new network
+              state is <Term type="constant">NETWORK_STATUS_WIFI</Term>, then this constitutes "becoming available".
+            </Item>
+          </ListUnordered>
+        </FormalItem>
+        <Paragraph>
+          When the application decides that the network has become available, it will start all uploads that are
+          configured to trigger when the network becomes available.
         </Paragraph>
       </Subsection>
-      <Subsection title="Phone Calls">
+      <Subsection title="Photo Taken"
+                  id="80afa8a4-fd52-4b67-89ec-1172a176ec4b">
         <Paragraph>
-          Phone Calls.
+          The application registers a service in the background that attempts to discern when the device camera has been
+          used to take a photo.
         </Paragraph>
-      </Subsection>
-      <Subsection title="Photo Taken">
         <Paragraph>
-          Photo Taken.
+          Unfortunately, the Android team have decided that detecting camera activity is now something to be forbidden.
+          Instead, the only option for applications running on modern devices is to try to detect changes in the
+          device's
+          <LinkExternal target="https://developer.android.com/training/data-storage/shared/media">
+            media store</LinkExternal>. Naturally, like all of Android's poorly-thought-out APIs, the new media store
+          API makes it impossible to distinguish between "a photo appeared in the media store because the camera took an
+          image" and "a photo appeared in the media store because someone saved one onto the device". Therefore, the
+          background service in the application might schedule more uploads than strictly necessary if the user is
+          manipulating images on their device.
+        </Paragraph>
+        <Paragraph>
+          The application registers a <Term type="term">content observer</Term> on the following media store URIs:
+        </Paragraph>
+        <FormalItem title="Media Store URIs"
+                    id="56428d08-749a-4ac0-9929-e253d0ed5434">
+          <ListUnordered>
+            <Item>
+              <Term type="constant">MediaStore.Images.Media.EXTERNAL_CONTENT_URI</Term>
+            </Item>
+            <Item>
+              <Term type="constant">MediaStore.Images.Media.INTERNAL_CONTENT_URI</Term>
+            </Item>
+            <Item>
+              <Term type="constant">MediaStore.Video.Media.EXTERNAL_CONTENT_URI</Term>
+            </Item>
+            <Item>
+              <Term type="constant">MediaStore.Video.Media.INTERNAL_CONTENT_URI</Term>
+            </Item>
+          </ListUnordered>
+        </FormalItem>
+        <Paragraph>
+          The application will then start all uploads that are configured to trigger when a photo is taken if the
+          system notifies it that any of the above content stores have changed.
         </Paragraph>
       </Subsection>
     </Subsection>
