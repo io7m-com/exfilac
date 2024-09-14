@@ -21,19 +21,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.io7m.exfilac.core.EFUploadConfiguration
 import com.io7m.exfilac.core.EFUploadEditModel
 
-class EFUploadsAdapter(
-  private var items: List<EFUploadConfiguration>,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class EFUploadsAdapter : ListAdapter<EFUploadConfiguration, RecyclerView.ViewHolder>(diffCallback) {
 
-  fun setUploads(
-    uploadList: List<EFUploadConfiguration>,
-  ) {
-    this.items = uploadList
-    this.notifyDataSetChanged()
+  companion object {
+    private val diffCallback =
+      object : DiffUtil.ItemCallback<EFUploadConfiguration>() {
+        override fun areContentsTheSame(
+          oldItem: EFUploadConfiguration,
+          newItem: EFUploadConfiguration
+        ): Boolean {
+          return oldItem == newItem
+        }
+
+        override fun areItemsTheSame(
+          oldItem: EFUploadConfiguration,
+          newItem: EFUploadConfiguration
+        ): Boolean {
+          return oldItem.name == newItem.name
+        }
+      }
   }
 
   override fun onCreateViewHolder(
@@ -51,11 +63,7 @@ class EFUploadsAdapter(
     holder: RecyclerView.ViewHolder,
     position: Int,
   ) {
-    (holder as? UploadViewHolder)?.bind(this.items[position])
-  }
-
-  override fun getItemCount(): Int {
-    return this.items.size
+    (holder as? UploadViewHolder)?.bind(this.getItem(position))
   }
 
   inner class UploadViewHolder(val view: View) : RecyclerView.ViewHolder(view) {

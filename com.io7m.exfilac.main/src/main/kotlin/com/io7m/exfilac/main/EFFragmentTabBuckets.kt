@@ -102,7 +102,7 @@ class EFFragmentTabBuckets : Fragment() {
   override fun onStart() {
     super.onStart()
 
-    this.adapter = EFBucketsAdapter(items = listOf())
+    this.adapter = EFBucketsAdapter()
     this.listView.adapter = this.adapter
     this.listView.visibility = View.VISIBLE
     this.emptyView.visibility = View.INVISIBLE
@@ -148,7 +148,7 @@ class EFFragmentTabBuckets : Fragment() {
     EFUIThread.checkIsUIThread()
 
     EFApplication.application.exfilac.bucketSelectionClear()
-    this.adapter.setBuckets(buckets)
+    this.adapter.submitList(buckets)
 
     if (buckets.isEmpty()) {
       this.listView.visibility = View.INVISIBLE

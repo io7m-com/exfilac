@@ -21,18 +21,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.io7m.exfilac.core.internal.EFUploadEventRecord
 
-class EFUploadStatusAdapter(
-  private var items: List<EFUploadEventRecord>
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class EFUploadStatusAdapter :
+  ListAdapter<EFUploadEventRecord, RecyclerView.ViewHolder>(diffCallback) {
 
-  fun setStatusEvents(
-    newList: List<EFUploadEventRecord>
-  ) {
-    this.items = newList
-    this.notifyDataSetChanged()
+  companion object {
+    private val diffCallback =
+      object : DiffUtil.ItemCallback<EFUploadEventRecord>() {
+        override fun areContentsTheSame(
+          oldItem: EFUploadEventRecord,
+          newItem: EFUploadEventRecord
+        ): Boolean {
+          return oldItem == newItem
+        }
+
+        override fun areItemsTheSame(
+          oldItem: EFUploadEventRecord,
+          newItem: EFUploadEventRecord
+        ): Boolean {
+          return oldItem.uploadID == newItem.uploadID
+        }
+      }
   }
 
   override fun onCreateViewHolder(
@@ -50,11 +63,7 @@ class EFUploadStatusAdapter(
     holder: RecyclerView.ViewHolder,
     position: Int
   ) {
-    (holder as? StatusViewHolder)?.bind(this.items[position])
-  }
-
-  override fun getItemCount(): Int {
-    return this.items.size
+    (holder as? StatusViewHolder)?.bind(this.getItem(position))
   }
 
   inner class StatusViewHolder(val view: View) : RecyclerView.ViewHolder(view) {

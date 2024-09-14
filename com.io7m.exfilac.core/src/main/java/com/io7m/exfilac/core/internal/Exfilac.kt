@@ -58,6 +58,7 @@ import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationPutType
 import com.io7m.exfilac.core.internal.database.EFQUploadEventRecordListParameters
 import com.io7m.exfilac.core.internal.database.EFQUploadEventRecordListType
 import com.io7m.exfilac.core.internal.database.EFQUploadRecordGetType
+import com.io7m.exfilac.core.internal.database.EFQUploadRecordsMarkCancelledType
 import com.io7m.exfilac.core.internal.uploads.EFUploadServiceType
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderFactoryType
 import com.io7m.exfilac.service.api.RPServiceDirectory
@@ -274,18 +275,40 @@ internal class Exfilac private constructor(
 
   private fun loadData() {
     this.database?.openTransaction()?.use { transaction ->
-      this.bucketsSource.set(
-        transaction.query(EFQBucketListType::class.java)
-          .execute(DDatabaseUnit.UNIT)
-      )
-      this.uploadsSource.set(
-        transaction.query(EFQUploadConfigurationListType::class.java)
-          .execute(DDatabaseUnit.UNIT),
-      )
-      this.settingsSource.set(
-        transaction.query(EFQSettingsGetType::class.java)
-          .execute(DDatabaseUnit.UNIT)
-      )
+      try {
+        transaction.query(EFQUploadRecordsMarkCancelledType::class.java)
+          .execute(this.clock.now())
+        transaction.commit()
+      } catch (e: Exception) {
+        logger.debug("Update uploads: ", e)
+      }
+
+      try {
+        this.bucketsSource.set(
+          transaction.query(EFQBucketListType::class.java)
+            .execute(DDatabaseUnit.UNIT)
+        )
+      } catch (e: Exception) {
+        logger.debug("Bucket list: ", e)
+      }
+
+      try {
+        this.uploadsSource.set(
+          transaction.query(EFQUploadConfigurationListType::class.java)
+            .execute(DDatabaseUnit.UNIT),
+        )
+      } catch (e: Exception) {
+        logger.debug("Upload list: ", e)
+      }
+
+      try {
+        this.settingsSource.set(
+          transaction.query(EFQSettingsGetType::class.java)
+            .execute(DDatabaseUnit.UNIT)
+        )
+      } catch (e: Exception) {
+        logger.debug("Settings: ", e)
+      }
     }
   }
 

@@ -22,9 +22,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.io7m.exfilac.core.EFUploadName
 import com.io7m.exfilac.core.EFUploadReasonManual
+import com.io7m.exfilac.core.EFUploadStatus
 import com.io7m.exfilac.core.EFUploadStatusCancelled
 import com.io7m.exfilac.core.EFUploadStatusCancelling
 import com.io7m.exfilac.core.EFUploadStatusFailed
@@ -32,15 +34,25 @@ import com.io7m.exfilac.core.EFUploadStatusNone
 import com.io7m.exfilac.core.EFUploadStatusRunning
 import com.io7m.exfilac.core.EFUploadStatusSucceeded
 
-class EFStatusAdapter(
-  private var items: List<EFUploadName>,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class EFStatusAdapter : ListAdapter<EFUploadStatus, RecyclerView.ViewHolder>(diffCallback) {
 
-  fun setUploadNames(
-    uploadList: List<EFUploadName>,
-  ) {
-    this.items = uploadList
-    this.notifyDataSetChanged()
+  companion object {
+    private val diffCallback =
+      object : DiffUtil.ItemCallback<EFUploadStatus>() {
+        override fun areContentsTheSame(
+          oldItem: EFUploadStatus,
+          newItem: EFUploadStatus
+        ): Boolean {
+          return oldItem == newItem
+        }
+
+        override fun areItemsTheSame(
+          oldItem: EFUploadStatus,
+          newItem: EFUploadStatus
+        ): Boolean {
+          return oldItem.id == newItem.id
+        }
+      }
   }
 
   override fun onCreateViewHolder(
@@ -58,11 +70,7 @@ class EFStatusAdapter(
     holder: RecyclerView.ViewHolder,
     position: Int,
   ) {
-    (holder as? StatusViewHolder)?.bind(this.items[position])
-  }
-
-  override fun getItemCount(): Int {
-    return this.items.size
+    (holder as? StatusViewHolder)?.bind(this.getItem(position))
   }
 
   enum class OnClick {
@@ -71,8 +79,9 @@ class EFStatusAdapter(
   }
 
   inner class StatusViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    private lateinit var uploadStatus: EFUploadStatus
+
     private var onClick: OnClick = OnClick.START
-    private lateinit var uploadName: EFUploadName
 
     private val name: TextView =
       this.itemView.findViewById(R.id.statusName)
@@ -90,34 +99,37 @@ class EFStatusAdapter(
         this.executeStartOrCancel()
       }
       this.view.setOnClickListener {
-        EFApplication.application.exfilac.uploadViewSelect(this.uploadName, uploadId = null)
+        EFApplication.application.exfilac.uploadViewSelect(this.uploadStatus.name, uploadId = null)
       }
     }
 
     private fun executeStartOrCancel() {
       when (this.onClick) {
         OnClick.START -> {
-          EFApplication.application.exfilac.uploadStart(this.uploadName, EFUploadReasonManual)
+          EFApplication.application.exfilac.uploadStart(
+            this.uploadStatus.name,
+            EFUploadReasonManual
+          )
         }
 
         OnClick.CANCEL -> {
-          EFApplication.application.exfilac.uploadCancel(this.uploadName)
+          EFApplication.application.exfilac.uploadCancel(this.uploadStatus.name)
         }
       }
     }
 
     fun bind(
-      newUploadName: EFUploadName,
+      newUploadStatus: EFUploadStatus,
     ) {
-      this.uploadName = newUploadName
-      this.name.text = newUploadName.value
+      this.uploadStatus = newUploadStatus
+      this.name.text = newUploadStatus.name.value
 
-      when (val status = EFApplication.application.exfilac.uploadStatus(this.uploadName)) {
+      when (newUploadStatus) {
         is EFUploadStatusNone -> {
           this.startCancel.setImageResource(R.drawable.start_24)
           this.onClick = OnClick.START
 
-          this.description.text = view.context.getString(R.string.statusNotRunning)
+          this.description.text = this.view.context.getString(R.string.statusNotRunning)
 
           this.progressMinor.isIndeterminate = false
           this.progressMinor.progress = 0
@@ -128,10 +140,10 @@ class EFStatusAdapter(
           this.startCancel.setImageResource(R.drawable.stop_24)
           this.onClick = OnClick.CANCEL
 
-          this.description.text = status.description
+          this.description.text = newUploadStatus.description
 
-          this.progressMajor.progress = (status.progressMajor * 100.0).toInt()
-          val minor = status.progressMinor
+          this.progressMajor.progress = (newUploadStatus.progressMajor * 100.0).toInt()
+          val minor = newUploadStatus.progressMinor
           if (minor == null) {
             this.progressMinor.isIndeterminate = true
           } else {
@@ -145,13 +157,16 @@ class EFStatusAdapter(
           this.onClick = OnClick.START
 
           this.startCancel.setOnClickListener {
-            EFApplication.application.exfilac.uploadStart(status.name, EFUploadReasonManual)
+            EFApplication.application.exfilac.uploadStart(
+              newUploadStatus.name,
+              EFUploadReasonManual
+            )
           }
 
           this.description.text =
-            view.context.getString(
+            this.view.context.getString(
               R.string.statusCompleted,
-              EFTimes.dateTimeFormatter.format(status.completedAt)
+              EFTimes.dateTimeFormatter.format(newUploadStatus.completedAt)
             )
 
           this.progressMinor.isIndeterminate = false
@@ -164,9 +179,9 @@ class EFStatusAdapter(
           this.onClick = OnClick.START
 
           this.description.text =
-            view.context.getString(
+            this.view.context.getString(
               R.string.statusCancelled,
-              EFTimes.dateTimeFormatter.format(status.cancelledAt)
+              EFTimes.dateTimeFormatter.format(newUploadStatus.cancelledAt)
             )
 
           this.progressMinor.isIndeterminate = false
@@ -179,7 +194,7 @@ class EFStatusAdapter(
           this.onClick = OnClick.START
 
           this.description.text =
-            view.context.getString(R.string.statusCancelling)
+            this.view.context.getString(R.string.statusCancelling)
 
           this.progressMinor.isIndeterminate = false
           this.progressMinor.progress = 0
@@ -191,13 +206,16 @@ class EFStatusAdapter(
           this.onClick = OnClick.START
 
           this.startCancel.setOnClickListener {
-            EFApplication.application.exfilac.uploadStart(status.name, EFUploadReasonManual)
+            EFApplication.application.exfilac.uploadStart(
+              newUploadStatus.name,
+              EFUploadReasonManual
+            )
           }
 
           this.description.text =
-            view.context.getString(
+            this.view.context.getString(
               R.string.statusFailed,
-              EFTimes.dateTimeFormatter.format(status.failedAt)
+              EFTimes.dateTimeFormatter.format(newUploadStatus.failedAt)
             )
 
           this.progressMinor.isIndeterminate = false

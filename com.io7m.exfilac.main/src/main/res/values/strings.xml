@@ -43,7 +43,7 @@
   <string name="bucketEndpoint">Endpoint</string>
   <string name="bucketEndpointDescription">The base endpoint for the bucket.</string>
   <string name="bucketInvalidURI">Invalid URI.</string>
-  <string name="bucketRefName">Name</string>
+  <string name="bucketRefName">Reference Name</string>
   <string name="bucketRefNameDescription">A unique name that will be used to refer to this bucket.</string>
   <string name="bucketRefNameTaken">A bucket already exists with this name.</string>
   <string name="bucketName">Name</string>

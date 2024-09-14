@@ -77,7 +77,7 @@ class EFFragmentTabStatus : Fragment() {
   override fun onStart() {
     super.onStart()
 
-    this.adapter = EFStatusAdapter(items = listOf())
+    this.adapter = EFStatusAdapter()
     this.listView.adapter = this.adapter
     this.listView.visibility = View.VISIBLE
     this.emptyView.visibility = View.INVISIBLE
@@ -105,6 +105,13 @@ class EFFragmentTabStatus : Fragment() {
     )
   }
 
+  private fun fetchStatusValues() {
+    this.adapter.submitList(
+      EFApplication.application.exfilac.uploads.get()
+        .map { upload -> EFApplication.application.exfilac.uploadStatus(upload.name) }
+    )
+  }
+
   @UiThread
   private fun onSettingsChanged(
     newValue: EFSettings
@@ -126,10 +133,12 @@ class EFFragmentTabStatus : Fragment() {
         this.statusIcon.setImageResource(R.drawable.network_none_16)
         this.statusText.setText(R.string.networkStatusUnavailable)
       }
+
       EFNetworkStatus.NETWORK_STATUS_CELLULAR -> {
         this.statusIcon.setImageResource(R.drawable.network_cellular_16)
         this.statusText.setText(R.string.networkStatusCellular)
       }
+
       EFNetworkStatus.NETWORK_STATUS_WIFI -> {
         this.statusIcon.setImageResource(R.drawable.network_wifi_16)
         this.statusText.setText(R.string.networkStatusWifi)
@@ -141,7 +150,7 @@ class EFFragmentTabStatus : Fragment() {
   private fun onUploadStatusChanged() {
     EFUIThread.checkIsUIThread()
 
-    this.adapter.notifyDataSetChanged()
+    this.fetchStatusValues()
   }
 
   override fun onStop() {
@@ -155,7 +164,9 @@ class EFFragmentTabStatus : Fragment() {
   ) {
     EFUIThread.checkIsUIThread()
 
-    this.adapter.setUploadNames(status.map { upload -> upload.name })
+    this.adapter.submitList(
+      status.map { upload -> EFApplication.application.exfilac.uploadStatus(upload.name) }
+    )
 
     if (status.isEmpty()) {
       this.listView.visibility = View.INVISIBLE

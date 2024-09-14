@@ -83,7 +83,7 @@ class EFFragmentTabUploads : Fragment() {
   override fun onStart() {
     super.onStart()
 
-    this.adapter = EFUploadsAdapter(items = listOf())
+    this.adapter = EFUploadsAdapter()
     this.listView.adapter = this.adapter
     this.listView.visibility = View.VISIBLE
     this.emptyView.visibility = View.INVISIBLE
@@ -126,7 +126,7 @@ class EFFragmentTabUploads : Fragment() {
     EFUIThread.checkIsUIThread()
 
     EFApplication.application.exfilac.uploadSelectionClear()
-    this.adapter.setUploads(uploads)
+    this.adapter.submitList(uploads)
 
     if (uploads.isEmpty()) {
       this.listView.visibility = View.INVISIBLE

@@ -24,7 +24,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.MaterialToolbar
 import com.io7m.exfilac.core.EFUploadResult
 import com.io7m.exfilac.core.internal.EFUploadEventRecord
@@ -102,7 +101,7 @@ class EFFragmentUploadStatus : EFFragment() {
 
     this.listView.layoutManager = LinearLayoutManager(view.context)
     this.listView.setHasFixedSize(true)
-    (this.listView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+    this.listView.itemAnimator = null
 
     this.eventCount.text = ""
     return view
@@ -111,7 +110,7 @@ class EFFragmentUploadStatus : EFFragment() {
   override fun onStart() {
     super.onStart()
 
-    this.adapter = EFUploadStatusAdapter(items = listOf())
+    this.adapter = EFUploadStatusAdapter()
     this.listView.adapter = this.adapter
     this.listView.visibility = View.VISIBLE
     this.subscriptions = CloseableCollection.create()
@@ -186,10 +185,9 @@ class EFFragmentUploadStatus : EFFragment() {
   private fun onUploadEventsChanged(
     newValue: List<EFUploadEventRecord>
   ) {
-    this.adapter.setStatusEvents(newValue)
+    this.adapter.submitList(newValue)
     this.eventCount.text =
       this.getString(R.string.uploadStatusEventCount, newValue.size)
-    this.listView.scrollToPosition(Math.max(0, newValue.size - 1))
   }
 
   override fun onStop() {

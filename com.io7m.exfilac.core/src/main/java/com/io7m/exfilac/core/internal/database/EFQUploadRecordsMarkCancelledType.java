@@ -14,25 +14,14 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.exfilac.main
+package com.io7m.exfilac.core.internal.database;
 
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.io7m.darco.api.DDatabaseQueryType;
+import com.io7m.darco.api.DDatabaseUnit;
 
-class EFTabAdapter(
-  parentFragment: Fragment,
-  private val fragments: List<Fragment>,
-  private val fragmentTitles: List<String>
-) : FragmentStateAdapter(parentFragment) {
-  override fun getItemCount(): Int {
-    return fragments.size
-  }
+import java.time.OffsetDateTime;
 
-  override fun createFragment(position: Int): Fragment {
-    return fragments[position]
-  }
+public interface EFQUploadRecordsMarkCancelledType
+  extends DDatabaseQueryType<OffsetDateTime, DDatabaseUnit> {
 
-  fun getTitle(position: Int): String {
-    return fragmentTitles[position]
-  }
 }

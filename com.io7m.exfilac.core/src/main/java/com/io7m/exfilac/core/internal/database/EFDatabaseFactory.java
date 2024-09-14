@@ -92,7 +92,8 @@ public final class EFDatabaseFactory extends DSDatabaseFactory<
       EFQUploadRecordGet.provider(),
       EFQUploadRecordList.provider(),
       EFQUploadRecordMostRecent.provider(),
-      EFQUploadRecordUpdate.provider()
+      EFQUploadRecordUpdate.provider(),
+      EFQUploadRecordsMarkCancelled.provider()
     );
   }
 }

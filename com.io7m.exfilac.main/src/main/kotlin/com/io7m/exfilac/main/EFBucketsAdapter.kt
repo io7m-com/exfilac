@@ -21,19 +21,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.io7m.exfilac.core.EFBucketConfiguration
 import com.io7m.exfilac.core.EFBucketEditModel
 
-class EFBucketsAdapter(
-  private var items: List<EFBucketConfiguration>,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class EFBucketsAdapter : ListAdapter<EFBucketConfiguration, RecyclerView.ViewHolder>(diffCallback) {
 
-  fun setBuckets(
-    bucketsList: List<EFBucketConfiguration>
-  ) {
-    this.items = bucketsList
-    this.notifyDataSetChanged()
+  companion object {
+    private val diffCallback =
+      object : DiffUtil.ItemCallback<EFBucketConfiguration>() {
+        override fun areContentsTheSame(
+          oldItem: EFBucketConfiguration,
+          newItem: EFBucketConfiguration
+        ): Boolean {
+          return oldItem == newItem
+        }
+
+        override fun areItemsTheSame(
+          oldItem: EFBucketConfiguration,
+          newItem: EFBucketConfiguration
+        ): Boolean {
+          return oldItem.referenceName == newItem.referenceName
+        }
+      }
   }
 
   override fun onCreateViewHolder(
@@ -51,11 +63,7 @@ class EFBucketsAdapter(
     holder: RecyclerView.ViewHolder,
     position: Int
   ) {
-    (holder as? BucketViewHolder)?.bind(this.items[position])
-  }
-
-  override fun getItemCount(): Int {
-    return this.items.size
+    (holder as? BucketViewHolder)?.bind(this.getItem(position))
   }
 
   inner class BucketViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
