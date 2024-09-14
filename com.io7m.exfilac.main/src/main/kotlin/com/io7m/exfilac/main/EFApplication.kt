@@ -60,6 +60,12 @@ class EFApplication : Application() {
       } catch (e: Throwable) {
         this.logger.error("Failed to start service: ", e)
       }
+
+      try {
+        context.startService(Intent(context, EFPhotoService::class.java))
+      } catch (e: Throwable) {
+        this.logger.error("Failed to start service: ", e)
+      }
     }
   }
 

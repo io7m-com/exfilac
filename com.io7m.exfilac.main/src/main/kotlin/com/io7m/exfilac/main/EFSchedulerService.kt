@@ -50,10 +50,10 @@ class EFSchedulerService : Service() {
     startId: Int
   ): Int {
     if (started.compareAndSet(false, true)) {
-      this.logger.debug("Starting background service…")
+      this.logger.debug("Starting scheduler service…")
       executor.scheduleWithFixedDelay(this::tick, 5L, 5L, TimeUnit.MINUTES)
     } else {
-      this.logger.debug("Ignoring redundant request to start background service.")
+      this.logger.debug("Ignoring redundant request to start scheduler service.")
     }
     return super.onStartCommand(intent, flags, startId)
   }
@@ -62,7 +62,7 @@ class EFSchedulerService : Service() {
     try {
       EFApplication.application.exfilac.uploadStartAllAsNecessary(EFUploadReasonTime)
     } catch (e: Throwable) {
-      this.logger.error("Background service error: ", e)
+      this.logger.error("Scheduler service error: ", e)
     }
   }
 

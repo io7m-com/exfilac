@@ -101,14 +101,16 @@
 
   <string name="statusPaused">Uploads are currently paused (see Settings).</string>
 
+  <string name="settingsBuild">Commit</string>
   <string name="settingsNetworking">Networking</string>
   <string name="settingsNetworkingUploadCellular">Allow uploads on cellular connections.</string>
-  <string name="settingsNetworkingUploadWifi">Allow uploads on WiFi.</string>
+  <string name="settingsNetworkingUploadWifi">Allow uploads on Wi-Fi.</string>
   <string name="settingsPause">Pause uploads.</string>
   <string name="settingsPrivacyPolicy">Privacy Policy</string>
+  <string name="settingsSupport">Support</string>
   <string name="settingsUploads">Uploads</string>
+  <string name="settingsUserManual">User Manual</string>
   <string name="settingsVersion">Version</string>
-  <string name="settingsBuild">Commit</string>
 
   <string name="networkStatusUnavailable">Network connectivity currently appears to be unavailable.</string>
   <string name="networkStatusCellular">Networking is currently provided by a cellular connection.</string>

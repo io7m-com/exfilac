@@ -38,6 +38,9 @@
     <!-- The network connectivity service. -->
     <service android:name="com.io7m.exfilac.main.EFNetworkConnectivityService" />
 
+    <!-- The photo observer service. -->
+    <service android:name="com.io7m.exfilac.main.EFPhotoService" />
+
     <!-- The one and only activity. -->
     <activity
       android:name="com.io7m.exfilac.main.EFActivity"
