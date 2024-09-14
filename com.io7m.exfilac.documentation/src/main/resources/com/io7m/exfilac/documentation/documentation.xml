@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Document xmlns="urn:com.io7m.structural:8:0"
+          xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          tableOfContentsDepth="1">
+
+  <Metadata>
+    <dc:creator>Mark Raynsford</dc:creator>
+    <dc:date>2024-09-13T13:44:37+00:00</dc:date>
+    <dc:description>User manual for the Exfilac package.</dc:description>
+    <dc:identifier>a6343771-b3f8-4981-9a57-ae2e1e2804eb</dc:identifier>
+    <dc:language>en</dc:language>
+    <dc:rights>Public Domain</dc:rights>
+    <dc:title>Exfilac User Manual</dc:title>
+  </Metadata>
+
+  <xi:include href="overview.xml"/>
+  <xi:include href="tutorial.xml"/>
+  <xi:include href="implementation.xml"/>
+  <xi:include href="colophon.xml"/>
+
+</Document>

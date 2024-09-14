@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         title="Overview">
+  
+  <Subsection title="Introduction">
+    <Paragraph>
+      The <Term type="package">exfilac</Term> application is a simple application that aims to do one thing well: Get
+      data out of Android devices and into <LinkExternal target="https://aws.amazon.com/s3/">S3</LinkExternal> buckets.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Features">
+    <Paragraph>
+      The <Term type="package">exfilac</Term> application provides the following features:
+    </Paragraph>
+    <FormalItem title="Features">
+      <ListUnordered>
+        <Item>
+          The application can work with any S3-compatible storage provider. This includes
+          <LinkExternal target="https://aws.amazon.com/s3/">Amazon AWS</LinkExternal>,
+          <LinkExternal target="https://docs.vultr.com/vultr-object-storage">Vultr Object Storage</LinkExternal>,
+          <LinkExternal target="https://www.idrive.com/s3-storage-e2/">IDrive®</LinkExternal>, and many other
+          commercial offerings. Additionally, the application can work with self-hosted S3 storage solutions such
+          as <LinkExternal target="https://min.io/">MinIO</LinkExternal>.
+        </Item>
+        <Item>
+          The application can (recursively) upload the contents of any directory on an Android device to which it has 
+          been granted access. The set of directories is configurable.
+        </Item>
+        <Item>
+          The application conserves precious bandwidth by avoiding uploading files that already exist on the remote 
+          storage. The cryptographic hashes of files are computed locally and files are only uploaded if the hashes of 
+          the files on the remote server do not match.
+        </Item>
+        <Item>
+          The application can be configured to upload files on a timed schedule, and/or in response to various
+          events occurring on the device such as a photo being taken, a phone call ending, and more.
+        </Item>
+        <Item>
+          The application vigorously respects the privacy of users: The application contains no telemetry or analytics
+          of any kind, and never collects any user data.
+        </Item>
+        <Item>
+          Development of the application is performed in the open. The complete source code is made available under
+          an extremely liberal <LinkExternal target="https://opensource.org/license/isc-license-txt">ISC</LinkExternal>
+          license, and development and bug tracking is handled in a public
+          <LinkExternal target="https://www.github.com/io7m-com/exfilac">GitHub</LinkExternal> repository.
+        </Item>
+        <Item>
+          The application rejects bug-prone Android programming practices and libraries and instead strives for
+          correctness and stability using battle-hardened, well-tested components designed outside the traditional
+          Android ecosystem.
+        </Item>
+        <Item>
+          The application adopts a cautious development approach and does not pursue huge sets of complex features. The
+          application attempts to adhere to the
+          <LinkExternal target="https://en.wikipedia.org/wiki/Unix_philosophy">Unix philosophy</LinkExternal> and
+          provide a simple, sharp tool that does one thing well.
+        </Item>
+        <Item>
+          The application attempts to respect the intelligence of users. Technical details of many aspects of the
+          system are clearly displayed onscreen, and important information is not hidden in the misguided pursuit of
+          "user-friendliness".
+        </Item>
+        <Item>
+          The application is comprehensively documented; you are currently reading this documentation!
+        </Item>
+      </ListUnordered>
+    </FormalItem>
+  </Subsection>
+  
+</Section>

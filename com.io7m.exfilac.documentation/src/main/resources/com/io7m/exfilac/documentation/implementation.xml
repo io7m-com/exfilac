@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         title="Theory Of Operation">
+
+  <Section title="Overview">
+    <Paragraph>
+      This section of the documentation describes the implementation or
+      <Term type="term">theory of operation</Term>
+      for the application. Knowing how the application works internally can be useful when trying to determine why
+      something doesn't appear to be working the way it should be.
+    </Paragraph>
+  </Section>
+
+  <Section title="Uploads">
+    <Subsection title="Directories"
+                id="18647abb-0b23-49d7-93b9-a71021c6a9ce">
+      <Paragraph>
+        Directories.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Checksums"
+                id="1d3d85f0-05c0-4bf7-821a-c36a7fb63b5c">
+      <Paragraph>
+        Checksums.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Schedules"
+                id="3defdc93-1be4-4444-96c4-d438462f6bd3">
+      <Paragraph>
+        Schedules.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Triggers"
+                id="41c18703-041e-47ac-9273-a249d6a4d1fc">
+      <Subsection title="Network Availability"
+                  id="f6482692-5b3e-42ec-a3f5-17a85fbb7c1b">
+        <Paragraph>
+          Network Availability.
+        </Paragraph>
+      </Subsection>
+      <Subsection title="Phone Calls">
+        <Paragraph>
+          Phone Calls.
+        </Paragraph>
+      </Subsection>
+      <Subsection title="Photo Taken">
+        <Paragraph>
+          Photo Taken.
+        </Paragraph>
+      </Subsection>
+    </Subsection>
+  </Section>
+
+  <Section title="Permissions"
+           id="7aec3135-cb5b-481f-a8ac-7a7d4ad25a30">
+    <Subsection title="Overview"
+                id="66fda3a1-0f92-44df-9c12-15b9fc407273">
+      <Paragraph>
+        This section of the documentation details the
+        <LinkExternal target="https://developer.android.com/guide/topics/permissions/overview">
+          permissions
+        </LinkExternal>
+        used by the application, and the reasons for requiring those permissions.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="android.permission.INTERNET">
+      <Paragraph>
+        The application requires the <Term type="constant">android.permission.INTERNET</Term> permission in order to
+        talk to external S3 servers.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="android.permission.CHANGE_NETWORK_STATE">
+      <Paragraph>
+        The application requires the <Term type="constant">android.permission.CHANGE_NETWORK_STATE</Term> permission in
+        order to determine if networking is currently available. Unfortunately, Android requires applications to use the
+        <Term type="constant">android.permission.CHANGE_NETWORK_STATE</Term>
+        permission just to read the networking state, even if they have no intention of
+        <Term type="term">changing</Term>
+        the network state. Bizarrely, Android also exposes an
+        <Term type="constant">android.permission.ACCESS_NETWORK_STATE</Term>
+        permission, but this apparently is not sufficient to access the
+        <Term type="class">ConnectivityManager</Term>
+        class used to monitor the networking status.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="android.permission.RECEIVE_BOOT_COMPLETED">
+      <Paragraph>
+        The application requires the
+        <Term type="constant">android.permission.RECEIVE_BOOT_COMPLETED</Term>
+        permission in order to be notified that the device has finished booting up. The application starts up a
+        background service that will periodically schedule uploads. This ensures that users don't need to remember to
+        start the application every time they reboot their device; forgetting to start the application might mean that
+        critical data backups don't get executed!
+      </Paragraph>
+    </Subsection>
+    <Subsection title="android.permission.CAMERA">
+      <Paragraph>
+        The application requires the
+        <Term type="constant">android.permission.CAMERA</Term>
+        permission in order to use camera to scan QR codes to configure buckets.
+      </Paragraph>
+    </Subsection>
+  </Section>
+
+</Section>

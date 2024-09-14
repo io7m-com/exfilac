@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         id="12dcbb23-6b44-4573-be1f-e8a0fa2f1373"
+         title="License">
+
+  <Paragraph>
+    Copyright © 2024 Mark Raynsford &lt;code@io7m.com&gt; https://www.io7m.com.
+  </Paragraph>
+
+  <Paragraph>
+    This book is placed into the public domain for free use by anyone for any purpose. It may be freely used, modified,
+    and distributed.
+  </Paragraph>
+
+  <Paragraph>
+    In jurisdictions that do not recognise the public domain this book may be freely used, modified, and distributed
+    without restriction.
+  </Paragraph>
+
+  <Paragraph>
+    This book comes with absolutely no warranty.
+  </Paragraph>
+
+</Section>

@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         title="Tutorial">
+
+  <Section title="What You Need To Know First">
+    <Paragraph>
+      In order to start using the application, you'll need to know a few details first:
+    </Paragraph>
+    <FormalItem title="Prerequisites">
+      <ListUnordered>
+        <Item>
+          You'll need to know the configuration details of one or more <Term type="term">S3 buckets</Term> that you'll
+          be using to receive data. Configuring an S3 bucket on a server is outside the scope of this documentation and
+          is, in any case, very provider-specific. Assuming that you have created an S3 bucket on a server, you'll need
+          to know the following:
+          <ListUnordered>
+            <Item>
+              The bucket <Link target="847c0c85-9eb2-4cca-8ec2-6a6752d9239a">name</Link>.
+            </Item>
+            <Item>
+              The bucket <Link target="693185cf-f0eb-4a9d-9881-226dac7196fa">access key</Link>.
+            </Item>
+            <Item>
+              The bucket <Link target="3cb22d3a-2373-470d-bc9c-a56d59ff5941">secret key</Link>.
+            </Item>
+            <Item>
+              The bucket <Link target="9e930051-3999-44c3-9f29-f45344f313f4">region</Link>.
+            </Item>
+            <Item>
+              The bucket <Link target="0e1e653a-1a95-4013-a3b5-ee432c480b63">endpoint</Link>.
+            </Item>
+          </ListUnordered>
+        </Item>
+        <Item>
+          If you want to use <Link target="391252b2-ee7f-4157-97a5-98d5dd5ee2f6">QR code configuration</Link>, you'll
+          need to know how to use QR encoding tools. The
+          <LinkExternal target="https://github.com/sorairolake/qrtool">qrtool</LinkExternal>
+          package comes highly recommended.
+        </Item>
+      </ListUnordered>
+    </FormalItem>
+  </Section>
+
+  <Section title="Buckets"
+           id="bdf8b20e-f5f7-41a1-ba41-e6dc6b799f13">
+    <Subsection title="Overview"
+                id="589c3df0-2a73-4dd7-a95f-57aa684d36c0">
+      <Paragraph>
+        The application opens to a set of tabs. The initially visible tab is the
+        <Term type="term">Buckets</Term>
+        tab. This is, unsurprisingly, where you'll configure the S3 buckets to which you want to upload files. The
+        buttons in the toolbar allow for configuring an S3 bucket
+        <Link target="161ae260-7a37-444c-95de-65198fae2369">manually</Link>
+        or, alternatively, configuring an S3 bucket from a
+        <Link target="391252b2-ee7f-4157-97a5-98d5dd5ee2f6">QR code</Link>.
+      </Paragraph>
+      <FormalItem title="Buckets">
+        <Image source="screen_buckets.png"
+               type="screenImage">
+          The "buckets" screen.
+        </Image>
+      </FormalItem>
+    </Subsection>
+    <Subsection title="Manual Configuration"
+                id="161ae260-7a37-444c-95de-65198fae2369">
+      <Paragraph>
+        Clicking the <Term type="term">Create Bucket</Term> toolbar button opens a screen that allows for configuring
+        the details of an S3 bucket manually.
+      </Paragraph>
+      <FormalItem title="Buckets">
+        <Image source="screen_create_bucket.png"
+               type="screenImage">
+          The "create bucket" screen.
+        </Image>
+      </FormalItem>
+      <Paragraph id="70486361-f260-4806-b847-4ae6cd0db5d8">
+        The <Term type="term">Reference Name</Term> field holds the name that you'll use to refer to the bucket in other
+        parts of the application. This name can be anything, although there are some restrictions on the characters that
+        are allowed to be used in the name. Don't worry; the UI will tell you if a name is valid or not as you type each
+        character. The name can't be changed later, so try to pick something useful and descriptive.
+      </Paragraph>
+      <Paragraph id="847c0c85-9eb2-4cca-8ec2-6a6752d9239a">
+        The <Term type="term">Name</Term> field holds the actual name of the S3 bucket as it appears on the server.
+        Amazon S3 in particular has
+        <LinkExternal target="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">
+          a long list of restrictions on the names of buckets</LinkExternal>.
+      </Paragraph>
+      <Paragraph id="9e930051-3999-44c3-9f29-f45344f313f4">
+        The <Term type="term">Region</Term> field holds the region within this bucket resides. For self-hosted options
+        such as <LinkExternal target="https://min.io/">MinIO</LinkExternal>, the region will always be
+        <Term type="constant">us-east-1</Term>.
+      </Paragraph>
+      <Paragraph id="693185cf-f0eb-4a9d-9881-226dac7196fa">
+        The <Term type="term">Access Key</Term> field holds the access key that will be used to access the bucket. You
+        can think of an access key as being analogous to a username in other systems. Typically, this will either be a
+        username, or it'll be an
+        <LinkExternal target="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html">IAM role</LinkExternal>
+        and will look like a short string of random alphanumeric characters.
+      </Paragraph>
+      <Paragraph id="3cb22d3a-2373-470d-bc9c-a56d59ff5941">
+        The <Term type="term">Secret Key</Term> field holds the secret key that will be used to access the bucket. You
+        can think of a secret key as being analogous to a password in other systems.
+      </Paragraph>
+      <Paragraph id="6c5bc851-c576-4ba8-b788-c776c2021e1d">
+        The <Term type="term">Access Style</Term> menu declares the method by which the bucket will be accessed. This
+        option is slightly esoteric, and the value you select will depend on which S3 storage provider you're using on
+        the server side. On Amazon AWS, at the time of writing, Amazon are recommending that people use
+        <LinkExternal target="https://docs.aws.amazon.com/AmazonS3/latest/userguide/VirtualHosting.html">
+          virtual host
+        </LinkExternal>
+        style access. In <Term type="term">virtual host</Term> mode, you would specify the
+        <Link target="0e1e653a-1a95-4013-a3b5-ee432c480b63">endpoint</Link>
+        of the server as, for example,
+        <Term type="constant">https://s3.us-east-1.amazonaws.com</Term>. Then, for a bucket named
+        <Term type="term">example-23</Term>, the S3 client would actually make requests to the address
+        <Term type="constant">https://example-23.s3.us-east-1.amazonaws.com</Term>
+        behind the scenes.
+      </Paragraph>
+      <Paragraph>
+        In contrast, for <Term type="term">path style</Term> access, the name of the bucket is simply added at the end
+        of the <Term type="term">endpoint</Term> URL. In <Term type="term">path style</Term> mode, you would specify the
+        <Link target="0e1e653a-1a95-4013-a3b5-ee432c480b63">endpoint</Link>
+        of the server as, for example,
+        <Term type="constant">https://s3.us-east-1.amazonaws.com</Term>. Then, for a bucket named
+        <Term type="term">example-23</Term>, the S3 client would actually make requests to the address
+        <Term type="constant">https://s3.us-east-1.amazonaws.com/example-23</Term>
+        behind the scenes.
+      </Paragraph>
+      <Paragraph>
+        Systems such as <Term type="package">minio</Term> require the use of
+        <Term type="term">path style</Term>
+        access. Amazon AWS currently accepts either access style in practice. Consult your S3 provider's documentation
+        for the rules.
+      </Paragraph>
+      <Paragraph id="0e1e653a-1a95-4013-a3b5-ee432c480b63">
+        Finally, the <Term type="term">Endpoint</Term> field specifies the actual base address that will be used for the
+        S3 bucket. If you're hosting S3 buckets yourself using <Term type="package">minio</Term>, then this is simply
+        the address of the server. If you're hosting S3 buckets on AWS, then this will be an address such
+        as <Term type="constant">https://s3.us-east-1.amazonaws.com</Term>. Again, you'll need to consult your S3
+        provider's documentation for the right server endpoint to use.
+      </Paragraph>
+      <FormalItem title="Buckets">
+        <Image source="screen_create_bucket_filled.png"
+               type="screenImage">
+          The "create bucket" screen, configured.
+        </Image>
+      </FormalItem>
+      <Paragraph>
+        Once you've configured all the fields, and none of the fields are showing a red warning icon, you can click the
+        <Term type="term">Save Bucket</Term>
+        button in the toolbar to save the bucket. Don't worry if you realize you got some of the details wrong; you can
+        <Link target="5452065f-2a70-4c8c-9915-95d91b4d4423">modify buckets</Link>
+        at any time. Once you have at least one bucket defined, you can proceed to the
+        <Link target="025bbd03-a513-4272-b486-8c4d0c06d844">uploads tab</Link>.
+      </Paragraph>
+    </Subsection>
+
+    <Subsection title="QR Code Configuration"
+                id="391252b2-ee7f-4157-97a5-98d5dd5ee2f6">
+      <Paragraph>
+        Entering long strings of characters using on-screen keyboards can be painful. To alleviate some of that pain,
+        it's possible to use third-party tools to put configuration information into a
+        <LinkExternal target="https://en.wikipedia.org/wiki/QR_code">QR code</LinkExternal>, and then have the
+        application scan the QR code to automatically configure a bucket.
+      </Paragraph>
+      <Paragraph>
+        Data in the QR code must be in the
+        <LinkExternal target="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Properties.html">
+          Java properties
+        </LinkExternal>
+        format. This is a simple line-based format where each line specifies a
+        <Term type="term">key</Term>
+        and a <Term type="term">value</Term>, separated by either a colon or an equals symbol. Key names are
+        case-sensitive.
+      </Paragraph>
+      <Paragraph>
+        This table lists the keys and their meanings:
+      </Paragraph>
+      <FormalItem title="Configuration Property Keys"
+                  id="9a9695e7-a7b9-49fd-b773-3318e4aed44b">
+        <Table type="genericTable">
+          <Columns>
+            <Column>Key</Column>
+            <Column>Meaning</Column>
+          </Columns>
+          <Row>
+            <Cell>AccessKey</Cell>
+            <Cell>The bucket access key.</Cell>
+          </Row>
+          <Row>
+            <Cell>AccessStyle</Cell>
+            <Cell>The bucket access style. Must be
+              <Term type="constant">PATH_STYLE</Term>
+              or
+              <Term type="constant">VIRTUALHOST_STYLE</Term>.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Bucket</Cell>
+            <Cell>The name of the bucket on the server.</Cell>
+          </Row>
+          <Row>
+            <Cell>Endpoint</Cell>
+            <Cell>The server endpoint.</Cell>
+          </Row>
+          <Row>
+            <Cell>Name</Cell>
+            <Cell>The bucket's reference name.</Cell>
+          </Row>
+          <Row>
+            <Cell>Region</Cell>
+            <Cell>The bucket region.</Cell>
+          </Row>
+          <Row>
+            <Cell>SecretKey</Cell>
+            <Cell>The bucket secret key.</Cell>
+          </Row>
+        </Table>
+      </FormalItem>
+      <Paragraph>
+        For example, a valid configuration might look like this:
+      </Paragraph>
+      <FormalItem title="Example Configuration"
+                  id="3a4be325-1eab-49e3-bff7-2ee5a3d3eb36">
+        <Verbatim><![CDATA[
+AccessKey=fc87a046
+AccessStyle=PATH_STYLE
+Bucket=tablet-test
+Endpoint=https://s3.example.com
+Name=qrtest
+Region=us-west-1
+SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
+]]></Verbatim>
+      </FormalItem>
+      <Paragraph>
+        When given to a QR encoding tool, the following image will be produced:
+      </Paragraph>
+      <FormalItem title="Example Configuration (QR)"
+                  id="9aa8e6f6-f7ac-4136-86ec-613673b55ed2">
+        <Image source="qrcode.png">
+          Example configuration QR code.
+        </Image>
+      </FormalItem>
+      <Paragraph>
+        Upon clicking the <Term type="term">Create Bucket (from QR code)</Term> toolbar button, the device's camera will
+        open and you will be given an opportunity to scan a QR code. Assuming the QR code is correctly scanned, the
+        <Link target="161ae260-7a37-444c-95de-65198fae2369">bucket configuration</Link>
+        screen will open, and you'll be given a chance to review and/or modify the parsed configuration values.
+      </Paragraph>
+      <Paragraph>
+        In practical terms, none of the keys listed above are required to be present in the QR code. If a key is
+        missing, you will simply have to enter the corresponding value manually on the bucket configuration screen after
+        scanning.
+      </Paragraph>
+      <Paragraph>
+        Once you have at least one bucket defined, you can proceed to the
+        <Link target="025bbd03-a513-4272-b486-8c4d0c06d844">uploads tab</Link>.
+      </Paragraph>
+    </Subsection>
+
+    <Subsection title="Modify Buckets"
+                id="5452065f-2a70-4c8c-9915-95d91b4d4423">
+      <Paragraph>
+        Clicking a bucket in the bucket list will take you back to the
+        <Link target="161ae260-7a37-444c-95de-65198fae2369">manual configuration</Link>
+        screen and allow you to change the details for a bucket.
+      </Paragraph>
+      <FormalItem title="Bucket Modification">
+        <Image source="screen_buckets_modify.png"
+               type="screenImage">
+          Bucket modification.
+        </Image>
+      </FormalItem>
+    </Subsection>
+    <Subsection title="Delete Buckets"
+                id="70a759b6-0d0e-48f6-89b3-43013fc50460">
+      <Paragraph>
+        Clicking the checkbox on the right hand side of a bucket selects that bucket for deletion. With one or more
+        buckets selected, a <Term type="term">Delete Bucket</Term> button becomes accessible in the toolbar. Clicking
+        the <Term type="term">Delete Bucket</Term> button asks for confirmation and then deletes the selected buckets.
+        Note that, if a bucket is deleted, any
+        <Link target="025bbd03-a513-4272-b486-8c4d0c06d844">uploads</Link>
+        associated with the bucket will also be deleted.
+      </Paragraph>
+      <FormalItem title="Bucket Deletion">
+        <Image source="screen_buckets_delete.png"
+               type="screenImage">
+          Bucket deletion.
+        </Image>
+      </FormalItem>
+    </Subsection>
+  </Section>
+
+  <Section title="Uploads"
+           id="025bbd03-a513-4272-b486-8c4d0c06d844">
+    <Subsection title="Overview"
+                id="3791ebc0-31b9-4c0f-b782-3510a0cdecfe">
+      <Paragraph>
+        The <Term type="term">Uploads</Term> tab is where you'll tell the application about the data you want to upload.
+        If the <Link target="bdf8b20e-f5f7-41a1-ba41-e6dc6b799f13">Buckets</Link> tab is considered to describe
+        <Term type="term">where</Term>
+        the data will end up, then the <Term type="term">Uploads</Term> tab can be considered to describe
+        <Term type="term">what</Term>
+        data is uploaded to any given bucket, and
+        <Term type="term">when</Term>
+        exactly those uploads occur.
+      </Paragraph>
+      <FormalItem title="Uploads">
+        <Image source="screen_uploads.png"
+               type="screenImage">
+          The "uploads" screen.
+        </Image>
+      </FormalItem>
+    </Subsection>
+    <Subsection title="Configuration"
+                id="9b1a6603-a4e7-465a-9ce8-46040e168b10">
+      <Paragraph>
+        The <Term type="term">Create Upload</Term> button in the toolbar opens a configuration screen to allow for
+        defining new uploads.
+      </Paragraph>
+      <FormalItem title="Uploads">
+        <Image source="screen_create_upload.png"
+               type="screenImage">
+          The "create upload" screen.
+        </Image>
+      </FormalItem>
+      <Paragraph id="d43ac35e-f04d-4b69-9a5d-8dad3e1f57e9">
+        In a similar manner to <Link target="70486361-f260-4806-b847-4ae6cd0db5d8">bucket reference names</Link>, the <Term type="term">
+        Upload Name
+      </Term> field holds the name you'll use to refer to the upload in other parts of the application. This name can be
+        anything, although there are some restrictions on the characters that are allowed to be used in the name. Don't
+        worry; the UI will tell you if a name is valid or not as you type each character. The name can't be changed
+        later, so try to pick something useful and descriptive.
+      </Paragraph>
+      <Paragraph id="fe9422bc-2685-420c-8fba-5031cba7efb4">
+        The <Term type="term">Device Directory</Term> field holds the name of the directory that will be scanned for
+        files for this upload. Unfortunately, Android has been steadily moving towards restricting access to the device
+        filesystem for years. It's therefore likely to be much easier to use the
+        <Term type="term">Select Directory</Term>
+        button to choose a directory on the device than to try to manually enter a path that Android will actually
+        accept. The
+        <Link target="18647abb-0b23-49d7-93b9-a71021c6a9ce">implementation</Link>
+        section of this manual has details on the generally user-hostile configuration that Android now provides.
+      </Paragraph>
+      <Paragraph id="50250af7-d6b4-496b-ba5e-1a3eb76e3641">
+        The <Term type="term">Schedule</Term> menu allows for selecting how frequently an upload will be attempted,
+        assuming that no other events trigger it into running. The menu allows for one of the following values:
+      </Paragraph>
+      <FormalItem title="Schedules"
+                  id="7ec370a3-cfc9-4049-8e3e-0994d0ee816a">
+        <Table type="genericTable">
+          <Columns>
+            <Column>Value</Column>
+            <Column>Meaning</Column>
+          </Columns>
+          <Row>
+            <Cell>Every five minutes.</Cell>
+            <Cell>The upload will be attempted every five minutes.</Cell>
+          </Row>
+          <Row>
+            <Cell>Every ten minutes.</Cell>
+            <Cell>The upload will be attempted every ten minutes.</Cell>
+          </Row>
+          <Row>
+            <Cell>Every twenty minutes.</Cell>
+            <Cell>The upload will be attempted every twenty minutes.</Cell>
+          </Row>
+          <Row>
+            <Cell>Every thirty minutes.</Cell>
+            <Cell>The upload will be attempted every thirty minutes.</Cell>
+          </Row>
+          <Row>
+            <Cell>Every hour.</Cell>
+            <Cell>The upload will be attempted every sixty minutes.</Cell>
+          </Row>
+          <Row>
+            <Cell>No schedule; only upload on trigger events.</Cell>
+            <Cell>
+              The upload will not use a time-based schedule and will only start in response to one or more of the
+              configured <Link target="64e72ee1-3f96-4ce7-9c7d-cff74ec09dde">trigger events</Link> having occurred.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>No schedule; only upload manually.</Cell>
+            <Cell>
+              The upload will not use a time-based schedule and will only start if you manually trigger it.
+            </Cell>
+          </Row>
+        </Table>
+      </FormalItem>
+      <Paragraph id="4e07294b-5ec6-45bd-b53d-5ced70d32841">
+        The <Term type="term">Bucket</Term> menu allows for selecting a bucket to which to upload. The values in the
+        menu correspond to the <Link target="70486361-f260-4806-b847-4ae6cd0db5d8">reference names</Link> of any buckets
+        you have configured.
+      </Paragraph>
+      <Paragraph id="64e72ee1-3f96-4ce7-9c7d-cff74ec09dde">
+        The various switches in the <Term type="term">Triggers</Term> section specify events that will cause the upload
+        to start running. The currently supported trigger events include:
+      </Paragraph>
+      <FormalItem title="Triggers"
+                  id="2c736c6f-cce9-41df-89d8-b57f96b5b348">
+        <Table type="genericTable">
+          <Columns>
+            <Column>Value</Column>
+            <Column>Meaning</Column>
+          </Columns>
+          <Row>
+            <Cell>A phone call ended.</Cell>
+            <Cell>
+              The upload will start when a phone call on the device ends. This can be useful for pushing phone call
+              recordings to the server.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              A photo was taken.
+            </Cell>
+            <Cell>
+              The upload will start when a photo is taken. This can be useful for ensuring that photos taken on the
+              device camera are promptly sent to the server.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              The network became available.
+            </Cell>
+            <Cell>
+              The upload will start when the network moves from a state that is considered "unavailable" to a state that
+              is considered "available". The precise meaning of this is described in the
+              <Link target="f6482692-5b3e-42ec-a3f5-17a85fbb7c1b">implementation section</Link>
+              of this manual.
+            </Cell>
+          </Row>
+        </Table>
+      </FormalItem>
+      <Paragraph>
+        Once you've configured all the fields, and none of the fields are showing a red warning icon, you can click the
+        <Term type="term">Save Upload</Term>
+        button in the toolbar to save the upload. Don't worry if you realize you got some of the details wrong; you can
+        <Link target="b93f7d36-e82d-4b5b-9b00-bee7701e841c">modify uploads</Link>
+        at any time. Once you have at least one upload defined, you can proceed to the
+        <Link target="24b84a43-be73-415c-89ef-bd3219ce7d41">status tab</Link>.
+      </Paragraph>
+    </Subsection>
+
+    <Subsection title="Modify Uploads"
+                id="b93f7d36-e82d-4b5b-9b00-bee7701e841c">
+      <Paragraph>
+        In a similar manner to <Link target="5452065f-2a70-4c8c-9915-95d91b4d4423">bucket modification</Link>, clicking
+        an upload in the upload list will take you back to the
+        <Link target="9b1a6603-a4e7-465a-9ce8-46040e168b10">configuration</Link>
+        screen and allow you to change the details for an upload.
+      </Paragraph>
+    </Subsection>
+
+    <Subsection title="Delete Uploads"
+                id="1b74a8d9-6dd9-4475-96b7-e95a0f48ee22">
+      <Paragraph>
+        In a similar manner to <Link target="70a759b6-0d0e-48f6-89b3-43013fc50460">bucket deletion</Link>, clicking the
+        checkbox on the right hand side of an upload selects that upload for deletion. With one or more uploads
+        selected, a <Term type="term">Delete Upload</Term> button becomes accessible in the toolbar. Clicking the <Term type="term">
+        Delete Upload
+      </Term> button asks for confirmation and then deletes the selected uploads.
+      </Paragraph>
+    </Subsection>
+  </Section>
+
+  <Section title="Status"
+           id="24b84a43-be73-415c-89ef-bd3219ce7d41">
+    <Subsection title="Overview"
+                id="d1748852-edcf-4704-8db2-cce3f75f27b3">
+      <Paragraph>
+        The <Term type="term">Status</Term> tab shows the current status of every defined upload. The
+        <Term type="term">Start/Stop Upload</Term>
+        button allows for manually starting uploads, or cancelling uploads that are currently running. Clicking on an
+        item in the status list will open a
+        <Link target="d1fda434-5f2b-4ada-8f47-724b02034a4e">details</Link>
+        screen for the most recent execution of an upload.
+      </Paragraph>
+      <FormalItem title="Status">
+        <Image source="screen_status.png"
+               type="screenImage">
+          The "status" screen.
+        </Image>
+      </FormalItem>
+    </Subsection>
+    <Subsection title="Details"
+                id="d1fda434-5f2b-4ada-8f47-724b02034a4e">
+      <Paragraph>
+        The details screen for a given upload shows information about the most recent execution of an upload.
+      </Paragraph>
+      <FormalItem title="Status Details">
+        <Image source="screen_status_details.png"
+               type="screenImage">
+          The "status details" screen.
+        </Image>
+      </FormalItem>
+      <Paragraph>
+        The details page displays the following fields:
+      </Paragraph>
+      <FormalItem title="Fields"
+                  id="a64f26a9-a2fb-4dfd-a142-1b9b6bacd9b0">
+        <Table type="genericTable">
+          <Columns>
+            <Column>Field</Column>
+            <Column>Meaning</Column>
+          </Columns>
+          <Row>
+            <Cell>Upload ID</Cell>
+            <Cell>The unique execution ID of the upload. Each execution of an upload will be assigned a new ID.</Cell>
+          </Row>
+          <Row>
+            <Cell>Bucket</Cell>
+            <Cell>The reference name of the bucket to which data is being uploaded.</Cell>
+          </Row>
+          <Row>
+            <Cell>Reason</Cell>
+            <Cell>The reason the upload started.</Cell>
+          </Row>
+          <Row>
+            <Cell>Time Started</Cell>
+            <Cell>The time and date the upload started.</Cell>
+          </Row>
+          <Row>
+            <Cell>Time Ended</Cell>
+            <Cell>The time and date the upload ended (assuming that it has ended).</Cell>
+          </Row>
+          <Row>
+            <Cell>Duration</Cell>
+            <Cell>The total duration of the upload (assuming that it has ended).</Cell>
+          </Row>
+          <Row>
+            <Cell>Files (Required)</Cell>
+            <Cell>
+              The number of files that were discovered by the most recent scan of the directory associated with the
+              upload.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Files (Skipped)</Cell>
+            <Cell>
+              The number of files that were skipped because it was determined that they had already been fully uploaded
+              by a previous upload attempt, and their contents had not changed since then.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Files (Failed)</Cell>
+            <Cell>
+              The number of files that failed to be uploaded due to some kind of error.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Files (Uploaded)</Cell>
+            <Cell>
+              The number of files that were successfully uploaded during this upload execution. It is normal for this
+              value to be zero if no files have been created or changed since the last execution of this upload.
+            </Cell>
+          </Row>
+        </Table>
+      </FormalItem>
+    </Subsection>
+  </Section>
+
+  <Section title="Settings"
+           id="fbafb6f9-10fe-4d3e-8726-6b091d16a207">
+    <Subsection title="Overview"
+                id="5592193b-8a5a-4354-ae5f-e539761c8483">
+      <Paragraph>
+        The <Term type="term">Settings</Term> tab shows the global settings for the application.
+      </Paragraph>
+      <FormalItem title="Settings">
+        <Image source="screen_settings.png"
+               type="screenImage">
+          The "settings" screen.
+        </Image>
+      </FormalItem>
+    </Subsection>
+    <Subsection title="Networking">
+      <Paragraph>
+        The <Term type="term">Networking</Term> section of the settings screen controls how the application will
+        handle the general aspects of networking on mobile devices.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="term">Allow uploads on cellular connections</Term> option, if enabled, will allow uploads
+        to occur if the device's networking is being provided by some kind of cellular connection. This option is
+        disabled by default, as the use of these kinds of networks can be financially costly for some users.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="term">Allow uploads on Wi-Fi</Term> option, if enabled, will allow uploads
+        to occur if the device's networking is being provided by Wi-Fi. This option is
+        enabled by default.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Upload">
+      <Paragraph>
+        The <Term type="term">Upload</Term> section of the settings screen provides general settings that affect
+        all uploads.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="term">Pause uploads</Term> option, if enabled, will prevent all uploads from executing until
+        the control is disabled. Note that uploads that are currently in progress will not be cancelled.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="User Manual">
+      <Paragraph>
+        The <Term type="term">User Manual</Term> option will open the user manual in a web browser.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Support">
+      <Paragraph>
+        The <Term type="term">Support</Term> option will open a web browser and take you to a location where you
+        may be able to get technical support for the application.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Privacy Policy">
+      <Paragraph>
+        The <Term type="term">Support</Term> option will open the application's privacy policy in a web browser.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Commit">
+      <Paragraph>
+        The <Term type="term">Commit</Term> option shows the unique identifier of the source code
+        <LinkExternal target="https://en.wikipedia.org/wiki/Commit_(version_control)">commit</LinkExternal>
+        that was used to build the application.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Version">
+      <Paragraph>
+        The <Term type="term">Version</Term> option shows the current application version number.
+      </Paragraph>
+    </Subsection>
+  </Section>
+
+</Section>
