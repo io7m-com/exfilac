@@ -36,8 +36,12 @@ class EFNetworkConnectivityService : Service() {
     LoggerFactory.getLogger(EFNetworkConnectivityService::class.java)
 
   companion object {
-    private val started =
+    private val isRunning =
       AtomicBoolean(false)
+
+    fun isRunning(): Boolean {
+      return this.isRunning.get()
+    }
   }
 
   override fun onStartCommand(
@@ -45,48 +49,53 @@ class EFNetworkConnectivityService : Service() {
     flags: Int,
     startId: Int
   ): Int {
-    if (started.compareAndSet(false, true)) {
+    if (isRunning.compareAndSet(false, true)) {
       this.logger.debug("Starting network service…")
 
-      val networkRequest =
-        NetworkRequest.Builder()
-          .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-          .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-          .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-          .build()
+      try {
+        val networkRequest =
+          NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+            .build()
 
-      val networkCallback =
-        object : NetworkCallback() {
-          override fun onCapabilitiesChanged(
-            network: Network,
-            networkCapabilities: NetworkCapabilities
-          ) {
-            super.onCapabilitiesChanged(network, networkCapabilities)
-            if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-              EFApplication.application.exfilac.networkStatusSet(NETWORK_STATUS_WIFI)
-              return
+        val networkCallback =
+          object : NetworkCallback() {
+            override fun onCapabilitiesChanged(
+              network: Network,
+              networkCapabilities: NetworkCapabilities
+            ) {
+              super.onCapabilitiesChanged(network, networkCapabilities)
+              if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                EFApplication.application.exfilac.networkStatusSet(NETWORK_STATUS_WIFI)
+                return
+              }
+              if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                EFApplication.application.exfilac.networkStatusSet(NETWORK_STATUS_CELLULAR)
+                return
+              }
             }
-            if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-              EFApplication.application.exfilac.networkStatusSet(NETWORK_STATUS_CELLULAR)
-              return
+
+            override fun onLost(network: Network) {
+              super.onLost(network)
+              EFApplication.application.exfilac.networkStatusSet(NETWORK_STATUS_UNAVAILABLE)
+            }
+
+            override fun onUnavailable() {
+              super.onUnavailable()
+              EFApplication.application.exfilac.networkStatusSet(NETWORK_STATUS_UNAVAILABLE)
             }
           }
 
-          override fun onLost(network: Network) {
-            super.onLost(network)
-            EFApplication.application.exfilac.networkStatusSet(NETWORK_STATUS_UNAVAILABLE)
-          }
+        val connectivityManager =
+          this.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
 
-          override fun onUnavailable() {
-            super.onUnavailable()
-            EFApplication.application.exfilac.networkStatusSet(NETWORK_STATUS_UNAVAILABLE)
-          }
-        }
-
-      val connectivityManager =
-        this.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
-
-      connectivityManager.requestNetwork(networkRequest, networkCallback)
+        connectivityManager.requestNetwork(networkRequest, networkCallback)
+      } catch (e: Throwable) {
+        this.logger.debug("Failed to start network service: ", e)
+        isRunning.set(false)
+      }
     } else {
       this.logger.debug("Ignoring redundant request to start network service.")
     }

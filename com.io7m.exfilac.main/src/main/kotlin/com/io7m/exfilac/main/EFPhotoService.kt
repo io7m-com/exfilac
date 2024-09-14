@@ -35,8 +35,15 @@ class EFPhotoService : Service() {
     LoggerFactory.getLogger(EFPhotoService::class.java)
 
   companion object {
-    private val started =
+    private val isRunning =
       AtomicBoolean(false)
+
+    private val mediaObserver =
+      MediaObserver(Handler(Looper.getMainLooper()))
+
+    fun isRunning(): Boolean {
+      return this.isRunning.get()
+    }
   }
 
   override fun onStartCommand(
@@ -44,47 +51,35 @@ class EFPhotoService : Service() {
     flags: Int,
     startId: Int
   ): Int {
-    if (started.compareAndSet(false, true)) {
+    if (isRunning.compareAndSet(false, true)) {
       this.logger.debug("Starting photo service…")
 
-      try {
-        this.contentResolver.registerContentObserver(
-          MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-          true,
-          this.MediaObserver(Handler(Looper.getMainLooper()))
-        )
-      } catch (e: Exception) {
-        this.logger.debug("Failed to register observer for Images.Media.EXTERNAL_CONTENT_URI: ", e)
-      }
+      val sourceURIs = listOf(
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+        MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+        MediaStore.Video.Media.INTERNAL_CONTENT_URI,
+      )
 
-      try {
-        this.contentResolver.registerContentObserver(
-          MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-          true,
-          this.MediaObserver(Handler(Looper.getMainLooper()))
-        )
-      } catch (e: Exception) {
-        this.logger.debug("Failed to register observer for Images.Media.INTERNAL_CONTENT_URI: ", e)
-      }
+      val ok =
+        sourceURIs.all { uri ->
+          try {
+            this.contentResolver.registerContentObserver(uri, true, mediaObserver)
+            true
+          } catch (e: Throwable) {
+            this.logger.debug("Failed to register observer for {}: ", uri, e)
+            false
+          }
+        }
 
-      try {
-        this.contentResolver.registerContentObserver(
-          MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-          true,
-          this.MediaObserver(Handler(Looper.getMainLooper()))
-        )
-      } catch (e: Exception) {
-        this.logger.debug("Failed to register observer for Video.Media.EXTERNAL_CONTENT_URI: ", e)
-      }
-
-      try {
-        this.contentResolver.registerContentObserver(
-          MediaStore.Video.Media.INTERNAL_CONTENT_URI,
-          true,
-          this.MediaObserver(Handler(Looper.getMainLooper()))
-        )
-      } catch (e: Exception) {
-        this.logger.debug("Failed to register observer for Video.Media.INTERNAL_CONTENT_URI: ", e)
+      if (!ok) {
+        try {
+          this.contentResolver.unregisterContentObserver(mediaObserver)
+        } catch (e: Throwable) {
+          this.logger.debug("Failed to deregister observer: ", e)
+        } finally {
+          isRunning.set(false)
+        }
       }
     } else {
       this.logger.debug("Ignoring redundant request to start photo service.")
@@ -97,13 +92,12 @@ class EFPhotoService : Service() {
     return null
   }
 
-  private inner class MediaObserver(
+  private class MediaObserver(
     handler: Handler
   ) : ContentObserver(handler) {
     override fun onChange(
       selfChange: Boolean
     ) {
-      this@EFPhotoService.logger.debug("onChange: {}", selfChange)
       EFApplication.application.exfilac.uploadStartAllAsNecessary(
         EFUploadReasonTrigger(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
       )
@@ -114,7 +108,6 @@ class EFPhotoService : Service() {
       uris: MutableCollection<Uri>,
       flags: Int
     ) {
-      this@EFPhotoService.logger.debug("onChange: {} {} {}", selfChange, uris, flags)
       EFApplication.application.exfilac.uploadStartAllAsNecessary(
         EFUploadReasonTrigger(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
       )
@@ -125,7 +118,6 @@ class EFPhotoService : Service() {
       uri: Uri?,
       flags: Int
     ) {
-      this@EFPhotoService.logger.debug("onChange: {} {} {}", selfChange, uri, flags)
       EFApplication.application.exfilac.uploadStartAllAsNecessary(
         EFUploadReasonTrigger(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
       )
@@ -135,7 +127,6 @@ class EFPhotoService : Service() {
       selfChange: Boolean,
       uri: Uri?
     ) {
-      this@EFPhotoService.logger.debug("onChange: {} {}", selfChange, uri)
       EFApplication.application.exfilac.uploadStartAllAsNecessary(
         EFUploadReasonTrigger(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
       )

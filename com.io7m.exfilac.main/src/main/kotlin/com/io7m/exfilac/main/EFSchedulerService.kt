@@ -40,8 +40,12 @@ class EFSchedulerService : Service() {
         thread
       }
 
-    private val started =
+    private val isRunning =
       AtomicBoolean(false)
+
+    fun isRunning(): Boolean {
+      return this.isRunning.get()
+    }
   }
 
   override fun onStartCommand(
@@ -49,7 +53,7 @@ class EFSchedulerService : Service() {
     flags: Int,
     startId: Int
   ): Int {
-    if (started.compareAndSet(false, true)) {
+    if (isRunning.compareAndSet(false, true)) {
       this.logger.debug("Starting scheduler service…")
       executor.scheduleWithFixedDelay(this::tick, 5L, 5L, TimeUnit.MINUTES)
     } else {
