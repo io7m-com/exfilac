@@ -17,9 +17,9 @@
                 id="18647abb-0b23-49d7-93b9-a71021c6a9ce">
       <Paragraph>
         Android has ultimately removed access to the filesystem for applications. Instead, it has exposed a
-        rather poorly-designed and restrictive <Term type="term">Content Provider</Term> API that exposes an
+        rather poorly-designed and restrictive <Term type="term">Content Provider</Term> API that provides an
         essentially proprietary filesystem-like API. This, naturally, complicates both development and testing
-        because instead of being able to use ubiquitous and standardized APIs to access files, developers now have
+        because, instead of being able to use ubiquitous and standardized APIs to access files, developers now have
         to use a proprietary API that cannot be executed outside of real and/or emulated devices.
       </Paragraph>
       <Paragraph>
