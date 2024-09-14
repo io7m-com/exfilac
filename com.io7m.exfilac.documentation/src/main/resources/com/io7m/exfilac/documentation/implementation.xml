@@ -203,7 +203,7 @@
       <Paragraph>
         The application requires the
         <Term type="constant">android.permission.CAMERA</Term>
-        permission in order to use camera to scan QR codes to configure buckets.
+        permission in order to use the camera to scan QR codes to configure buckets.
       </Paragraph>
     </Subsection>
   </Section>
