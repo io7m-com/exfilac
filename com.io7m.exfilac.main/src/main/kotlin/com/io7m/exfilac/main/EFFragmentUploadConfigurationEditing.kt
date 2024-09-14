@@ -62,7 +62,6 @@ class EFFragmentUploadConfigurationEditing : EFScreenFragment() {
   private lateinit var schedule: Spinner
   private lateinit var toolbar: MaterialToolbar
   private lateinit var triggerNetwork: SwitchMaterial
-  private lateinit var triggerPhone: SwitchMaterial
   private lateinit var triggerPhoto: SwitchMaterial
 
   override fun onBackPressed(): EFBackResult {
@@ -90,8 +89,6 @@ class EFFragmentUploadConfigurationEditing : EFScreenFragment() {
       view.findViewById(R.id.uploadEditBucketHeader)
     this.schedule =
       view.findViewById(R.id.uploadEditSchedule)
-    this.triggerPhone =
-      view.findViewById(R.id.uploadTriggerPhoneCallEnded)
     this.triggerPhoto =
       view.findViewById(R.id.uploadTriggerPhotoTaken)
     this.triggerNetwork =
@@ -111,8 +108,7 @@ class EFFragmentUploadConfigurationEditing : EFScreenFragment() {
     this.name.setText(EFUploadEditModel.name)
     this.path.setText(EFUploadEditModel.source)
     this.schedule.setSelection(EFUploadEditModel.schedule.ordinal)
-    this.triggerPhone.isChecked =
-      EFUploadEditModel.triggers.contains(EFUploadTrigger.TRIGGER_WHEN_PHONE_CALL_ENDED)
+
     this.triggerPhoto.isChecked =
       EFUploadEditModel.triggers.contains(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
     this.triggerNetwork.isChecked =
@@ -172,13 +168,6 @@ class EFFragmentUploadConfigurationEditing : EFScreenFragment() {
         EFUploadEditModel.addTrigger(EFUploadTrigger.TRIGGER_WHEN_NETWORK_AVAILABLE)
       } else {
         EFUploadEditModel.removeTrigger(EFUploadTrigger.TRIGGER_WHEN_NETWORK_AVAILABLE)
-      }
-    }
-    this.triggerPhone.setOnCheckedChangeListener { _, isChecked ->
-      if (isChecked) {
-        EFUploadEditModel.addTrigger(EFUploadTrigger.TRIGGER_WHEN_PHONE_CALL_ENDED)
-      } else {
-        EFUploadEditModel.removeTrigger(EFUploadTrigger.TRIGGER_WHEN_PHONE_CALL_ENDED)
       }
     }
 

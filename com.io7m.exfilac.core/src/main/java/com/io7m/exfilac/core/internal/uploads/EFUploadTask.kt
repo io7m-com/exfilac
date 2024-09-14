@@ -152,10 +152,6 @@ class EFUploadTask(
       EFUploadReasonTime -> "Upload was triggered due to the time-based schedule."
       is EFUploadReasonTrigger ->
         when (reason.trigger) {
-          EFUploadTrigger.TRIGGER_WHEN_PHONE_CALL_ENDED -> {
-            "Upload was triggered because a phone call ended."
-          }
-
           EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN -> {
             "Upload was triggered because a photo was taken."
           }

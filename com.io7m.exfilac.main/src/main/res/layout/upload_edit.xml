@@ -216,15 +216,6 @@
         android:textSize="@dimen/settingsDescriptionTextSize" />
 
       <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/uploadTriggerPhoneCallEnded"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginStart="@dimen/settingsMarginHorizontal"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="@dimen/settingsMarginHorizontal"
-        android:text="@string/uploadTriggerOnCall" />
-
-      <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/uploadTriggerPhotoTaken"
         android:layout_width="match_parent"
         android:layout_height="48dp"

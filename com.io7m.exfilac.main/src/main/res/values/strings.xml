@@ -79,7 +79,6 @@
   <string name="uploadSchedule">Schedule</string>
   <string name="uploadScheduleDescription">The frequency at which the directory will be scanned for file changes.</string>
   <string name="uploadSelectPath">Select Directory…</string>
-  <string name="uploadTriggerOnCall">A phone call ended.</string>
   <string name="uploadTriggerOnPhoto">A photo was taken.</string>
   <string name="uploadTriggerOnWifi">The network became available.</string>
   <string name="uploadTriggers">Triggers</string>

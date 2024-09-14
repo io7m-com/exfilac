@@ -17,7 +17,6 @@
 package com.io7m.exfilac.core
 
 enum class EFUploadTrigger {
-  TRIGGER_WHEN_PHONE_CALL_ENDED,
   TRIGGER_WHEN_PHOTO_TAKEN,
   TRIGGER_WHEN_NETWORK_AVAILABLE
 }
