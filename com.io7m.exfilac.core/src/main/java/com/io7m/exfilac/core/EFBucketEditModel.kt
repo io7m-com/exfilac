@@ -26,13 +26,57 @@ object EFBucketEditModel {
   }
 
   var referenceName: String = ""
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
   var editOperation: EditOperation = EditOperation.CREATE
+
+  private var unsaved: Boolean = false
+
   var name: String = ""
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
   var region: String = "us-east-1"
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
   var accessKey: String = ""
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
   var secret: String = ""
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
   var endpoint: URI = URI.create("https://s3.example.com")
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
   var accessStyle: EFBucketAccessStyle = EFBucketAccessStyle.VIRTUALHOST_STYLE
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
 
   fun clear() {
     this.editOperation = EditOperation.CREATE
@@ -43,6 +87,7 @@ object EFBucketEditModel {
     this.secret = ""
     this.endpoint = URI.create("https://s3.example.com")
     this.accessStyle = EFBucketAccessStyle.VIRTUALHOST_STYLE
+    this.unsaved = false
   }
 
   fun setBucket(
@@ -56,5 +101,10 @@ object EFBucketEditModel {
     this.secret = configuration.secret.value
     this.endpoint = configuration.endpoint
     this.accessStyle = configuration.accessStyle
+    this.unsaved = false
+  }
+
+  fun isUnsaved(): Boolean {
+    return this.unsaved
   }
 }

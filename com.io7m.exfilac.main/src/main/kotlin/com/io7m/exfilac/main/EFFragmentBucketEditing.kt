@@ -24,8 +24,10 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.annotation.UiThread
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.exfilac.core.EFAccessKey
 import com.io7m.exfilac.core.EFBucketAccessStyle
 import com.io7m.exfilac.core.EFBucketConfiguration
@@ -38,7 +40,7 @@ import com.io7m.exfilac.core.EFRegion
 import com.io7m.exfilac.core.EFSecretKey
 import java.net.URI
 
-class EFFragmentBucketEditing : EFFragment() {
+class EFFragmentBucketEditing : EFScreenFragment() {
 
   private lateinit var refName: EditText
   private lateinit var accessKey: EditText
@@ -49,6 +51,11 @@ class EFFragmentBucketEditing : EFFragment() {
   private lateinit var saveButton: MenuItem
   private lateinit var secret: EditText
   private lateinit var toolbar: MaterialToolbar
+
+  override fun onBackPressed(): EFBackResult {
+    this.onWantClose()
+    return EFBackResult.BACK_HANDLED
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -145,18 +152,7 @@ class EFFragmentBucketEditing : EFFragment() {
       }
 
     this.saveButton.setOnMenuItemClickListener {
-      EFApplication.application.exfilac.bucketEditConfirm(
-        EFBucketConfiguration(
-          referenceName = EFBucketReferenceName(EFBucketEditModel.referenceName),
-          name = EFBucketName(EFBucketEditModel.name),
-          region = EFRegion(EFBucketEditModel.region),
-          accessKey = EFAccessKey(EFBucketEditModel.accessKey),
-          secret = EFSecretKey(EFBucketEditModel.secret),
-          accessStyle = EFBucketEditModel.accessStyle,
-          endpoint = EFBucketEditModel.endpoint
-        )
-      )
-      EFBucketEditModel.clear()
+      this.onTrySaveConfirm()
       true
     }
 
@@ -176,14 +172,59 @@ class EFFragmentBucketEditing : EFFragment() {
     return view
   }
 
-  private fun validate() {
+  @UiThread
+  private fun onWantClose() {
+    EFUIThread.checkIsUIThread()
+
+    if (EFBucketEditModel.isUnsaved()) {
+      val builder = MaterialAlertDialogBuilder(this.requireContext())
+      builder.setMessage(R.string.bucketEditCancelConfirm)
+      builder.setPositiveButton(R.string.saveChanges) { _, _ ->
+        this.onTrySaveConfirm()
+      }
+      builder.setNegativeButton(R.string.discard) { d, _ ->
+        d.cancel()
+        EFApplication.application.exfilac.bucketEditCancel()
+      }
+      builder.show()
+    } else {
+      EFApplication.application.exfilac.bucketEditCancel()
+    }
+  }
+
+  private fun onSaveConfirm() {
+    EFApplication.application.exfilac.bucketEditConfirm(
+      EFBucketConfiguration(
+        referenceName = EFBucketReferenceName(EFBucketEditModel.referenceName),
+        name = EFBucketName(EFBucketEditModel.name),
+        region = EFRegion(EFBucketEditModel.region),
+        accessKey = EFAccessKey(EFBucketEditModel.accessKey),
+        secret = EFSecretKey(EFBucketEditModel.secret),
+        accessStyle = EFBucketEditModel.accessStyle,
+        endpoint = EFBucketEditModel.endpoint
+      )
+    )
+    EFBucketEditModel.clear()
+  }
+
+  private fun onTrySaveConfirm() {
+    if (!this.validate()) {
+      val builder = MaterialAlertDialogBuilder(this.requireContext())
+      builder.setMessage(R.string.editFieldsNotValid)
+      builder.show()
+    } else {
+      this.onSaveConfirm()
+    }
+  }
+
+  private fun validate(): Boolean {
     var ok = this.validateName()
     ok = ok and this.validateReferenceName()
     ok = ok and this.validateRegion()
     ok = ok and this.validateAccessKey()
     ok = ok and this.validateSecret()
     ok = ok and this.validateEndpoint()
-    this.saveButton.isEnabled = ok
+    return ok
   }
 
   private fun validateEndpoint(): Boolean {

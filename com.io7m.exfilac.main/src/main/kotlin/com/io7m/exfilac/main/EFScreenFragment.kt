@@ -18,4 +18,29 @@ package com.io7m.exfilac.main
 
 import androidx.fragment.app.Fragment
 
-sealed class EFFragment : Fragment()
+/**
+ * The type of fragments that represent entire screens in the application.
+ */
+
+sealed class EFScreenFragment : Fragment() {
+
+  /**
+   * The fragment's response to the back button.
+   */
+
+  enum class EFBackResult {
+    /**
+     * The fragment handled the back button.
+     */
+
+    BACK_HANDLED,
+
+    /**
+     * The fragment didn't handle the back button. Propagate the event to the host.
+     */
+
+    BACK_PROPAGATE_UP
+  }
+
+  abstract fun onBackPressed(): EFBackResult
+}

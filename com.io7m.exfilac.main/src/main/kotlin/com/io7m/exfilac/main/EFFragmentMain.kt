@@ -28,13 +28,13 @@ import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 
 /**
- * The main fragment is solely responsible for managing fragments for tables. The Android
+ * The main fragment is solely responsible for managing fragments for tabs. The Android
  * ViewPager and ViewPager2 are totally broken and frequently just outright ignore requests
  * to scroll between tabs. Therefore, we simply replace the current fragment whenever the
  * user clicks on a tab.
  */
 
-class EFFragmentMain : EFFragment() {
+class EFFragmentMain : EFScreenFragment() {
 
   private var fragmentNow: Fragment? = null
   private lateinit var tabContent: FrameLayout
@@ -42,6 +42,10 @@ class EFFragmentMain : EFFragment() {
 
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
+
+  override fun onBackPressed(): EFBackResult {
+    return EFBackResult.BACK_PROPAGATE_UP
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,

@@ -33,8 +33,10 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.UiThread
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.io7m.exfilac.core.EFBucketReferenceName
 import com.io7m.exfilac.core.EFDeviceSource
@@ -48,7 +50,7 @@ import com.io7m.exfilac.core.EFUploadSchedule
 import com.io7m.exfilac.core.EFUploadTrigger
 import java.net.URI
 
-class EFFragmentUploadConfigurationEditing : EFFragment() {
+class EFFragmentUploadConfigurationEditing : EFScreenFragment() {
 
   private lateinit var bucketHeader: TextView
   private lateinit var pathSelectCallback: ActivityResultLauncher<Intent>
@@ -62,6 +64,11 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
   private lateinit var triggerNetwork: SwitchMaterial
   private lateinit var triggerPhone: SwitchMaterial
   private lateinit var triggerPhoto: SwitchMaterial
+
+  override fun onBackPressed(): EFBackResult {
+    this.onWantClose()
+    return EFBackResult.BACK_HANDLED
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -94,7 +101,7 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
 
     this.toolbar.setNavigationIcon(R.drawable.back_24)
     this.toolbar.setNavigationOnClickListener {
-      EFApplication.application.exfilac.uploadEditCancel()
+      this.onWantClose()
     }
     this.toolbar.menu.clear()
     val activity = this.requireActivity()
@@ -155,23 +162,23 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
 
     this.triggerPhoto.setOnCheckedChangeListener { _, isChecked ->
       if (isChecked) {
-        EFUploadEditModel.triggers.add(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
+        EFUploadEditModel.addTrigger(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
       } else {
-        EFUploadEditModel.triggers.remove(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
+        EFUploadEditModel.removeTrigger(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
       }
     }
     this.triggerNetwork.setOnCheckedChangeListener { _, isChecked ->
       if (isChecked) {
-        EFUploadEditModel.triggers.add(EFUploadTrigger.TRIGGER_WHEN_NETWORK_AVAILABLE)
+        EFUploadEditModel.addTrigger(EFUploadTrigger.TRIGGER_WHEN_NETWORK_AVAILABLE)
       } else {
-        EFUploadEditModel.triggers.remove(EFUploadTrigger.TRIGGER_WHEN_NETWORK_AVAILABLE)
+        EFUploadEditModel.removeTrigger(EFUploadTrigger.TRIGGER_WHEN_NETWORK_AVAILABLE)
       }
     }
     this.triggerPhone.setOnCheckedChangeListener { _, isChecked ->
       if (isChecked) {
-        EFUploadEditModel.triggers.add(EFUploadTrigger.TRIGGER_WHEN_PHONE_CALL_ENDED)
+        EFUploadEditModel.addTrigger(EFUploadTrigger.TRIGGER_WHEN_PHONE_CALL_ENDED)
       } else {
-        EFUploadEditModel.triggers.remove(EFUploadTrigger.TRIGGER_WHEN_PHONE_CALL_ENDED)
+        EFUploadEditModel.removeTrigger(EFUploadTrigger.TRIGGER_WHEN_PHONE_CALL_ENDED)
       }
     }
 
@@ -188,18 +195,7 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
     }
 
     this.saveButton.setOnMenuItemClickListener {
-      EFApplication.application.exfilac.uploadEditConfirm(
-        EFUploadConfiguration(
-          name = EFUploadName(EFUploadEditModel.name),
-          source = EFDeviceSource(URI.create(EFUploadEditModel.source)),
-          bucket = EFUploadEditModel.bucket!!,
-          policy = EFUploadPolicy(
-            EFUploadEditModel.schedule,
-            EFUploadEditModel.triggers.toSet()
-          )
-        )
-      )
-      EFUploadEditModel.clear()
+      this.onTrySaveConfirm()
       true
     }
 
@@ -216,7 +212,7 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
      */
 
     this.pathSelectCallback =
-      registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+      this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
           val data = result.data?.data
           if (data != null) {
@@ -238,17 +234,62 @@ class EFFragmentUploadConfigurationEditing : EFFragment() {
     return view
   }
 
-  private fun validate() {
+  private fun onSaveConfirm() {
+    EFApplication.application.exfilac.uploadEditConfirm(
+      EFUploadConfiguration(
+        name = EFUploadName(EFUploadEditModel.name),
+        source = EFDeviceSource(URI.create(EFUploadEditModel.source)),
+        bucket = EFUploadEditModel.bucket!!,
+        policy = EFUploadPolicy(
+          EFUploadEditModel.schedule,
+          EFUploadEditModel.triggers.toSet()
+        )
+      )
+    )
+    EFUploadEditModel.clear()
+  }
+
+  private fun onTrySaveConfirm() {
+    if (!this.validate()) {
+      val builder = MaterialAlertDialogBuilder(this.requireContext())
+      builder.setMessage(R.string.editFieldsNotValid)
+      builder.show()
+    } else {
+      this.onSaveConfirm()
+    }
+  }
+
+  @UiThread
+  private fun onWantClose() {
+    EFUIThread.checkIsUIThread()
+
+    if (EFUploadEditModel.isUnsaved()) {
+      val builder = MaterialAlertDialogBuilder(this.requireContext())
+      builder.setMessage(R.string.uploadEditCancelConfirm)
+      builder.setPositiveButton(R.string.saveChanges) { _, _ ->
+        this.onTrySaveConfirm()
+      }
+      builder.setNegativeButton(R.string.discard) { d, _ ->
+        d.cancel()
+        EFApplication.application.exfilac.uploadEditCancel()
+      }
+      builder.show()
+    } else {
+      EFApplication.application.exfilac.uploadEditCancel()
+    }
+  }
+
+  private fun validate(): Boolean {
     var ok = this.validateName()
     ok = ok and this.validateSource()
     ok = ok and this.validateBucket()
-    this.saveButton.isEnabled = ok
+    return ok
   }
 
   private fun validateBucket(): Boolean {
     return try {
       if (EFUploadEditModel.bucket == null) {
-        this.bucketHeader.error = getString(R.string.uploadBucketNotSpecified)
+        this.bucketHeader.error = this.getString(R.string.uploadBucketNotSpecified)
         false
       } else {
         this.bucketHeader.error = null

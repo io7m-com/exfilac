@@ -163,12 +163,16 @@ class EFFragmentTabBuckets : Fragment() {
   @UiThread
   private fun onBucketMenuAddSelected() {
     EFUIThread.checkIsUIThread()
+
+    EFBucketEditModel.clear()
     EFApplication.application.exfilac.bucketEditBegin()
   }
 
   @UiThread
   private fun onBucketMenuAddQRSelected() {
     EFUIThread.checkIsUIThread()
+
+    EFBucketEditModel.clear()
     this.barcodeLauncher.launch(ScanOptions())
     EFApplication.application.exfilac.bucketEditBegin()
   }

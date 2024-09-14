@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.exfilac.core.EFUploadConfiguration
+import com.io7m.exfilac.core.EFUploadEditModel
 import com.io7m.exfilac.core.EFUploadName
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
@@ -141,6 +142,8 @@ class EFFragmentTabUploads : Fragment() {
   @UiThread
   private fun onUploadMenuAddSelected() {
     EFUIThread.checkIsUIThread()
+
+    EFUploadEditModel.clear()
     EFApplication.application.exfilac.uploadEditBegin()
   }
 

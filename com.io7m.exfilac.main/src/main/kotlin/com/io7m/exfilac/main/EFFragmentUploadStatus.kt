@@ -34,7 +34,7 @@ import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import java.time.Duration
 import java.util.Optional
 
-class EFFragmentUploadStatus : EFFragment() {
+class EFFragmentUploadStatus : EFScreenFragment() {
 
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
@@ -55,6 +55,11 @@ class EFFragmentUploadStatus : EFFragment() {
   private lateinit var timeStarted: TextView
   private lateinit var toolbar: MaterialToolbar
   private lateinit var uploaded: TextView
+
+  override fun onBackPressed(): EFBackResult {
+    EFApplication.application.exfilac.uploadViewCancel()
+    return EFBackResult.BACK_HANDLED
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,

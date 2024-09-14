@@ -33,12 +33,16 @@ import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 
-class EFFragmentBooting : EFFragment() {
+class EFFragmentBooting : EFScreenFragment() {
 
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
   private lateinit var loadingProgress: ProgressBar
+
+  override fun onBackPressed(): EFBackResult {
+    return EFBackResult.BACK_PROPAGATE_UP
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,

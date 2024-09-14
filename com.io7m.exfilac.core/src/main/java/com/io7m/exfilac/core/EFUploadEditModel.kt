@@ -23,12 +23,54 @@ object EFUploadEditModel {
     MODIFY
   }
 
-  var bucket: EFBucketReferenceName? = null
   var editOperation: EditOperation = EditOperation.CREATE
+
+  private var unsaved: Boolean = false
+
+  var bucket: EFBucketReferenceName? = null
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
   var name: String = ""
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
   var source: String = ""
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
   var schedule: EFUploadSchedule = EFUploadSchedule.EVERY_HOUR
-  var triggers: MutableSet<EFUploadTrigger> = mutableSetOf()
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
+  var triggers: Set<EFUploadTrigger> = setOf()
+    set(value) {
+      val diff = field != value
+      field = value
+      this.unsaved = diff
+    }
+
+  fun addTrigger(t: EFUploadTrigger) {
+    this.triggers = this.triggers.plus(t)
+    this.unsaved = true
+  }
+
+  fun removeTrigger(t: EFUploadTrigger) {
+    this.triggers = this.triggers.minus(t)
+    this.unsaved = true
+  }
 
   fun clear() {
     this.editOperation = EditOperation.CREATE
@@ -36,7 +78,8 @@ object EFUploadEditModel {
     this.source = ""
     this.bucket = null
     this.schedule = EFUploadSchedule.EVERY_HOUR
-    this.triggers.clear()
+    this.triggers = setOf()
+    this.unsaved = false
   }
 
   fun setUploadConfiguration(
@@ -47,7 +90,11 @@ object EFUploadEditModel {
     this.source = configuration.source.toString()
     this.bucket = configuration.bucket
     this.schedule = configuration.policy.schedule
-    this.triggers.clear()
-    this.triggers.addAll(configuration.policy.triggers)
+    this.triggers = configuration.policy.triggers.toSet()
+    this.unsaved = false
+  }
+
+  fun isUnsaved(): Boolean {
+    return this.unsaved
   }
 }

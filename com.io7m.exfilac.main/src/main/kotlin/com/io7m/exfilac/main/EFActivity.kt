@@ -18,7 +18,6 @@ package com.io7m.exfilac.main
 
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import com.io7m.exfilac.core.EFState
 import com.io7m.exfilac.core.EFStateBootFailed
 import com.io7m.exfilac.core.EFStateBooting
@@ -26,13 +25,14 @@ import com.io7m.exfilac.core.EFStateBucketEditing
 import com.io7m.exfilac.core.EFStateReady
 import com.io7m.exfilac.core.EFStateUploadConfigurationEditing
 import com.io7m.exfilac.core.EFStateUploadStatusViewing
+import com.io7m.exfilac.main.EFScreenFragment.EFBackResult
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 
 class EFActivity : AppCompatActivity(R.layout.main_activity) {
 
-  private lateinit var fragmentNow: Fragment
+  private lateinit var fragmentNow: EFScreenFragment
 
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
@@ -82,24 +82,9 @@ class EFActivity : AppCompatActivity(R.layout.main_activity) {
 
   @Deprecated("This method has been deprecated by clueless \"engineers\".")
   override fun onBackPressed() {
-    when (EFApplication.application.exfilac.state.get()) {
-      is EFStateBucketEditing -> {
-        EFApplication.application.exfilac.bucketEditCancel()
-      }
-
-      is EFStateUploadConfigurationEditing -> {
-        EFApplication.application.exfilac.uploadEditCancel()
-      }
-
-      is EFStateBootFailed,
-      is EFStateBooting,
-      is EFStateReady -> {
-        super.onBackPressed()
-      }
-
-      is EFStateUploadStatusViewing -> {
-        EFApplication.application.exfilac.uploadViewCancel()
-      }
+    when (this.fragmentNow.onBackPressed()) {
+      EFBackResult.BACK_HANDLED -> Unit
+      EFBackResult.BACK_PROPAGATE_UP -> super.onBackPressed()
     }
   }
 
@@ -108,7 +93,7 @@ class EFActivity : AppCompatActivity(R.layout.main_activity) {
     this.subscriptions.close()
   }
 
-  private fun switchFragment(fragment: Fragment) {
+  private fun switchFragment(fragment: EFScreenFragment) {
     this.fragmentNow = fragment
     this.supportFragmentManager.beginTransaction()
       .replace(R.id.mainFragmentHolder, fragment)

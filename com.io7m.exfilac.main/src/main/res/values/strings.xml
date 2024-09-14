@@ -37,17 +37,18 @@
   <string name="bucketAddQR">Add bucket from QR code</string>
   <string name="bucketCreate">Create</string>
   <string name="bucketDeleteConfirm">Are you sure you want to delete the selected buckets?\n\nDeleting buckets will also delete any uploads associated with them.</string>
+  <string name="bucketEditCancelConfirm">You have made changes to this bucket configuration. Do you want to save your changes?</string>
   <string name="bucketEditCreate">Create Bucket</string>
   <string name="bucketEditModify">Modify Bucket</string>
   <string name="bucketEditSave">Save Bucket</string>
   <string name="bucketEndpoint">Endpoint</string>
   <string name="bucketEndpointDescription">The base endpoint for the bucket.</string>
   <string name="bucketInvalidURI">Invalid URI.</string>
+  <string name="bucketName">Name</string>
+  <string name="bucketNameDescription">The name of the bucket on the server.</string>
   <string name="bucketRefName">Reference Name</string>
   <string name="bucketRefNameDescription">A unique name that will be used to refer to this bucket.</string>
   <string name="bucketRefNameTaken">A bucket already exists with this name.</string>
-  <string name="bucketName">Name</string>
-  <string name="bucketNameDescription">The name of the bucket on the server.</string>
   <string name="bucketRegion">Region</string>
   <string name="bucketRegionDescription">The name of the region within which this bucket resides.</string>
   <string name="bucketRemove">Remove bucket(s)</string>
@@ -59,6 +60,8 @@
   <string name="delete">Delete</string>
   <string name="modify">Modify</string>
 
+  <string name="editFieldsNotValid">One or more fields do not have valid values. Please correct these before attempting to save.</string>
+
   <string name="uploadAdd">Add upload</string>
   <string name="uploadBucket">Bucket</string>
   <string name="uploadBucketDescription">The bucket to which files will be uploaded.</string>
@@ -66,6 +69,7 @@
   <string name="uploadEditCreate">Create Upload</string>
   <string name="uploadEditModify">Modify Upload</string>
   <string name="uploadEditSave">Save Upload</string>
+  <string name="uploadEditCancelConfirm">You have made changes to this upload configuration. Do you want to save your changes?</string>
   <string name="uploadName">Upload Name</string>
   <string name="uploadNameDescription">A unique name that will be used to refer to this upload.</string>
   <string name="uploadNameTaken">An upload already exists with this name.</string>
@@ -84,6 +88,9 @@
   <string name="uploadStartedManually">Upload started manually.</string>
   <string name="uploadStatusDetails">Most recent upload</string>
   <string name="uploadStatusEventCount">%d events logged.</string>
+
+  <string name="discard">Discard</string>
+  <string name="saveChanges">Save changes</string>
 
   <string name="statusRunning">Running…</string>
   <string name="statusNotRunning">Not currently running.</string>
