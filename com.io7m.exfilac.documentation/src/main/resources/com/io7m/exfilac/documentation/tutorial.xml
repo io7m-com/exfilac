@@ -608,7 +608,7 @@ SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
     </Subsection>
     <Subsection title="Privacy Policy">
       <Paragraph>
-        The <Term type="term">Support</Term> option will open the application's privacy policy in a web browser.
+        The <Term type="term">Privacy Policy</Term> option will open the application's privacy policy in a web browser.
       </Paragraph>
     </Subsection>
     <Subsection title="Commit">
