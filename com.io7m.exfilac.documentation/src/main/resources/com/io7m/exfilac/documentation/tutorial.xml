@@ -128,14 +128,14 @@
         behind the scenes.
       </Paragraph>
       <Paragraph>
-        Systems such as <Term type="package">minio</Term> require the use of
+        Systems such as <Term type="package">MinIO</Term> require the use of
         <Term type="term">path style</Term>
         access. Amazon AWS currently accepts either access style in practice. Consult your S3 provider's documentation
         for the rules.
       </Paragraph>
       <Paragraph id="0e1e653a-1a95-4013-a3b5-ee432c480b63">
         Finally, the <Term type="term">Endpoint</Term> field specifies the actual base address that will be used for the
-        S3 bucket. If you're hosting S3 buckets yourself using <Term type="package">minio</Term>, then this is simply
+        S3 bucket. If you're hosting S3 buckets yourself using <Term type="package">MinIO</Term>, then this is simply
         the address of the server. If you're hosting S3 buckets on AWS, then this will be an address such
         as <Term type="constant">https://s3.us-east-1.amazonaws.com</Term>. Again, you'll need to consult your S3
         provider's documentation for the right server endpoint to use.
