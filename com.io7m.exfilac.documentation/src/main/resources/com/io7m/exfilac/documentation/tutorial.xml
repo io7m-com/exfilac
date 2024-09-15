@@ -199,7 +199,7 @@ SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
         </Image>
       </FormalItem>
       <Paragraph>
-        This table lists the keys and their meanings:
+        This table lists the configuration keys and their meanings:
       </Paragraph>
       <FormalItem title="Configuration Property Keys"
                   id="9a9695e7-a7b9-49fd-b773-3318e4aed44b">
