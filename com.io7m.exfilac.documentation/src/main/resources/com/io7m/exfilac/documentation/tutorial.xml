@@ -175,6 +175,30 @@
         case-sensitive.
       </Paragraph>
       <Paragraph>
+        For example, a valid configuration in this format might look like this:
+      </Paragraph>
+      <FormalItem title="Example Configuration"
+                  id="3a4be325-1eab-49e3-bff7-2ee5a3d3eb36">
+        <Verbatim><![CDATA[
+AccessKey=fc87a046
+AccessStyle=PATH_STYLE
+Bucket=tablet-test
+Endpoint=https://s3.example.com
+Name=qrtest
+Region=us-west-1
+SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
+]]></Verbatim>
+      </FormalItem>
+      <Paragraph>
+        When given to a QR encoding tool, the following image will be produced:
+      </Paragraph>
+      <FormalItem title="Example Configuration (QR)"
+                  id="9aa8e6f6-f7ac-4136-86ec-613673b55ed2">
+        <Image source="qrcode.png">
+          Example configuration QR code.
+        </Image>
+      </FormalItem>
+      <Paragraph>
         This table lists the keys and their meanings:
       </Paragraph>
       <FormalItem title="Configuration Property Keys"
@@ -217,30 +241,6 @@
             <Cell>The bucket secret key.</Cell>
           </Row>
         </Table>
-      </FormalItem>
-      <Paragraph>
-        For example, a valid configuration might look like this:
-      </Paragraph>
-      <FormalItem title="Example Configuration"
-                  id="3a4be325-1eab-49e3-bff7-2ee5a3d3eb36">
-        <Verbatim><![CDATA[
-AccessKey=fc87a046
-AccessStyle=PATH_STYLE
-Bucket=tablet-test
-Endpoint=https://s3.example.com
-Name=qrtest
-Region=us-west-1
-SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
-]]></Verbatim>
-      </FormalItem>
-      <Paragraph>
-        When given to a QR encoding tool, the following image will be produced:
-      </Paragraph>
-      <FormalItem title="Example Configuration (QR)"
-                  id="9aa8e6f6-f7ac-4136-86ec-613673b55ed2">
-        <Image source="qrcode.png">
-          Example configuration QR code.
-        </Image>
       </FormalItem>
       <Paragraph>
         Upon clicking the <Term type="term">Create Bucket (from QR code)</Term> toolbar button, the device's camera will
