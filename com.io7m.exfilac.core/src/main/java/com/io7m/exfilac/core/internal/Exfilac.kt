@@ -58,6 +58,7 @@ import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationListType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationPutType
 import com.io7m.exfilac.core.internal.database.EFQUploadEventRecordListParameters
 import com.io7m.exfilac.core.internal.database.EFQUploadEventRecordListType
+import com.io7m.exfilac.core.internal.database.EFQUploadRecordDeleteByAgeType
 import com.io7m.exfilac.core.internal.database.EFQUploadRecordGetType
 import com.io7m.exfilac.core.internal.database.EFQUploadRecordsMarkCancelledType
 import com.io7m.exfilac.core.internal.uploads.EFUploadServiceType
@@ -292,6 +293,14 @@ internal class Exfilac private constructor(
         transaction.commit()
       } catch (e: Exception) {
         logger.debug("Update uploads: ", e)
+      }
+
+      try {
+        transaction.query(EFQUploadRecordDeleteByAgeType::class.java)
+          .execute(this.clock.now().minusDays(7L))
+        transaction.commit()
+      } catch (e: Exception) {
+        logger.debug("Delete old uploads: ", e)
       }
 
       try {
