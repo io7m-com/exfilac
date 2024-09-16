@@ -27,13 +27,15 @@ object ExfilacFactory : ExfilacFactoryType {
     contentTrees: EFContentTreeFactoryType,
     s3Uploaders: EFS3UploaderFactoryType,
     clock: EFClockServiceType,
-    dataDirectory: Path
+    dataDirectory: Path,
+    cacheDirectory: Path
   ): ExfilacType {
     return Exfilac.open(
       contentTrees = contentTrees,
       s3Uploaders = s3Uploaders,
       clock = clock,
-      dataDirectory = dataDirectory
+      dataDirectory = dataDirectory,
+      cacheDirectory = cacheDirectory
     )
   }
 }

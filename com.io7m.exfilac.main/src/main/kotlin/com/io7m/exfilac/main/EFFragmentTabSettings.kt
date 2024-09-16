@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -41,11 +42,14 @@ class EFFragmentTabSettings : Fragment() {
   private lateinit var manual: TextView
   private lateinit var paused: SwitchMaterial
   private lateinit var privacyPolicy: TextView
+  private lateinit var saveLogs: TextView
   private lateinit var support: TextView
   private lateinit var toolbar: MaterialToolbar
   private lateinit var uploadCellular: SwitchMaterial
   private lateinit var uploadWifi: SwitchMaterial
   private lateinit var version: TextView
+
+  private var crashClicks = 0
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -72,6 +76,8 @@ class EFFragmentTabSettings : Fragment() {
       view.findViewById(R.id.settingsSupport)
     this.manual =
       view.findViewById(R.id.settingsUserManual)
+    this.saveLogs =
+      view.findViewById(R.id.settingsDumpLogs)
 
     this.uploadCellular.setOnCheckedChangeListener { _, isChecked ->
       this.updateSettings { settings: EFSettings ->
@@ -102,10 +108,37 @@ class EFFragmentTabSettings : Fragment() {
       )
     }
 
+    this.saveLogs.setOnClickListener {
+      EFCrashLogging.saveLogs()
+        .thenApply { filePath ->
+          EFUIThread.runOnUIThread {
+            Toast.makeText(
+              EFApplication.application,
+              EFApplication.application.getString(R.string.settingsSavedLogsTo, filePath),
+              Toast.LENGTH_LONG
+            ).show()
+          }
+        }
+    }
+
     this.commit.text = BuildConfig.EXFILAC_GIT_COMMIT
     this.version.text = BuildConfig.EXFILAC_VERSION
+
+    /*
+     * Register a commit click listener that will deliberately crash the application after
+     * ten clicks. The purpose of this is to allow for testing the crash handler.
+     */
+
+    this.commit.setOnClickListener {
+      this.crashClicks += 1
+      if (this.crashClicks >= 10) {
+        throw CrashedDeliberately()
+      }
+    }
     return view
   }
+
+  private class CrashedDeliberately : Exception("Crashed deliberately!")
 
   private fun updateSettings(
     updater: (EFSettings) -> EFSettings

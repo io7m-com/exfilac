@@ -16,15 +16,33 @@
 
 package com.io7m.exfilac.core
 
-import com.io7m.jattribute.core.AttributeReadableType
-import java.net.URI
-import java.nio.file.Path
-import java.util.concurrent.CompletableFuture
+import java.time.format.DateTimeFormatterBuilder
 
-interface ExfilacSettingsType {
-  val settings: AttributeReadableType<EFSettings>
-  fun settingsUpdate(settings: EFSettings): CompletableFuture<*>
-  fun settingsDocumentOpen(uri: URI)
-  fun settingsDocumentClose()
-  fun settingsDumpLogs(output: Path): CompletableFuture<*>
+object EFTimes {
+
+  val dateTimeFormatter =
+    DateTimeFormatterBuilder()
+      .appendPattern("YYYY")
+      .appendLiteral('-')
+      .appendPattern("MM")
+      .appendLiteral('-')
+      .appendPattern("dd")
+      .appendLiteral(' ')
+      .appendPattern("HH")
+      .appendLiteral(':')
+      .appendPattern("mm")
+      .appendLiteral(':')
+      .appendPattern("ss")
+      .appendPattern("Z")
+      .toFormatter()
+
+  val rawTimestampFormatter =
+    DateTimeFormatterBuilder()
+      .appendPattern("YYYY")
+      .appendPattern("MM")
+      .appendPattern("dd")
+      .appendPattern("HH")
+      .appendPattern("mm")
+      .appendPattern("ss")
+      .toFormatter()
 }

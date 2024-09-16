@@ -110,6 +110,8 @@
   <string name="settingsUploads">Uploads</string>
   <string name="settingsUserManual">User Manual</string>
   <string name="settingsVersion">Version</string>
+  <string name="settingsDumpLogs">Save Logs</string>
+  <string name="settingsSavedLogsTo">Saved logs to %s</string>
 
   <string name="networkStatusUnavailable">Network connectivity currently appears to be unavailable.</string>
   <string name="networkStatusCellular">Networking is currently provided by a cellular connection.</string>

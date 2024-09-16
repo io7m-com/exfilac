@@ -75,7 +75,10 @@ import com.io7m.taskrecorder.core.TRTaskRecorder
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteErrorCode
 import org.sqlite.SQLiteException
+import java.io.BufferedOutputStream
+import java.io.FileOutputStream
 import java.net.URI
+import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -86,12 +89,16 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
+import java.util.stream.Collectors
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 internal class Exfilac private constructor(
   private val resources: CloseableCollectionType<ClosingResourceFailedException>,
   private val databaseExecutor: ExecutorService,
   private val commandExecutor: ExecutorService,
   private val dataDirectory: Path,
+  private val cacheDirectory: Path,
   private val contentTrees: EFContentTreeFactoryType,
   private val s3Uploaders: EFS3UploaderFactoryType,
   private val clock: EFClockServiceType
@@ -149,6 +156,7 @@ internal class Exfilac private constructor(
       s3Uploaders: EFS3UploaderFactoryType,
       clock: EFClockServiceType,
       dataDirectory: Path,
+      cacheDirectory: Path
     ): ExfilacType {
       val resources =
         CloseableCollection.create()
@@ -177,6 +185,7 @@ internal class Exfilac private constructor(
         databaseExecutor = databaseExecutor,
         commandExecutor = commandExecutor,
         dataDirectory = dataDirectory,
+        cacheDirectory = cacheDirectory,
         contentTrees = contentTrees,
         s3Uploaders = s3Uploaders,
         clock = clock
@@ -325,10 +334,10 @@ internal class Exfilac private constructor(
     return x as B
   }
 
-  private fun executeCommand(
-    f: () -> Unit
-  ): CompletableFuture<*> {
-    val cf = CompletableFuture<Unit>()
+  private fun <T> executeCommand(
+    f: () -> T
+  ): CompletableFuture<T> {
+    val cf = CompletableFuture<T>()
     this.commandExecutor.execute {
       try {
         cf.complete(f.invoke())
@@ -650,6 +659,35 @@ internal class Exfilac private constructor(
 
   override fun settingsDocumentClose() {
     this.stateSource.set(EFStateReady())
+  }
+
+  override fun settingsDumpLogs(output: Path): CompletableFuture<*> {
+    return this.executeCommand {
+      val logPackFile =
+        output.toFile()
+      val logDirectory =
+        this.cacheDirectory.resolve("log")
+      val logFiles =
+        Files.list(logDirectory)
+          .sorted()
+          .collect(Collectors.toList())
+
+      FileOutputStream(logPackFile).use { fileOut ->
+        BufferedOutputStream(fileOut).use { bufferedOut ->
+          ZipOutputStream(bufferedOut).use { zipOut ->
+            for (file in logFiles) {
+              val entryName = file.fileName.toString()
+              val entry = ZipEntry(entryName)
+              zipOut.putNextEntry(entry)
+              Files.copy(file, zipOut)
+              zipOut.closeEntry()
+            }
+            zipOut.finish()
+          }
+        }
+      }
+      output
+    }
   }
 
   private fun uploadPermittedByNetworkStatus(): Boolean {

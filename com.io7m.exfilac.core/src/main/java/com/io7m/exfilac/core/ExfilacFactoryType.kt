@@ -26,6 +26,7 @@ interface ExfilacFactoryType {
     contentTrees: EFContentTreeFactoryType,
     s3Uploaders: EFS3UploaderFactoryType,
     clock: EFClockServiceType,
-    dataDirectory: Path
+    dataDirectory: Path,
+    cacheDirectory: Path
   ): ExfilacType
 }

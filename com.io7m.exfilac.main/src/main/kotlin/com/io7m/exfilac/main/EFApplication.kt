@@ -73,7 +73,19 @@ class EFApplication : Application() {
     super.onCreate()
     INSTANCE = this
 
+    EFApplicationLogging.configure(this.cacheDir)
     this.logger.info("Start")
+
+    /*
+     * Configure a crash handler that dumps logs when the application crashes.
+     */
+
+    val existingHandler = Thread.getDefaultUncaughtExceptionHandler()
+    Thread.setDefaultUncaughtExceptionHandler { t, e ->
+      this.logger.error("Uncaught exception: ", e)
+      EFCrashLogging.saveLogs().join()
+      existingHandler?.uncaughtException(t, e)
+    }
 
     this.exfilacField =
       ExfilacOnUI(
@@ -81,6 +93,7 @@ class EFApplication : Application() {
           contentTrees = EFContentTreeDevice(this, this.contentResolver),
           s3Uploaders = EFS3AMZUploaders(),
           dataDirectory = application.dataDir.toPath(),
+          cacheDirectory = application.cacheDir.toPath(),
           clock = EFClockSystem
         )
       )

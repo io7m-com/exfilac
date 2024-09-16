@@ -1115,6 +1115,7 @@ class ExfilacTest {
       contentTrees = EFContentTreeNull,
       s3Uploaders = EFS3UploaderFactoryNull,
       dataDirectory = this.directory,
+      cacheDirectory = this.directory,
       clock = EFClockMock
     )
     while (c.state.get() !is EFStateReady) {

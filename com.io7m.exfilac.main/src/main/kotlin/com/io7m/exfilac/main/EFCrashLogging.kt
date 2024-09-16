@@ -16,23 +16,28 @@
 
 package com.io7m.exfilac.main
 
-import java.time.format.DateTimeFormatterBuilder
+import android.os.Environment
+import com.io7m.exfilac.core.EFTimes
+import java.nio.file.Path
+import java.time.OffsetDateTime
+import java.util.concurrent.CompletableFuture
 
-object EFTimes {
+object EFCrashLogging {
 
-  val dateTimeFormatter =
-    DateTimeFormatterBuilder()
-      .appendPattern("YYYY")
-      .appendLiteral('-')
-      .appendPattern("MM")
-      .appendLiteral('-')
-      .appendPattern("dd")
-      .appendLiteral(' ')
-      .appendPattern("HH")
-      .appendLiteral(':')
-      .appendPattern("mm")
-      .appendLiteral(':')
-      .appendPattern("ss")
-      .appendPattern("Z")
-      .toFormatter()
+  fun saveLogs(): CompletableFuture<Path> {
+    val directory =
+      Environment.getExternalStorageDirectory()
+        .toPath()
+        .resolve("Documents")
+    val timestamp =
+      EFTimes.rawTimestampFormatter.format(OffsetDateTime.now())
+    val fileName =
+      "exfilac-logs-$timestamp.zip"
+    val filePath =
+      directory.resolve(fileName)
+        .toAbsolutePath()
+
+    return EFApplication.application.exfilac.settingsDumpLogs(filePath)
+      .thenApply { filePath }
+  }
 }

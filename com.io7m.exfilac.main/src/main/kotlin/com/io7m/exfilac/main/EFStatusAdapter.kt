@@ -25,6 +25,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.io7m.exfilac.core.EFTimes
 import com.io7m.exfilac.core.EFUploadReasonManual
 import com.io7m.exfilac.core.EFUploadStatus
 import com.io7m.exfilac.core.EFUploadStatusCancelled
