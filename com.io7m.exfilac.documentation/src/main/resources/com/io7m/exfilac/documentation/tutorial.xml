@@ -571,28 +571,27 @@ SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
     </Subsection>
     <Subsection title="Networking">
       <Paragraph>
-        The <Term type="term">Networking</Term> section of the settings screen controls how the application will
-        handle the general aspects of networking on mobile devices.
+        The <Term type="term">Networking</Term> section of the settings screen controls how the application will handle
+        the general aspects of networking on mobile devices.
       </Paragraph>
       <Paragraph>
-        The <Term type="term">Allow uploads on cellular connections</Term> option, if enabled, will allow uploads
-        to occur if the device's networking is being provided by some kind of cellular connection. This option is
-        disabled by default, as the use of these kinds of networks can be financially costly for some users.
+        The <Term type="term">Allow uploads on cellular connections</Term> option, if enabled, will allow uploads to
+        occur if the device's networking is being provided by some kind of cellular connection. This option is disabled
+        by default, as the use of these kinds of networks can be financially costly for some users.
       </Paragraph>
       <Paragraph>
-        The <Term type="term">Allow uploads on Wi-Fi</Term> option, if enabled, will allow uploads
-        to occur if the device's networking is being provided by Wi-Fi. This option is
-        enabled by default.
+        The <Term type="term">Allow uploads on Wi-Fi</Term> option, if enabled, will allow uploads to occur if the
+        device's networking is being provided by Wi-Fi. This option is enabled by default.
       </Paragraph>
     </Subsection>
     <Subsection title="Upload">
       <Paragraph>
-        The <Term type="term">Upload</Term> section of the settings screen provides general settings that affect
-        all uploads.
+        The <Term type="term">Upload</Term> section of the settings screen provides general settings that affect all
+        uploads.
       </Paragraph>
       <Paragraph>
-        The <Term type="term">Pause uploads</Term> option, if enabled, will prevent all uploads from executing until
-        the control is disabled. Note that uploads that are currently in progress will not be cancelled.
+        The <Term type="term">Pause uploads</Term> option, if enabled, will prevent all uploads from executing until the
+        control is disabled. Note that uploads that are currently in progress will not be cancelled.
       </Paragraph>
     </Subsection>
     <Subsection title="User Manual">
@@ -602,8 +601,8 @@ SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
     </Subsection>
     <Subsection title="Support">
       <Paragraph>
-        The <Term type="term">Support</Term> option will open a web browser and take you to a location where you
-        may be able to get technical support for the application.
+        The <Term type="term">Support</Term> option will open a web browser and take you to a location where you may be
+        able to get technical support for the application.
       </Paragraph>
     </Subsection>
     <Subsection title="Privacy Policy">
@@ -621,6 +620,30 @@ SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
     <Subsection title="Version">
       <Paragraph>
         The <Term type="term">Version</Term> option shows the current application version number.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Save Logs" id="4a57b1f9-95e9-4b7d-904f-45339a6d5d0b">
+      <Paragraph>
+        The application, as with most applications, produces various log messages as it operates. These messages
+        typically go into
+        <LinkExternal target="https://developer.android.com/studio/debug/logcat">
+          Android's internal log</LinkExternal>. Unfortunately, Android doesn't provide a standard utility to actually
+        view these logs and so any user wishing to view the log is forced to install the enormous Android developer
+        tools. The
+        <Term type="package">exfilac</Term>
+        application avoids this issue by logging to plain text files internally, and provides a mechanism for users to
+        get access to these log files for use in reporting issues with the application (or just to satisfy outright
+        morbid curiosity).
+      </Paragraph>
+      <Paragraph>
+        The <Term type="term">Save Logs</Term> option takes every internal log file that currently exists, packs them
+        into a <LinkExternal target="https://en.wikipedia.org/wiki/ZIP_(file_format)">zip</LinkExternal> file, and saves
+        the zip file to Android's <Term type="term">Documents</Term> directory.
+      </Paragraph>
+      <Paragraph>
+        Please note that although the <Term type="package">exfilac</Term> application takes care not to log
+        sensitive data to log files, third-party libraries upon which the application depends may not be so careful.
+        Please review log files for sensitive data such as S3 credentials before posting them anywhere publicly.
       </Paragraph>
     </Subsection>
   </Section>

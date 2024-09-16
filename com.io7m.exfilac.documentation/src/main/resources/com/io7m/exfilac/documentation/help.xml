@@ -10,4 +10,10 @@
       discussions board on GitHub</LinkExternal>.
   </Paragraph>
 
+  <Paragraph>
+    Please make use of the <Link target="4a57b1f9-95e9-4b7d-904f-45339a6d5d0b">Save Logs</Link> functionality
+    when reporting problems; it's exceedingly difficult to debug issues with the application without appropriate
+    error logs.
+  </Paragraph>
+
 </Section>
