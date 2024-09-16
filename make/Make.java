@@ -107,6 +107,23 @@ public final class Make
 
     copyDirectory(DOCUMENTATION_SOURCES, DOCUMENTATION_ASSETS_OUTPUT);
     executeXStructural();
+
+    if (!Objects.equals(System.getProperty("make.gradle"), "true")) {
+      executeGradle();
+    }
+  }
+
+  private static void executeGradle()
+    throws Exception
+  {
+    LOG.info("Executing gradle…");
+
+    final var args = new ArrayList<String>();
+    args.add("./gradlew");
+    args.add("clean");
+    args.add("assemble");
+    args.add("test");
+    execute(args);
   }
 
   private static void copyDirectory(
