@@ -112,6 +112,7 @@
   <string name="settingsVersion">Version</string>
   <string name="settingsDumpLogs">Save Logs</string>
   <string name="settingsSavedLogsTo">Saved logs to %s</string>
+  <string name="settingsLive">Click to see the live version of this documentation at\nhttps://www.io7m.com/software/exfilac/documentation/index-m.xhtml</string>
 
   <string name="networkStatusUnavailable">Network connectivity currently appears to be unavailable.</string>
   <string name="networkStatusCellular">Networking is currently provided by a cellular connection.</string>

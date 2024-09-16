@@ -28,9 +28,31 @@
     android:id="@+id/webView"
     android:layout_width="0dp"
     android:layout_height="0dp"
-    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/webViewDivider"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@id/documentAppBarLayout" />
+
+  <View
+    android:id="@+id/webViewDivider"
+    android:layout_width="0dp"
+    android:layout_height="1dp"
+    android:background="?android:attr/listDivider"
+    app:layout_constraintBottom_toTopOf="@id/webViewLive"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
+
+  <TextView
+    android:id="@+id/webViewLive"
+    android:layout_width="0dp"
+    android:layout_height="48dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:gravity="center"
+    android:clickable="true"
+    android:text="@string/settingsLive"
+    android:textSize="11sp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -31,9 +31,14 @@ import com.io7m.exfilac.core.EFSettings
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import org.slf4j.LoggerFactory
 import java.net.URI
+import java.nio.charset.StandardCharsets
 
 class EFFragmentTabSettings : Fragment() {
+
+  private val logger =
+    LoggerFactory.getLogger(EFFragmentTabSettings::class.java)
 
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
@@ -95,7 +100,7 @@ class EFFragmentTabSettings : Fragment() {
       }
     }
     this.privacyPolicy.setOnClickListener {
-      // Not implemented yet
+      this.openPrivacyPolicy()
     }
     this.support.setOnClickListener {
       val i = Intent(Intent.ACTION_VIEW)
@@ -104,7 +109,8 @@ class EFFragmentTabSettings : Fragment() {
     }
     this.manual.setOnClickListener {
       EFApplication.application.exfilac.settingsDocumentOpen(
-        URI.create("file:///android_asset/manual/index-m.xhtml")
+        bundledURI = URI.create("file:///android_asset/manual/index-m.xhtml"),
+        externalURI = URI.create("https://www.io7m.com/software/exfilac/documentation/index-m.xhtml")
       )
     }
 
@@ -136,6 +142,23 @@ class EFFragmentTabSettings : Fragment() {
       }
     }
     return view
+  }
+
+  private fun openPrivacyPolicy() {
+    try {
+      this.context?.assets?.let { assets ->
+        assets.open("manual/privacy-link.txt").use { stream ->
+          val linkBytes = stream.readBytes()
+          val linkText = linkBytes.toString(StandardCharsets.UTF_8).trim()
+          EFApplication.application.exfilac.settingsDocumentOpen(
+            bundledURI = URI.create("file:///android_asset/manual/$linkText"),
+            externalURI = URI.create("https://www.io7m.com/software/exfilac/documentation/index-m.xhtml")
+          )
+        }
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to open privacy policy: ", e)
+    }
   }
 
   private class CrashedDeliberately : Exception("Crashed deliberately!")

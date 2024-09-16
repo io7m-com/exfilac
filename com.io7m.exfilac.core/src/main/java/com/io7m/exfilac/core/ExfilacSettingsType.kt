@@ -24,7 +24,10 @@ import java.util.concurrent.CompletableFuture
 interface ExfilacSettingsType {
   val settings: AttributeReadableType<EFSettings>
   fun settingsUpdate(settings: EFSettings): CompletableFuture<*>
-  fun settingsDocumentOpen(uri: URI)
+  fun settingsDocumentOpen(
+    bundledURI: URI,
+    externalURI: URI
+  )
   fun settingsDocumentClose()
   fun settingsDumpLogs(output: Path): CompletableFuture<*>
 }

@@ -16,11 +16,14 @@
 
 package com.io7m.exfilac.main
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
+import android.widget.TextView
 import com.google.android.material.appbar.MaterialToolbar
 import com.io7m.exfilac.core.EFStateBootFailed
 import com.io7m.exfilac.core.EFStateBooting
@@ -32,8 +35,9 @@ import com.io7m.exfilac.core.EFStateUploadStatusViewing
 
 class EFFragmentDocument : EFScreenFragment() {
 
-  private lateinit var webView: WebView
+  private lateinit var liveText: TextView
   private lateinit var toolbar: MaterialToolbar
+  private lateinit var webView: WebView
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -47,6 +51,8 @@ class EFFragmentDocument : EFScreenFragment() {
       view.findViewById(R.id.documentAppBar)
     this.webView =
       view.findViewById(R.id.webView)
+    this.liveText =
+      view.findViewById(R.id.webViewLive)
 
     this.toolbar.setNavigationIcon(R.drawable.back_24)
     this.toolbar.setNavigationOnClickListener {
@@ -55,7 +61,30 @@ class EFFragmentDocument : EFScreenFragment() {
     this.toolbar.menu.clear()
 
     this.webView.settings.allowFileAccess = true
+
+    this.liveText.setOnClickListener {
+      this.openLiveText()
+    }
     return view
+  }
+
+  private fun openLiveText() {
+    when (val state = EFApplication.application.exfilac.state.get()) {
+      is EFStateSettingsReadingDocument -> {
+        val i = Intent(Intent.ACTION_VIEW)
+        i.setData(Uri.parse(state.externalURI.toString()))
+        this.startActivity(i)
+      }
+
+      is EFStateBootFailed,
+      is EFStateBooting,
+      is EFStateBucketEditing,
+      is EFStateReady,
+      is EFStateUploadConfigurationEditing,
+      is EFStateUploadStatusViewing -> {
+        // Nothing to do
+      }
+    }
   }
 
   private fun onWantClose() {
@@ -68,7 +97,7 @@ class EFFragmentDocument : EFScreenFragment() {
     if (this.webView.url == null) {
       when (val state = EFApplication.application.exfilac.state.get()) {
         is EFStateSettingsReadingDocument -> {
-          this.webView.loadUrl(state.target.toString())
+          this.webView.loadUrl(state.bundledURI.toString())
         }
 
         is EFStateBootFailed,

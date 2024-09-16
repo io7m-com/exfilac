@@ -662,8 +662,16 @@ internal class Exfilac private constructor(
     }
   }
 
-  override fun settingsDocumentOpen(target: URI) {
-    this.stateSource.set(EFStateSettingsReadingDocument(target))
+  override fun settingsDocumentOpen(
+    bundledURI: URI,
+    externalURI: URI
+  ) {
+    this.stateSource.set(
+      EFStateSettingsReadingDocument(
+        bundledURI = bundledURI,
+        externalURI = externalURI
+      )
+    )
   }
 
   override fun settingsDocumentClose() {

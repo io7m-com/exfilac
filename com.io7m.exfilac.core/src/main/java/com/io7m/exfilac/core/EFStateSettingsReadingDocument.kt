@@ -19,5 +19,6 @@ package com.io7m.exfilac.core
 import java.net.URI
 
 class EFStateSettingsReadingDocument(
-  val target: URI
+  val bundledURI: URI,
+  val externalURI: URI
 ) : EFState()
