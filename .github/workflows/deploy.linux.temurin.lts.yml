@@ -1,0 +1,33 @@
+name: deploy.linux.temurin.lts
+
+on:
+  push:
+    tags: [ com.io7m.exfilac-* ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: Check PGP version
+        run: gpg --version
+
+      - name: Import signing key
+        env:
+          PGP_SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY }}
+        run: echo "${PGP_SIGNING_KEY}" | gpg -v --import
+
+      - name: Build
+        run: java make/Make.java
+
+      - name: Deploy release
+        run: .github/workflows/deploy-release.sh

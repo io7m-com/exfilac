@@ -1,0 +1,22 @@
+name: main.linux.temurin.current
+
+on:
+  push:
+    branches: [ develop, feature/*, release/* ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 22
+          distribution: 'temurin'
+
+      - name: Build
+        run: java make/Make.java

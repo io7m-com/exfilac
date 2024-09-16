@@ -1,0 +1,22 @@
+name: pr.linux.temurin.lts
+
+on:
+  pull_request:
+    branches: [ develop, feature/*, release/* ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+
+      - name: Build
+        run: java make/Make.java
