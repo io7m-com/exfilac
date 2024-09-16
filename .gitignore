@@ -6,6 +6,6 @@ gen
 local.properties
 obj
 com.io7m.exfilac.main/src/main/jniLibs
-com.io7m.exfilac.documentation/src/main/assets
+com.io7m.exfilac.main/src/main/assets/manual
 target
 .gradle

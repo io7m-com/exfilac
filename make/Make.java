@@ -89,7 +89,7 @@ public final class Make
       .resolve("documentation");
 
   private static final Path DOCUMENTATION_ASSETS_OUTPUT =
-    Paths.get("com.io7m.exfilac.documentation")
+    Paths.get("com.io7m.exfilac.main")
       .resolve("src")
       .resolve("main")
       .resolve("assets")

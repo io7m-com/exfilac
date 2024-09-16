@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
+import com.google.android.material.appbar.MaterialToolbar
 import com.io7m.exfilac.core.EFStateBootFailed
 import com.io7m.exfilac.core.EFStateBooting
 import com.io7m.exfilac.core.EFStateBucketEditing
@@ -32,16 +33,33 @@ import com.io7m.exfilac.core.EFStateUploadStatusViewing
 class EFFragmentDocument : EFScreenFragment() {
 
   private lateinit var webView: WebView
+  private lateinit var toolbar: MaterialToolbar
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    val view = inflater.inflate(R.layout.web_view, container, false)
-    this.webView = view.findViewById(R.id.webView)
+    val view =
+      inflater.inflate(R.layout.web_view, container, false)
+
+    this.toolbar =
+      view.findViewById(R.id.documentAppBar)
+    this.webView =
+      view.findViewById(R.id.webView)
+
+    this.toolbar.setNavigationIcon(R.drawable.back_24)
+    this.toolbar.setNavigationOnClickListener {
+      this.onWantClose()
+    }
+    this.toolbar.menu.clear()
+
     this.webView.settings.allowFileAccess = true
     return view
+  }
+
+  private fun onWantClose() {
+    EFApplication.application.exfilac.settingsDocumentClose()
   }
 
   override fun onStart() {
@@ -66,7 +84,12 @@ class EFFragmentDocument : EFScreenFragment() {
   }
 
   override fun onBackPressed(): EFBackResult {
-    EFApplication.application.exfilac.settingsDocumentClose()
+    if (this.webView.canGoBack()) {
+      this.webView.goBack()
+      return EFBackResult.BACK_HANDLED
+    }
+
+    this.onWantClose()
     return EFBackResult.BACK_HANDLED
   }
 }

@@ -104,7 +104,7 @@ class EFFragmentTabSettings : Fragment() {
     }
     this.manual.setOnClickListener {
       EFApplication.application.exfilac.settingsDocumentOpen(
-        URI.create("file:///android_asset/manual/index.xhtml")
+        URI.create("file:///android_asset/manual/index-m.xhtml")
       )
     }
 

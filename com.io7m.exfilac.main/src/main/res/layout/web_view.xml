@@ -14,9 +14,6 @@
     app:layout_constraintTop_toTopOf="parent">
 
     <com.google.android.material.appbar.MaterialToolbar
-      app:logo="@drawable/io7m_24"
-      app:title="@string/app_name"
-      app:titleMarginStart="@dimen/appBarTitleMarginStart"
       android:id="@+id/documentAppBar"
       android:layout_width="match_parent"
       android:layout_height="48dp" />
