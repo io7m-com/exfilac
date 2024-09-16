@@ -13,6 +13,8 @@
     <dc:language>en</dc:language>
     <dc:rights>Public Domain</dc:rights>
     <dc:title>Exfilac User Manual</dc:title>
+
+    <MetaProperty name="com.io7m.xstructural.web.cover">bookBanner.jpg</MetaProperty>
   </Metadata>
 
   <xi:include href="overview.xml"/>
