@@ -301,7 +301,7 @@ public final class Make
       }
 
       final var received = sha256Of(outputFile);
-      if (Objects.equals(received, checksum)) {
+      if (!Objects.equals(received, checksum)) {
         throw errorUnexpectedSHA256(outputFile, checksum, received);
       }
     }
