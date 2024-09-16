@@ -16,8 +16,6 @@
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.gradle.LibraryExtension
-import de.undercouch.gradle.tasks.download.Download
-import de.undercouch.gradle.tasks.download.Verify
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
@@ -70,8 +68,6 @@ val io7mRootBuildDirectory =
   "$rootDir/build"
 val io7mDeployDirectory =
   "$io7mRootBuildDirectory/maven"
-val io7mScandoJarFile =
-  "$rootDir/scando.jar"
 val io7mKtlintJarFile =
   "$rootDir/ktlint.jar"
 
@@ -291,212 +287,13 @@ val cleanTask = task("CleanMavenDeployDirectory", Delete::class) {
 }
 
 /**
- * A function to download and verify the Scando jar file.
- *
- * @return The verification task
- */
-
-fun createScandoDownloadTask(project: Project): Task {
-  val scandoVersion =
-    "1.0.0"
-  val scandoSHA256 =
-    "08fba5fc4bc3b5a49d205a4c38356dc8c7e01f4963adb661b67f9d2ed23751ae"
-  val scandoSource =
-    "https://repo1.maven.org/maven2/com/io7m/scando/com.io7m.scando.cmdline/$scandoVersion/com.io7m.scando.cmdline-$scandoVersion-main.jar"
-
-  val scandoMakeDirectory =
-    project.task("ScandoMakeDirectory") {
-      mkdir(io7mRootBuildDirectory)
-    }
-
-  val scandoDownload =
-    project.task("ScandoDownload", Download::class) {
-      src(scandoSource)
-      dest(file(io7mScandoJarFile))
-      overwrite(true)
-      this.dependsOn.add(scandoMakeDirectory)
-    }
-
-  return project.task("ScandoDownloadVerify", Verify::class) {
-    src(file(io7mScandoJarFile))
-    checksum(scandoSHA256)
-    algorithm("SHA-256")
-    this.dependsOn(scandoDownload)
-  }
-}
-
-/**
- * A task to execute Scando to analyze semantic versioning.
- */
-
-fun createScandoAnalyzeTask(project: Project): Task {
-  val group =
-    property(project, "GROUP")
-  val artifactId =
-    property(project, "POM_ARTIFACT_ID")
-  val versionCurrent =
-    property(project, "VERSION_NAME")
-  val versionPrevious =
-    property(project, "VERSION_PREVIOUS")
-
-  val oldGroup =
-    group.replace('.', '/')
-  val oldPath =
-    "$oldGroup/$artifactId/$versionPrevious/$artifactId-$versionPrevious.aar"
-  val oldUrl =
-    "https://repo1.maven.org/maven2/$oldPath"
-
-  val commandLineArguments: List<String> = arrayListOf(
-    "java",
-    "-jar",
-    io7mScandoJarFile,
-    "--excludeList",
-    "${project.rootDir}/VERSIONING.txt",
-    "--oldJarUri",
-    oldUrl,
-    "--oldJarVersion",
-    versionPrevious,
-    "--ignoreMissingOld",
-    "--newJar",
-    "${project.buildDir}/outputs/aar/$artifactId-debug.aar",
-    "--newJarVersion",
-    versionCurrent,
-    "--textReport",
-    "${project.buildDir}/scando-report.txt",
-    "--htmlReport",
-    "${project.buildDir}/scando-report.html",
-  )
-
-  return project.task("ScandoAnalyze", Exec::class) {
-    commandLine = commandLineArguments
-  }
-}
-
-/*
- * Create a task in the root project that downloads Scando.
- */
-
-lateinit var scandoDownloadTask: Task
-
-rootProject.afterEvaluate {
-  apply(plugin = "de.undercouch.download")
-  scandoDownloadTask = createScandoDownloadTask(this)
-}
-
-/**
- * A function to download and verify the ktlint jar file.
- *
- * @return The verification task
- */
-
-fun createKtlintDownloadTask(project: Project): Task {
-  val ktlintVersion =
-    "0.50.0"
-  val ktlintSHA256 =
-    "c704fbc28305bb472511a1e98a7e0b014aa13378a571b716bbcf9d99d59a5092"
-  val ktlintSource =
-    "https://repo1.maven.org/maven2/com/pinterest/ktlint/$ktlintVersion/ktlint-$ktlintVersion-all.jar"
-
-  val ktlintMakeDirectory =
-    project.task("KtlintMakeDirectory") {
-      mkdir(io7mRootBuildDirectory)
-    }
-
-  val ktlintDownload =
-    project.task("KtlintDownload", Download::class) {
-      src(ktlintSource)
-      dest(file(io7mKtlintJarFile))
-      overwrite(true)
-      onlyIfModified(true)
-      this.dependsOn.add(ktlintMakeDirectory)
-    }
-
-  return project.task("KtlintDownloadVerify", Verify::class) {
-    src(file(io7mKtlintJarFile))
-    checksum(ktlintSHA256)
-    algorithm("SHA-256")
-    this.dependsOn(ktlintDownload)
-  }
-}
-
-/**
- * A task to execute ktlint to check sources.
- */
-
-val ktlintPatterns: List<String> = arrayListOf(
-  "*/src/**/*.kt",
-  "*/build.gradle.kts",
-  "build.gradle.kts",
-  "!*/src/test/**",
-)
-
-fun createKtlintCheckTask(project: Project): Task {
-  val commandLineArguments: ArrayList<String> = arrayListOf(
-    "java",
-    "-jar",
-    io7mKtlintJarFile,
-  )
-  commandLineArguments.addAll(ktlintPatterns)
-
-  return project.task("KtlintCheck", Exec::class) {
-    commandLine = commandLineArguments
-  }
-}
-
-/**
- * A task to execute ktlint to reformat sources.
- */
-
-fun createKtlintFormatTask(project: Project): Task {
-  val commandLineArguments: ArrayList<String> = arrayListOf(
-    "java",
-    "-jar",
-    io7mKtlintJarFile,
-    "-F",
-  )
-  commandLineArguments.addAll(ktlintPatterns)
-
-  return project.task("KtlintFormat", Exec::class) {
-    commandLine = commandLineArguments
-  }
-}
-
-/*
- * Create a task in the root project that downloads ktlint.
- */
-
-lateinit var ktlintDownloadTask: Task
-
-rootProject.afterEvaluate {
-  apply(plugin = "de.undercouch.download")
-  ktlintDownloadTask = createKtlintDownloadTask(this)
-
-  val enableKtlintChecks =
-    propertyBoolean(this, "com.io7m.build.enableKtLint")
-
-  if (enableKtlintChecks) {
-    val checkActual = createKtlintCheckTask(this)
-    checkActual.dependsOn.add(ktlintDownloadTask)
-    cleanTask.dependsOn.add(checkActual)
-  }
-
-  /*
-   * Create a task that can be used to reformat sources. This is purely for manual execution
-   * from the command-line, and is not executed otherwise.
-   */
-
-  val formatTask = createKtlintFormatTask(this)
-  formatTask.dependsOn.add(ktlintDownloadTask)
-}
-
-/**
  * A task to unpack native libraries from the SQLite package.
  */
 
 fun createSQLiteUnpackTask(project: Project): Task {
   val commandLineArguments: List<String> = arrayListOf(
     "java",
-    "UnpackSQLite.java",
+    "make/UnpackSQLite.java",
     libs.xerial.sqlite.get().version!!,
   )
 
@@ -645,27 +442,6 @@ allprojects {
         encoding = "UTF-8"
         sourceCompatibility = JavaVersion.toVersion(jdkBytecodeTarget)
         targetCompatibility = JavaVersion.toVersion(jdkBytecodeTarget)
-      }
-
-      /*
-       * Configure semantic versioning analysis.
-       */
-
-      afterEvaluate {
-        val enableSemanticVersionChecks =
-          propertyBoolean(this, "com.io7m.build.checkSemanticVersioning")
-
-        if (enableSemanticVersionChecks) {
-          val verifyActual = createScandoAnalyzeTask(this)
-          verifyActual.dependsOn.add(scandoDownloadTask)
-          verifyActual.dependsOn.add("assembleDebug")
-
-          val verifyTask = project.task("verifySemanticVersioning")
-          verifyTask.dependsOn.add(verifyActual)
-        } else {
-          // Create a do-nothing task to keep interface compatibility.
-          project.task("verifySemanticVersioning")
-        }
       }
     }
 

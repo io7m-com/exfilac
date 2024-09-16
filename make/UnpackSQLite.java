@@ -10,14 +10,15 @@ import java.nio.file.StandardCopyOption;
 import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
-public final class UnpackSQLite {
-
+public final class UnpackSQLite
+{
   private static final Logger LOG =
     Logger.getLogger(UnpackSQLite.class.getName());
 
   public static void main(
     final String[] args)
-    throws Exception {
+    throws Exception
+  {
     if (args.length != 1) {
       System.err.println("Usage: version");
       throw new IllegalArgumentException();
@@ -96,7 +97,8 @@ public final class UnpackSQLite {
     ZipFile zip,
     String zipName,
     Path output)
-    throws IOException {
+    throws IOException
+  {
     LOG.info("Copying %s to %s".formatted(zipName, output));
 
     final var entry = zip.getEntry(zipName);

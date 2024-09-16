@@ -24,6 +24,7 @@ dependencies {
   implementation(project(":com.io7m.exfilac.content_tree.api"))
   implementation(project(":com.io7m.exfilac.content_tree.device"))
   implementation(project(":com.io7m.exfilac.core"))
+  implementation(project(":com.io7m.exfilac.documentation"))
   implementation(project(":com.io7m.exfilac.s3_uploader.amazon"))
   implementation(project(":com.io7m.exfilac.s3_uploader.api"))
   implementation(project(":com.io7m.exfilac.service.api"))
