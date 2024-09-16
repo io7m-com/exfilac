@@ -14,6 +14,12 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,6 +28,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HexFormat;
@@ -107,10 +114,63 @@ public final class Make
 
     copyDirectory(DOCUMENTATION_SOURCES, DOCUMENTATION_ASSETS_OUTPUT);
     executeXStructural();
+    executeExtractPrivacyPolicy();
 
-    if (!Objects.equals(System.getProperty("make.gradle"), "true")) {
+    if (!Objects.equals(System.getProperty("make.gradle"), "false")) {
       executeGradle();
     }
+  }
+
+  private static void executeExtractPrivacyPolicy()
+    throws Exception
+  {
+    LOG.info("Extracting privacy policy link…");
+
+    final var indexFile =
+      DOCUMENTATION_ASSETS_OUTPUT.resolve("xstructural-index.xml");
+
+    final var factory =
+      DocumentBuilderFactory.newInstance();
+    final var builder =
+      factory.newDocumentBuilder();
+    final var doc =
+      builder.parse(indexFile.toString());
+    final var xPathfactory =
+      XPathFactory.newInstance();
+    final var xpath =
+      xPathfactory.newXPath();
+    final var expr =
+      xpath.compile("/Index/Item[@ID='6f66cea7-9131-42ad-9bfc-98a2d9676bc2']");
+    final var nodes =
+      (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+
+    if (nodes.getLength() != 1) {
+      throw errorNoPrivacyPolicy();
+    }
+
+    final var element =
+      (Element) nodes.item(0);
+    final var file =
+      element.getAttribute("File");
+
+    LOG.info("Privacy policy: %s".formatted(file));
+
+    final var privacyLink =
+      DOCUMENTATION_ASSETS_OUTPUT.resolve("privacy-link.txt");
+
+    Files.writeString(
+      privacyLink,
+      file.trim(),
+      StandardOpenOption.CREATE,
+      StandardOpenOption.WRITE,
+      StandardOpenOption.TRUNCATE_EXISTING
+    );
+  }
+
+  private static Exception errorNoPrivacyPolicy()
+  {
+    LOG.severe("Failed to locate the privacy policy.");
+    return new IOException();
   }
 
   private static void executeGradle()
