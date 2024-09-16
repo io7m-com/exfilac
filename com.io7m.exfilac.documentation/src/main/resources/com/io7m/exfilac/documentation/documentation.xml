@@ -20,6 +20,7 @@
   <xi:include href="help.xml"/>
   <xi:include href="implementation.xml"/>
   <xi:include href="license.xml"/>
+  <xi:include href="privacy.xml"/>
   <xi:include href="colophon.xml"/>
 
 </Document>

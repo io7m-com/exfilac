@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         id="6f66cea7-9131-42ad-9bfc-98a2d9676bc2"
+         title="Privacy Policy">
+
+  <Subsection title="Overview">
+    <Paragraph>
+      This privacy notice tells you what to expect us to do with your personal information.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Contact Details">
+    <Paragraph>
+      Email:
+      <Term type="constant">privacy@io7m.com</Term>
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="What Information We Collect, Use, and Why">
+    <Paragraph>
+      We do not collect any personal information. The application currently keeps the following information internally:
+    </Paragraph>
+    <FormalItem title="Internal Data">
+      <ListUnordered>
+        <Item>
+          A 30-day rotating set of internal debug logs. These never leave the device unless the user specifically
+          downloads them from the device and sends them to us for problem reporting.
+        </Item>
+        <Item>
+          A 7-day log of the most recent upload operations. These never leave the device.
+        </Item>
+      </ListUnordered>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Lawful Bases and Data Protection Rights">
+    <Paragraph>
+      Under UK data protection law, we must have a "lawful basis" for collecting and using your personal information.
+      There is a list of possible lawful bases in the UK GDPR. You can find out more about lawful bases on the ICO’s
+      website.
+    </Paragraph>
+    <Paragraph>
+      Which lawful basis we rely on may affect your data protection rights which are in brief set out below. You can
+      find out more about your data protection rights and the exemptions which may apply on the ICO’s website:
+    </Paragraph>
+    <FormalItem title="Lawful Bases">
+      <ListUnordered>
+        <Item>
+          Your right of access - You have the right to ask us for copies of your personal information. You can request
+          other information such as details about where we get personal information from and who we share personal
+          information with. There are some exemptions which means you may not receive all the information you ask for.
+        </Item>
+        <Item>
+          Your right to rectification - You have the right to ask us to correct or delete personal information you think
+          is inaccurate or incomplete.
+        </Item>
+        <Item>
+          Your right to erasure - You have the right to ask us to delete your personal information.
+        </Item>
+        <Item>
+          Your right to restriction of processing - You have the right to ask us to limit how we can use your personal
+          information.
+        </Item>
+        <Item>
+          Your right to object to processing - You have the right to object to the processing of your personal data.
+        </Item>
+        <Item>
+          Your right to data portability - You have the right to ask that we transfer the personal information you gave
+          us to another organisation, or to you.
+        </Item>
+        <Item>
+          Your right to withdraw consent – When we use consent as our lawful basis you have the right to withdraw your
+          consent at any time.
+        </Item>
+      </ListUnordered>
+    </FormalItem>
+    <Paragraph>
+      If you make a request, we must respond to you without undue delay and in any event within one month. To make a
+      data protection rights request, please contact us using the contact details at the top of this privacy notice.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Our Lawful Bases For The Collection And Use Of Your Data">
+    <Paragraph>
+      Consent - we have permission from you after we gave you all the relevant information. All of your data protection
+      rights may apply, except the right to object. To be clear, you do have the right to withdraw your consent at any
+      time.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Where We Get Personal Information From">
+    <Paragraph>
+      We don't collect any personal information.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="How Long We Keep Information">
+    <Paragraph>
+      If a user submits log files as part of a problem report, the log files are deleted as soon as the problem has been
+      fixed.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="How To Complain">
+    <Paragraph>
+      If you have any concerns about our use of your personal data, you can make a complaint to us using the contact
+      details at the top of this privacy notice.
+    </Paragraph>
+    <Paragraph>
+      If you remain unhappy with how we’ve used your data after raising a complaint with us, you can also complain to
+      the ICO.
+    </Paragraph>
+    <Paragraph>
+      The ICO’s address:
+    </Paragraph>
+    <FormalItem title="ICO Address">
+      <Verbatim><![CDATA[
+Information Commissioner’s Office
+Wycliffe House
+Water Lane
+Wilmslow
+Cheshire
+SK9 5AF
+
+Helpline number: 0303 123 1113
+
+Website: https://www.ico.org.uk/make-a-complaint
+]]></Verbatim>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Last Updated">
+    <Paragraph>
+      <Term type="constant">2024-09-16</Term>
+    </Paragraph>
+  </Subsection>
+
+</Section>
