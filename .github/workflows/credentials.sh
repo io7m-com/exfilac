@@ -6,6 +6,12 @@ fatal()
   exit 1
 }
 
+error()
+{
+  echo "credentials.sh: error: $1" 1>&2
+  exit 1
+}
+
 FAILED=0
 if [ -z "${IO7M_ANDROID_KEYSTORE}" ]
 then
