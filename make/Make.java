@@ -108,13 +108,13 @@ public final class Make
   {
     final var releaseType =
       switch (cmdlineArguments[0]) {
-        case "release" -> "release"
-        case "debug" -> "debug"
+        case "release" -> "release";
+        case "debug" -> "debug";
         default -> {
           throw new IllegalArgumentException(
             "Unknown release type: %s".formatted(cmdlineArguments[0]));
         }
-      }
+      };
 
     openProperties();
     downloadScando();
