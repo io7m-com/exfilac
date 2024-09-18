@@ -27,7 +27,7 @@ jobs:
         run: echo "${PGP_SIGNING_KEY}" | gpg -v --import
 
       - name: Build
-        run: java make/Make.java
+        run: java make/Make.java release
 
       - name: Deploy release
         run: .github/workflows/deploy-release.sh
