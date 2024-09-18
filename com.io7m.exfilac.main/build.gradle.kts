@@ -1,14 +1,3 @@
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
-
-fun calculateVersionCode(): Int {
-  val now = LocalDateTime.now(ZoneId.of("UTC"))
-  val nowSeconds = now.toEpochSecond(ZoneOffset.UTC)
-  // Seconds since 2024-09-18T15:20:00 UTC
-  return (nowSeconds - 1726672800).toInt()
-}
-
 fun getGitHash(): String {
   val proc = ProcessBuilder("git", "rev-parse", "--short", "HEAD")
     .redirectOutput(ProcessBuilder.Redirect.PIPE)
@@ -26,7 +15,7 @@ android {
 
   this.defaultConfig {
     this.versionName = rootProject.ext["VERSION_NAME"].toString()
-    this.versionCode = calculateVersionCode()
+    this.versionCode = rootProject.ext["VERSION_CODE"].toInt()
     this.buildConfigField("String", "EXFILAC_GIT_COMMIT", "\"${getGitHash()}\"")
     this.buildConfigField("String", "EXFILAC_VERSION", "\"${rootProject.ext["VERSION_NAME"]}\"")
   }
