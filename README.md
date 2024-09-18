@@ -14,3 +14,6 @@ exfilac
 
 Simple, reliable, automated S3 uploads for Android.
 
+### Documentation
+
+See the [user manual](https://www.io7m.com/software/exfilac/documentation/).

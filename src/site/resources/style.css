@@ -1,0 +1,43 @@
+body {
+  font-family: sans-serif;
+  font-size:   14px;
+}
+
+a:link    { color: #0000ff; }
+a:visited { color: #000055; }
+a:hover   { color: #0000ff; }
+a:active  { color: #0000ff; }
+
+.main {
+  margin-left:   32px;
+  margin-right:  32px;
+  margin-top:    32px;
+  margin-bottom: 32px;
+}
+
+table.links {
+  width: 1280px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td {
+  border: 1px solid #aaaaaa;
+  padding: 12px;
+}
+
+table td:nth-child(1) {
+  width:     256px;
+  min-width: 256px;
+}
+
+th {
+  border: 1px solid #aaaaaa;
+  padding: 12px;
+}
+
+p {
+  margin-bottom: 2em;
+}
