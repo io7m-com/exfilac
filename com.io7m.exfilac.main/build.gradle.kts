@@ -15,7 +15,7 @@ android {
 
   this.defaultConfig {
     this.versionName = rootProject.ext["VERSION_NAME"].toString()
-    this.versionCode = rootProject.ext["VERSION_CODE"].toInt()
+    this.versionCode = rootProject.ext["VERSION_CODE"].toString().toInt()
     this.buildConfigField("String", "EXFILAC_GIT_COMMIT", "\"${getGitHash()}\"")
     this.buildConfigField("String", "EXFILAC_VERSION", "\"${rootProject.ext["VERSION_NAME"]}\"")
   }
