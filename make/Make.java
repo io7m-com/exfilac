@@ -103,19 +103,9 @@ public final class Make
       .resolve("manual");
 
   public static void main(
-    final String[] cmdlineArguments)
+    final String[] ignored)
     throws Exception
   {
-    final var releaseType =
-      switch (cmdlineArguments[0]) {
-        case "release" -> "release";
-        case "debug" -> "debug";
-        default -> {
-          throw new IllegalArgumentException(
-            "Unknown release type: %s".formatted(cmdlineArguments[0]));
-        }
-      };
-
     openProperties();
     downloadScando();
     downloadKtlint();
@@ -127,7 +117,7 @@ public final class Make
     executeExtractPrivacyPolicy();
 
     if (!Objects.equals(System.getProperty("make.gradle"), "false")) {
-      executeGradle(releaseType);
+      executeGradle();
     }
   }
 
@@ -183,8 +173,7 @@ public final class Make
     return new IOException();
   }
 
-  private static void executeGradle(
-    final String releaseType)
+  private static void executeGradle()
     throws Exception
   {
     LOG.info("Executing gradle…");
@@ -197,18 +186,8 @@ public final class Make
     }
 
     args.add("clean");
-
-    switch (releaseType) {
-      case "debug" -> {
-        args.add("assembleDebug");
-        args.add("test");
-      }
-      case "release" -> {
-        args.add("assembleRelease");
-        args.add("test");
-      }
-    }
-
+    args.add("assemble");
+    args.add("test");
     execute(args);
   }
 

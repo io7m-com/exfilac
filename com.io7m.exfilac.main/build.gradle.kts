@@ -19,27 +19,6 @@ fun getGitHash(): String {
   return proc.inputStream.bufferedReader().readText().trim()
 }
 
-val io7mKeyStore =
-  File("$rootDir/io7m.keystore")
-val io7mKeyAlias =
-  project.findProperty("com.io7m.keyAlias") as String?
-val io7mKeyPassword =
-  project.findProperty("com.io7m.keyPassword") as String?
-val io7mStorePassword =
-  project.findProperty("com.io7m.storePassword") as String?
-
-val requiredSigningTask = task("CheckReleaseSigningInformation") {
-  if (io7mKeyAlias == null) {
-    throw GradleException("com.io7m.keyAlias is not specified.")
-  }
-  if (io7mKeyPassword == null) {
-    throw GradleException("com.io7m.keyPassword is not specified.")
-  }
-  if (io7mStorePassword == null) {
-    throw GradleException("com.io7m.storePassword is not specified.")
-  }
-}
-
 android {
   this.buildFeatures {
     this.buildConfig = true
@@ -50,19 +29,6 @@ android {
     this.versionCode = calculateVersionCode()
     this.buildConfigField("String", "EXFILAC_GIT_COMMIT", "\"${getGitHash()}\"")
     this.buildConfigField("String", "EXFILAC_VERSION", "\"${rootProject.ext["VERSION_NAME"]}\"")
-  }
-
-  /*
-   * Ensure that release builds are signed.
-   */
-
-  this.signingConfigs {
-    this.create("release") {
-      this.keyAlias = io7mKeyAlias
-      this.keyPassword = io7mKeyPassword
-      this.storeFile = io7mKeyStore
-      this.storePassword = io7mStorePassword
-    }
   }
 
   /*
@@ -86,29 +52,8 @@ android {
         this.abiFilters.add("arm64-v8a")
         this.abiFilters.add("armeabi")
       }
-      this.signingConfig = this@android.signingConfigs.getByName("release")
     }
   }
-
-  /*
-   * Release builds need extra checking.
-   */
-
-  this.applicationVariants.all {
-    if (this.buildType.name == "release") {
-      val preBuildTask = tasks.findByName("preReleaseBuild")
-      preBuildTask?.dependsOn?.add(requiredSigningTask)
-    }
-  }
-}
-
-/*
- * Produce an AAB file whenever someone asks for "assemble".
- */
-
-afterEvaluate {
-  this.tasks.findByName("assemble")
-    ?.dependsOn?.add(this.tasks.findByName("bundle"))
 }
 
 dependencies {

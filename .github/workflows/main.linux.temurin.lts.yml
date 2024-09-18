@@ -12,15 +12,6 @@ jobs:
         with:
           submodules: true
 
-      - name: CredentialsPrepare
-        run: chmod +x ./.github/workflows/credentials.sh
-
-      - name: Credentials
-        env:
-          IO7M_ANDROID_KEYSTORE:          ${{ secrets.IO7M_ANDROID_KEYSTORE }}
-          IO7M_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.IO7M_ANDROID_KEYSTORE_PASSWORD }}
-        run: ./.github/workflows/credentials.sh
-
       - name: JDK
         uses: actions/setup-java@v4
         with:
@@ -28,4 +19,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Build
-        run: java make/Make.java release
+        run: java make/Make.java
