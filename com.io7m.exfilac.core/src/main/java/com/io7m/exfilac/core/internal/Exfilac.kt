@@ -250,7 +250,6 @@ internal class Exfilac private constructor(
     this.serviceDirectory = services
     this.database = services.requireService(EFDatabaseType::class.java)
     this.uploadService = services.requireService(EFUploadServiceType::class.java)
-    this.stateSource.set(EFStateReady())
     this.executeDatabase { this.loadData() }
 
     this@Exfilac.resources.add(
@@ -286,49 +285,53 @@ internal class Exfilac private constructor(
   }
 
   private fun loadData() {
-    this.database?.openTransaction()?.use { transaction ->
-      try {
-        transaction.query(EFQUploadRecordsMarkCancelledType::class.java)
-          .execute(this.clock.now())
-        transaction.commit()
-      } catch (e: Exception) {
-        logger.debug("Update uploads: ", e)
-      }
+    try {
+      this.database?.openTransaction()?.use { transaction ->
+        try {
+          transaction.query(EFQUploadRecordsMarkCancelledType::class.java)
+            .execute(this.clock.now())
+          transaction.commit()
+        } catch (e: Exception) {
+          logger.debug("Update uploads: ", e)
+        }
 
-      try {
-        transaction.query(EFQUploadRecordDeleteByAgeType::class.java)
-          .execute(this.clock.now().minusDays(7L))
-        transaction.commit()
-      } catch (e: Exception) {
-        logger.debug("Delete old uploads: ", e)
-      }
+        try {
+          transaction.query(EFQUploadRecordDeleteByAgeType::class.java)
+            .execute(this.clock.now().minusDays(7L))
+          transaction.commit()
+        } catch (e: Exception) {
+          logger.debug("Delete old uploads: ", e)
+        }
 
-      try {
-        this.bucketsSource.set(
-          transaction.query(EFQBucketListType::class.java)
-            .execute(DDatabaseUnit.UNIT)
-        )
-      } catch (e: Exception) {
-        logger.debug("Bucket list: ", e)
-      }
+        try {
+          this.bucketsSource.set(
+            transaction.query(EFQBucketListType::class.java)
+              .execute(DDatabaseUnit.UNIT)
+          )
+        } catch (e: Exception) {
+          logger.debug("Bucket list: ", e)
+        }
 
-      try {
-        this.uploadsSource.set(
-          transaction.query(EFQUploadConfigurationListType::class.java)
-            .execute(DDatabaseUnit.UNIT),
-        )
-      } catch (e: Exception) {
-        logger.debug("Upload list: ", e)
-      }
+        try {
+          this.uploadsSource.set(
+            transaction.query(EFQUploadConfigurationListType::class.java)
+              .execute(DDatabaseUnit.UNIT),
+          )
+        } catch (e: Exception) {
+          logger.debug("Upload list: ", e)
+        }
 
-      try {
-        this.settingsSource.set(
-          transaction.query(EFQSettingsGetType::class.java)
-            .execute(DDatabaseUnit.UNIT)
-        )
-      } catch (e: Exception) {
-        logger.debug("Settings: ", e)
+        try {
+          this.settingsSource.set(
+            transaction.query(EFQSettingsGetType::class.java)
+              .execute(DDatabaseUnit.UNIT)
+          )
+        } catch (e: Exception) {
+          logger.debug("Settings: ", e)
+        }
       }
+    } finally {
+      this.stateSource.set(EFStateReady())
     }
   }
 
