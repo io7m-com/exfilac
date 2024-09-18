@@ -7,7 +7,7 @@ updates:
     schedule:
       interval: "daily"
 
-  - package-ecosystem: "maven"
+  - package-ecosystem: "gradle"
     directory: "/"
     schedule:
       interval: "daily"
