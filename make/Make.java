@@ -179,7 +179,12 @@ public final class Make
     LOG.info("Executing gradle…");
 
     final var args = new ArrayList<String>();
-    args.add("./gradlew");
+    if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS")) {
+      args.add(".\\gradlew.bat");
+    } else {
+      args.add("./gradlew");
+    }
+
     args.add("clean");
     args.add("assemble");
     args.add("test");
