@@ -46,18 +46,6 @@ plugins {
   id("com.android.application")
     .version("8.5.0")
     .apply(false)
-
-  /*
-   * Download plugin. Used to fetch artifacts such as Scando during the build.
-   *
-   * https://plugins.gradle.org/plugin/de.undercouch.download
-   */
-
-  id("de.undercouch.download")
-    .version("5.6.0")
-    .apply(false)
-
-  id("maven-publish")
 }
 
 /*
@@ -116,177 +104,6 @@ fun propertyBooleanOptional(
 }
 
 /**
- * Configure Maven publishing. Artifacts are published to a local directory
- * so that they can be pushed to Maven Central in one step using brooklime.
- */
-
-fun configurePublishingFor(project: Project) {
-  val mavenCentralUsername =
-    (project.findProperty("mavenCentralUsername") ?: "") as String
-  val mavenCentralPassword =
-    (project.findProperty("mavenCentralPassword") ?: "") as String
-
-  val versionName =
-    property(project, "VERSION_NAME")
-  val packaging =
-    property(project, "POM_PACKAGING")
-
-  val publishSources =
-    propertyBoolean(project, "com.io7m.build.publishSources")
-  val enableSigning =
-    propertyBooleanOptional(project, "com.io7m.build.enableSigning", true)
-
-  /*
-   * Create an empty JavaDoc jar. Required for Maven Central deployments.
-   */
-
-  val taskJavadocEmpty =
-    project.task("JavadocEmptyJar", org.gradle.jvm.tasks.Jar::class) {
-      this.archiveClassifier = "javadoc"
-    }
-
-  /*
-   * Create a publication. Note that the name of the publication must be unique across all
-   * modules, because the broken Gradle signing plugin will create a signing task for each
-   * one that, in the case of a name conflict, will silently overwrite the previous signing
-   * task.
-   */
-
-  project.publishing {
-    publications {
-      create<MavenPublication>("_${project.name}_MavenPublication") {
-        groupId = property(project, "GROUP")
-        artifactId = property(project, "POM_ARTIFACT_ID")
-        version = versionName
-
-        /*
-         * https://central.sonatype.org/publish/requirements/#sufficient-metadata
-         */
-
-        pom {
-          name.set(property(project, "POM_NAME"))
-          description.set(property(project, "POM_DESCRIPTION"))
-          url.set(property(project, "POM_URL"))
-
-          scm {
-            connection.set(property(project, "POM_SCM_CONNECTION"))
-            developerConnection.set(property(project, "POM_SCM_DEV_CONNECTION"))
-            url.set(property(project, "POM_SCM_URL"))
-          }
-
-          licenses {
-            license {
-              name.set(property(project, "POM_LICENCE_NAME"))
-              url.set(property(project, "POM_LICENCE_URL"))
-            }
-          }
-
-          developers {
-            developer {
-              name.set("The Palace Project")
-              email.set("info@theio7mproject.org")
-              organization.set("The Palace Project")
-              organizationUrl.set("https://theio7mproject.org/")
-            }
-          }
-        }
-
-        artifact(taskJavadocEmpty)
-
-        from(
-          when (packaging) {
-            "jar" -> {
-              project.components["java"]
-            }
-
-            "aar" -> {
-              project.components["release"]
-            }
-
-            "apk" -> {
-              project.components["release"]
-            }
-
-            else -> {
-              throw java.lang.IllegalArgumentException(
-                "Cannot set up publishing for packaging type $packaging",
-              )
-            }
-          },
-        )
-      }
-    }
-
-    repositories {
-      maven {
-        name = "Directory"
-        url = uri(io7mDeployDirectory)
-      }
-
-      /*
-       * Only deploy to the Sonatype snapshots repository if the current version is a
-       * snapshot version.
-       */
-
-      if (versionName.endsWith("-SNAPSHOT")) {
-        maven {
-          name = "SonatypeCentralSnapshots"
-          url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-
-          credentials {
-            username = mavenCentralUsername
-            password = mavenCentralPassword
-          }
-        }
-      }
-    }
-  }
-
-  /*
-   * If source publications are disabled in the project properties, it seems that the only
-   * way to stop the Android plugins from publishing sources is to manually "disable" the
-   * publication tasks by deleting all of the actions within the tasks, and then specifying
-   * a dependency on our own task that produces an empty jar file.
-   */
-
-  if (!publishSources) {
-    logger.info("com.io7m.build.publishSources is false, so source jars are disabled.")
-
-    val taskSourcesEmpty =
-      project.task("SourcesEmptyJar", org.gradle.jvm.tasks.Jar::class) {
-        this.archiveClassifier = "sources"
-      }
-
-    project.tasks.matching { task -> task.name.endsWith("SourcesJar") }
-      .forEach { task ->
-        task.actions.clear()
-        task.dependsOn.add(taskSourcesEmpty)
-      }
-  }
-
-  /*
-   * Configure signing.
-   */
-
-  if (enableSigning) {
-    signing {
-      useGpgCmd()
-      sign(project.publishing.publications)
-    }
-  }
-}
-
-/*
- * A task that cleans up the Maven deployment directory. The "clean" tasks of
- * each project are configured to depend upon this task. This prevents any
- * deployment of stale artifacts to remote repositories.
- */
-
-val cleanTask = task("CleanMavenDeployDirectory", Delete::class) {
-  this.delete.add(io7mDeployDirectory)
-}
-
-/**
  * A task to unpack native libraries from the SQLite package.
  */
 
@@ -310,7 +127,6 @@ lateinit var sqliteUnpackTask: Task
 
 rootProject.afterEvaluate {
   sqliteUnpackTask = createSQLiteUnpackTask(this)
-  cleanTask.dependsOn.add(sqliteUnpackTask)
 }
 
 allprojects {
@@ -494,20 +310,6 @@ allprojects {
   }
 
   /*
-   * Configure publishing.
-   */
-
-  when (extra["POM_PACKAGING"]) {
-    "jar", "aar" -> {
-      apply(plugin = "maven-publish")
-
-      afterEvaluate {
-        configurePublishingFor(this.project)
-      }
-    }
-  }
-
-  /*
    * Configure some aggressive version resolution behaviour. The listed configurations have
    * transitive dependency resolution enabled; all other configurations do not. This forces
    * projects to be extremely explicit about what is imported.
@@ -585,13 +387,12 @@ allprojects {
   }
 
   /*
-   * Configure all "clean" tasks to depend upon the global Maven deployment directory cleaning
-   * task.
+   * Configure all "clean" tasks to depend upon the SQLite unpack task.
    */
 
   afterEvaluate {
     tasks.matching { task -> task.name == "clean" }
-      .forEach { task -> task.dependsOn(cleanTask) }
+      .forEach { task -> task.dependsOn(sqliteUnpackTask) }
   }
 
   /*
