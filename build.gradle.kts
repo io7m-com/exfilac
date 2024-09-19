@@ -127,7 +127,6 @@ lateinit var sqliteUnpackTask: Task
 
 rootProject.afterEvaluate {
   sqliteUnpackTask = createSQLiteUnpackTask(this)
-  cleanTask.dependsOn.add(sqliteUnpackTask)
 }
 
 allprojects {
@@ -311,20 +310,6 @@ allprojects {
   }
 
   /*
-   * Configure publishing.
-   */
-
-  when (extra["POM_PACKAGING"]) {
-    "jar", "aar" -> {
-      apply(plugin = "maven-publish")
-
-      afterEvaluate {
-        configurePublishingFor(this.project)
-      }
-    }
-  }
-
-  /*
    * Configure some aggressive version resolution behaviour. The listed configurations have
    * transitive dependency resolution enabled; all other configurations do not. This forces
    * projects to be extremely explicit about what is imported.
@@ -402,13 +387,12 @@ allprojects {
   }
 
   /*
-   * Configure all "clean" tasks to depend upon the global Maven deployment directory cleaning
-   * task.
+   * Configure all "clean" tasks to depend upon the SQLite unpack task.
    */
 
   afterEvaluate {
     tasks.matching { task -> task.name == "clean" }
-      .forEach { task -> task.dependsOn(cleanTask) }
+      .forEach { task -> task.dependsOn(sqliteUnpackTask) }
   }
 
   /*
