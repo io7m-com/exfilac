@@ -350,7 +350,9 @@ public final class Make
     }
 
     LOG.info("Downloading %s".formatted(source));
-    try (final var client = HttpClient.newHttpClient()) {
+    final var client = HttpClient.newHttpClient();
+
+    try {
       final var request =
         HttpRequest.newBuilder(URI.create(source))
           .build();
@@ -369,6 +371,8 @@ public final class Make
       if (!Objects.equals(received, checksum)) {
         throw errorUnexpectedSHA256(outputFile, checksum, received);
       }
+    } finally {
+      client.shutdown();
     }
   }
 
