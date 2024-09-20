@@ -1,8 +1,6 @@
 exfilac
 ===
 
-![Java Version](https://img.shields.io/badge/17-java?label=java&color=e6c35c)
-
 ![com.io7m.exfilac](./src/site/resources/exfilac.jpg?raw=true)
 
 | JVM | Platform | Status |

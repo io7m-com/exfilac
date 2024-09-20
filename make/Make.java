@@ -54,16 +54,6 @@ public final class Make
     "https://repo1.maven.org/maven2/com/io7m/xstructural/com.io7m.xstructural.cmdline/%s/com.io7m.xstructural.cmdline-%s-main.jar"
       .formatted(XSTRUCTURAL_VERSION, XSTRUCTURAL_VERSION);
 
-  private static final String SCANDO_VERSION =
-    "1.0.0";
-
-  private static final String SCANDO_CHECKSUM =
-    "08fba5fc4bc3b5a49d205a4c38356dc8c7e01f4963adb661b67f9d2ed23751ae";
-
-  private static final String SCANDO_SOURCE =
-    "https://repo1.maven.org/maven2/com/io7m/scando/com.io7m.scando.cmdline/%s/com.io7m.scando.cmdline-%s-main.jar"
-      .formatted(SCANDO_VERSION, SCANDO_VERSION);
-
   private static final String KTLINT_VERSION =
     "0.50.0";
 
@@ -107,7 +97,7 @@ public final class Make
     throws Exception
   {
     openProperties();
-    downloadScando();
+
     downloadKtlint();
     downloadXStructural();
     executeKtlint();
@@ -316,18 +306,6 @@ public final class Make
       "ktlint.jar",
       KTLINT_CHECKSUM,
       KTLINT_SOURCE
-    );
-  }
-
-  private static void downloadScando()
-    throws Exception
-  {
-    LOG.info("Downloading scando…");
-
-    downloadJar(
-      "scando.jar",
-      SCANDO_CHECKSUM,
-      SCANDO_SOURCE
     );
   }
 
