@@ -20,3 +20,10 @@ jobs:
 
       - name: Build
         run: java make/Make.java
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apk
+          path: ./com.io7m.exfilac.main/build/outputs/apk/release/com.io7m.exfilac.main-release-unsigned.apk
