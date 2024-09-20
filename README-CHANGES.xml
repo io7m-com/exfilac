@@ -16,7 +16,10 @@
     <c:release date="2024-09-20T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.0.0-beta0005">
       <c:changes/>
     </c:release>
-    <c:release date="2024-09-20T15:03:08+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.0.0-beta0006">
+    <c:release date="2024-09-20T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.0.0-beta0006">
+      <c:changes/>
+    </c:release>
+    <c:release date="2024-09-20T16:36:12+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.0.0-beta0007">
       <c:changes/>
     </c:release>
   </c:releases>
