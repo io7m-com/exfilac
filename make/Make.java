@@ -352,27 +352,23 @@ public final class Make
     LOG.info("Downloading %s".formatted(source));
     final var client = HttpClient.newHttpClient();
 
-    try {
-      final var request =
-        HttpRequest.newBuilder(URI.create(source))
-          .build();
+    final var request =
+      HttpRequest.newBuilder(URI.create(source))
+        .build();
 
-      final var response =
-        client.send(
-          request,
-          HttpResponse.BodyHandlers.ofFile(Paths.get(outputName))
-        );
+    final var response =
+      client.send(
+        request,
+        HttpResponse.BodyHandlers.ofFile(Paths.get(outputName))
+      );
 
-      if (response.statusCode() >= 400) {
-        throw errorServerError(source, response.statusCode());
-      }
+    if (response.statusCode() >= 400) {
+      throw errorServerError(source, response.statusCode());
+    }
 
-      final var received = sha256Of(outputFile);
-      if (!Objects.equals(received, checksum)) {
-        throw errorUnexpectedSHA256(outputFile, checksum, received);
-      }
-    } finally {
-      client.shutdown();
+    final var received = sha256Of(outputFile);
+    if (!Objects.equals(received, checksum)) {
+      throw errorUnexpectedSHA256(outputFile, checksum, received);
     }
   }
 
