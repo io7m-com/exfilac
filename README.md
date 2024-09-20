@@ -2,7 +2,7 @@ exfilac
 ===
 
 [<img src="https://liberapay.com/assets/widgets/donate.svg">](https://liberapay.com/io7m/donate)
-[<img src="https://img.shields.io/f-droid/v/com.io7m.exfilac.main?style=for-the-badge"](https://f-droid.org/en/packages/com.io7m.exfilac.main/)
+[<img src="https://img.shields.io/f-droid/v/com.io7m.exfilac.main?style=for-the-badge">](https://f-droid.org/en/packages/com.io7m.exfilac.main/)
 
 ![com.io7m.exfilac](./src/site/resources/exfilac.jpg?raw=true)
 
