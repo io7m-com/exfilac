@@ -1,0 +1,35 @@
+The exfilac application is a simple application that aims to do one thing well:
+Get data out of Android devices and into S3 buckets.
+
+Features:
+
+- The application can work with any S3-compatible storage provider. This
+  includes Amazon AWS, Vultr Object Storage, IDrive®, and many other commercial
+  offerings. Additionally, the application can work with self-hosted S3 storage
+  solutions such as MinIO.
+- The application can (recursively) upload the contents of any directory on an
+  Android device to which it has been granted access. The set of directories
+  is configurable.
+- The application conserves precious bandwidth by avoiding uploading files that
+  already exist on the remote storage. The cryptographic hashes of files are
+  computed locally and files are only uploaded if the hashes of
+  the files on the remote server do not match.
+- The application can be configured to upload files on a timed schedule,
+  and/or in response to various events occurring on the device such as a photo
+  being taken, or the network becoming available.
+- The application vigorously respects the privacy of users: The application
+  contains no telemetry or analytics of any kind, and never collects any user data.
+- Development of the application is performed in the open. The complete source code is made available under
+  an extremely liberal ISC license, and development and bug tracking is handled
+  in a public GitHub repository.
+- The application rejects bug-prone Android programming practices and libraries
+  and instead strives for correctness and stability using battle-hardened,
+  well-tested components designed outside the traditional Android ecosystem.
+- The application adopts a cautious development approach and does not pursue
+  huge sets of complex features. The application attempts to adhere to the Unix
+  philosophy and provide a simple, sharp tool that does one thing well.
+- The application attempts to respect the intelligence of users. Technical
+  details of many aspects of the system are clearly displayed onscreen, and
+  important information is not hidden in the misguided pursuit of
+  "user-friendliness".
+- The application is comprehensively documented.
