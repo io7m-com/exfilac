@@ -387,11 +387,11 @@ allprojects {
   }
 
   /*
-   * Configure all "clean" tasks to depend upon the SQLite unpack task.
+   * Configure all compile tasks to depend upon the SQLite unpack task.
    */
 
   afterEvaluate {
-    tasks.matching { task -> task.name == "clean" }
+    tasks.matching { task -> task.name == "compileDebugSources" || task.name == "compileReleaseSources" }
       .forEach { task -> task.dependsOn(sqliteUnpackTask) }
   }
 
