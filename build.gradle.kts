@@ -56,8 +56,6 @@ val io7mRootBuildDirectory =
   "$rootDir/build"
 val io7mDeployDirectory =
   "$io7mRootBuildDirectory/maven"
-val io7mKtlintJarFile =
-  "$rootDir/ktlint.jar"
 
 /**
  * Convenience functions to read strongly-typed values from property files.
@@ -101,32 +99,6 @@ fun propertyBooleanOptional(
 ): Boolean {
   val value = propertyOptional(project, name) ?: return defaultValue
   return value.toBooleanStrict()
-}
-
-/**
- * A task to unpack native libraries from the SQLite package.
- */
-
-fun createSQLiteUnpackTask(project: Project): Task {
-  val commandLineArguments: List<String> = arrayListOf(
-    "java",
-    "make/UnpackSQLite.java",
-    libs.xerial.sqlite.get().version!!,
-  )
-
-  return project.task("UnpackSQLite", Exec::class) {
-    commandLine = commandLineArguments
-  }
-}
-
-/*
- * Create a task in the root project that unpacks SQLite.
- */
-
-lateinit var sqliteUnpackTask: Task
-
-rootProject.afterEvaluate {
-  sqliteUnpackTask = createSQLiteUnpackTask(this)
 }
 
 allprojects {
@@ -384,15 +356,6 @@ allprojects {
       isTransitive = transitiveConfigurations.contains(name)
       // resolutionStrategy.failOnVersionConflict()
     }
-  }
-
-  /*
-   * Configure all "clean" tasks to depend upon the SQLite unpack task.
-   */
-
-  afterEvaluate {
-    tasks.matching { task -> task.name == "clean" }
-      .forEach { task -> task.dependsOn(sqliteUnpackTask) }
   }
 
   /*

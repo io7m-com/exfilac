@@ -20,6 +20,7 @@ dependencies {
   implementation(libs.io7m.trasco.api)
   implementation(libs.io7m.trasco.vanilla)
   implementation(libs.io7m.trasco.xml.schemas)
+  implementation(libs.io7m.xyloid.natives)
 
   implementation(libs.apache.commons.io)
   implementation(libs.apache.commons.math3)

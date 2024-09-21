@@ -1,20 +1,21 @@
 [versions]
-darco            = "2.0.0"
-opentelemetry    = "1.41.0"
-slf4j            = "2.0.16"
-logback_android  = "3.0.0"
-trasco           = "3.0.0"
-anethum          = "1.1.1"
-jlexing          = "3.2.0"
-jxe              = "2.0.0"
-junreachable     = "4.0.2"
-blackthorne      = "2.0.2"
-xerces           = "2.12.2"
-junit            = "5.11.0"
-junit_platform   = "1.11.0"
 amazon_aws       = "2.27.8"
+anethum          = "1.1.1"
+blackthorne      = "2.0.2"
+darco            = "2.0.0"
 ervilla          = "1.0.0"
 jade             = "1.0.3"
+jlexing          = "3.2.0"
+junit            = "5.11.0"
+junit_platform   = "1.11.0"
+junreachable     = "4.0.2"
+jxe              = "2.0.0"
+logback_android  = "3.0.0"
+opentelemetry    = "1.41.0"
+slf4j            = "2.0.16"
+sqlite           = "3.46.1.0"
+trasco           = "3.0.0"
+xerces           = "2.12.2"
 
 [libraries]
 junit_jupiter_api       = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
@@ -60,10 +61,11 @@ io7m_trasco_api          = { module = "com.io7m.trasco:com.io7m.trasco.api", ver
 io7m_trasco_vanilla      = { module = "com.io7m.trasco:com.io7m.trasco.vanilla", version.ref = "trasco" }
 io7m_trasco_xml_schemas  = { module = "com.io7m.trasco:com.io7m.trasco.xml.schemas", version.ref = "trasco" }
 
-xerial_sqlite           = { module = "org.xerial:sqlite-jdbc", version = "3.46.1.0" }
-xerces                  = { module = "xerces:xercesImpl", version.ref = "xerces" }
-stax_api                = { module = "javax.xml.stream:stax-api", version = "1.0-2" }
-stax                    = { module = "stax:stax", version = "1.2.0" }
+io7m_xyloid_natives = { module = "com.io7m.xyloid:com.io7m.xyloid.natives", version.ref = "sqlite" }
+xerial_sqlite       = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
+xerces              = { module = "xerces:xercesImpl", version.ref = "xerces" }
+stax_api            = { module = "javax.xml.stream:stax-api", version = "1.0-2" }
+stax                = { module = "stax:stax", version = "1.2.0" }
 
 zxing_embedded = { module = "com.journeyapps:zxing-android-embedded", version = "4.3.0" }
 zxing_core     = { module = "com.google.zxing:core", version = "3.4.1" }
