@@ -56,8 +56,6 @@ val io7mRootBuildDirectory =
   "$rootDir/build"
 val io7mDeployDirectory =
   "$io7mRootBuildDirectory/maven"
-val io7mKtlintJarFile =
-  "$rootDir/ktlint.jar"
 
 /**
  * Convenience functions to read strongly-typed values from property files.
