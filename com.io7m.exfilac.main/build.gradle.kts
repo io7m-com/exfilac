@@ -72,6 +72,7 @@ dependencies {
   this.implementation(libs.io7m.trasco.api)
   this.implementation(libs.io7m.trasco.vanilla)
   this.implementation(libs.io7m.trasco.xml.schemas)
+  this.implementation(libs.io7m.xyloid.natives)
 
   this.implementation(libs.apache.commons.io)
   this.implementation(libs.kotlin.stdlib)

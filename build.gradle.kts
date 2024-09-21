@@ -103,32 +103,6 @@ fun propertyBooleanOptional(
   return value.toBooleanStrict()
 }
 
-/**
- * A task to unpack native libraries from the SQLite package.
- */
-
-fun createSQLiteUnpackTask(project: Project): Task {
-  val commandLineArguments: List<String> = arrayListOf(
-    "java",
-    "make/UnpackSQLite.java",
-    libs.xerial.sqlite.get().version!!,
-  )
-
-  return project.task("UnpackSQLite", Exec::class) {
-    commandLine = commandLineArguments
-  }
-}
-
-/*
- * Create a task in the root project that unpacks SQLite.
- */
-
-lateinit var sqliteUnpackTask: Task
-
-rootProject.afterEvaluate {
-  sqliteUnpackTask = createSQLiteUnpackTask(this)
-}
-
 allprojects {
 
   /*
@@ -384,15 +358,6 @@ allprojects {
       isTransitive = transitiveConfigurations.contains(name)
       // resolutionStrategy.failOnVersionConflict()
     }
-  }
-
-  /*
-   * Configure all compile tasks to depend upon the SQLite unpack task.
-   */
-
-  afterEvaluate {
-    tasks.matching { task -> task.name == "compileDebugSources" || task.name == "compileReleaseSources" }
-      .forEach { task -> task.dependsOn(sqliteUnpackTask) }
   }
 
   /*
