@@ -3,6 +3,7 @@ name: main.linux.temurin.lts
 on:
   push:
     branches: [ develop, master, feature/*, release/* ]
+    tags: [ com.io7m.exfilac-* ]
 
 jobs:
   build:
