@@ -2,7 +2,7 @@ name: main.linux.temurin.lts
 
 on:
   push:
-    branches: [ develop, feature/*, release/* ]
+    branches: [ develop, master, feature/*, release/* ]
 
 jobs:
   build:
