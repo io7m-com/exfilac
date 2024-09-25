@@ -23,9 +23,9 @@ jobs:
 
       - name: Sign APKs
         env:
-          IO7M_ANDROID_SIGNING_KEY:  ${{ secrets:IO7M_ANDROID_SIGNING_KEY  }}
-          IO7M_ANDROID_KEY_ALIAS:    ${{ secrets:IO7M_ANDROID_KEY_ALIAS    }}
-          IO7M_ANDROID_KEY_PASSWORD: ${{ secrets:IO7M_ANDROID_KEY_PASSWORD }}
+          IO7M_ANDROID_SIGNING_KEY:  ${{ secrets.IO7M_ANDROID_SIGNING_KEY  }}
+          IO7M_ANDROID_KEY_ALIAS:    ${{ secrets.IO7M_ANDROID_KEY_ALIAS    }}
+          IO7M_ANDROID_KEY_PASSWORD: ${{ secrets.IO7M_ANDROID_KEY_PASSWORD }}
         run: .github/workflows/sign.sh ./com.io7m.exfilac.main/build/outputs/apk/release/
 
       - name: Upload APK(s)
