@@ -26,7 +26,7 @@ jobs:
           IO7M_ANDROID_SIGNING_KEY:  ${{ secrets.IO7M_ANDROID_SIGNING_KEY  }}
           IO7M_ANDROID_KEY_ALIAS:    ${{ secrets.IO7M_ANDROID_KEY_ALIAS    }}
           IO7M_ANDROID_KEY_PASSWORD: ${{ secrets.IO7M_ANDROID_KEY_PASSWORD }}
-        run: .github/workflows/sign.sh ./com.io7m.exfilac.main/build/outputs/apk/release/
+        run: .github/workflows/sign.sh ./com.io7m.exfilac.main/build/outputs/apk/release/com.io7m.exfilac.main-release-unsigned.apk
 
       - name: Upload APK(s)
         uses: actions/upload-artifact@v4
