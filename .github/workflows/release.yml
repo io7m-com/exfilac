@@ -21,20 +21,16 @@ jobs:
       - name: Build
         run: java make/Make.java
 
-      - uses: ilharp/sign-android-release@v1
-        name: Sign app APK
-        id: sign_app
-        with:
-          releaseDir:        ./com.io7m.exfilac.main/build/outputs/apk/release/
-          signingKey:        ${{ secrets.IO7M_ANDROID_SIGNING_KEY }}
-          keyAlias:          ${{ secrets.IO7M_ANDROID_KEY_ALIAS }}
-          keyStorePassword:  ${{ secrets.IO7M_ANDROID_KEY_PASSWORD }}
-          keyPassword:       ${{ secrets.IO7M_ANDROID_KEY_PASSWORD }}
-          buildToolsVersion: 33.0.0
+      - name: Sign APKs
+        env:
+          IO7M_ANDROID_SIGNING_KEY:  ${{ secrets:IO7M_ANDROID_SIGNING_KEY  }}
+          IO7M_ANDROID_KEY_ALIAS:    ${{ secrets:IO7M_ANDROID_KEY_ALIAS    }}
+          IO7M_ANDROID_KEY_PASSWORD: ${{ secrets:IO7M_ANDROID_KEY_PASSWORD }}
+        run: .github/workflows/sign.sh ./com.io7m.exfilac.main/build/outputs/apk/release/
 
       - name: Upload APK(s)
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: apk
-          path: ./com.io7m.exfilac.main/build/outputs/apk/release/
+          path: signed.apk
