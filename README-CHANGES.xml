@@ -30,9 +30,14 @@
         <c:change date="2024-09-21T00:00:00+00:00" summary="Adjust build process."/>
       </c:changes>
     </c:release>
-    <c:release date="2024-09-24T15:30:35+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.0.3">
+    <c:release date="2024-09-24T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.0.3">
       <c:changes>
         <c:change date="2024-09-24T00:00:00+00:00" summary="Adjust build process for F-Droid."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2024-09-25T17:12:52+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.0.4">
+      <c:changes>
+        <c:change date="2024-09-25T00:00:00+00:00" summary="Add release signing for F-Droid."/>
       </c:changes>
     </c:release>
   </c:releases>
