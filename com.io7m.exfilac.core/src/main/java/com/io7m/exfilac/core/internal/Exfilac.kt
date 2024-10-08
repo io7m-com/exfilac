@@ -93,6 +93,7 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.stream.Collectors
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlin.math.roundToLong
 
 internal class Exfilac private constructor(
   private val resources: CloseableCollectionType<ClosingResourceFailedException>,
@@ -366,16 +367,16 @@ internal class Exfilac private constructor(
   ): CompletableFuture<*> {
     val cf = CompletableFuture<Unit>()
     this.databaseExecutor.execute {
-      for (attempt in 1..5) {
+      for (attempt in 1..10) {
         try {
           cf.complete(f.invoke())
           return@execute
         } catch (e: SQLiteException) {
           logger.debug("executeDatabase: ", e)
-          if (e.resultCode != SQLiteErrorCode.SQLITE_BUSY || attempt == 5) {
+          if (e.resultCode != SQLiteErrorCode.SQLITE_BUSY || attempt == 10) {
             cf.completeExceptionally(e)
           }
-          Thread.sleep(250L)
+          Thread.sleep((Math.random() * 1_000L).roundToLong())
         } catch (e: Throwable) {
           logger.debug("executeDatabase: ", e)
           cf.completeExceptionally(e)
