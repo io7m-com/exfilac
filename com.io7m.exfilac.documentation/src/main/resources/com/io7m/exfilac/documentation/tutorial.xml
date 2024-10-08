@@ -4,6 +4,7 @@
          title="Tutorial">
 
   <Section title="What You Need To Know First">
+    <Subsection title="Information">
     <Paragraph>
       In order to start using the application, you'll need to know a few details first:
     </Paragraph>
@@ -40,6 +41,22 @@
         </Item>
       </ListUnordered>
     </FormalItem>
+    </Subsection>
+    <Subsection title="Notifications" id="dc570de8-a427-4f2f-9899-0885b3572412">
+      <Paragraph>
+        Unfortunately, the application requires notifications to work reliably. This is due to Android
+        placing restrictions on what applications are allowed to do in the "background". The reasoning
+        appears to be that if an application publishes a notification to indicate to the user that it
+        is running, then this allows users to blame the application when their device runs out of
+        battery.
+      </Paragraph>
+      <Paragraph>
+        The application will ask you to grant permission to use notifications. You may deny permission,
+        of course, although this may cause background uploads to work less reliably. The application
+        promises not to send you annoying notifications for any reason; the notifications solely exist
+        to satisfy Android's new restrictions on background work.
+      </Paragraph>
+    </Subsection>
   </Section>
 
   <Section title="Buckets"
@@ -592,6 +609,13 @@ SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
       <Paragraph>
         The <Term type="term">Pause uploads</Term> option, if enabled, will prevent all uploads from executing until the
         control is disabled. Note that uploads that are currently in progress will not be cancelled.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Notifications">
+      <Paragraph>
+        The <Term type="term">Notifications</Term> section indicates whether
+        <Link target="dc570de8-a427-4f2f-9899-0885b3572412">notifications</Link> are currently
+        permitted.
       </Paragraph>
     </Subsection>
     <Subsection title="User Manual">

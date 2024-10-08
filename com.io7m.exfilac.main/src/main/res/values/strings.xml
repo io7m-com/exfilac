@@ -114,9 +114,9 @@
   <string name="settingsSavedLogsTo">Saved logs to %s</string>
   <string name="settingsLive">Click to see the live version of this documentation at\nhttps://www.io7m.com/software/exfilac/documentation/index-m.xhtml</string>
 
-  <string name="networkStatusUnavailable">Network connectivity currently appears to be unavailable.</string>
-  <string name="networkStatusCellular">Networking is currently provided by a cellular connection.</string>
-  <string name="networkStatusWifi">Networking is currently provided by a Wi-Fi connection.</string>
+  <string name="networkStatusUnavailable">No network.</string>
+  <string name="networkStatusCellular">On cellular.</string>
+  <string name="networkStatusWifi">On Wi-Fi.</string>
 
   <string name="time">Time</string>
   <string name="file">File</string>
@@ -140,4 +140,22 @@
   <string name="timeEnded">Time Ended</string>
   <string name="timeDuration">Duration</string>
   <string name="bucket">Bucket</string>
+
+  <string name="notification_title">Exfilac</string>
+  <string name="notification_description">Exfilac is running.</string>
+  <string name="notification_explanation">
+    Due to restrictions in Android, Exfilac requires notifications to be enabled in order to
+    reliably run a background service that manages uploads.\n\n
+    Exfilac will never send you annoying notifications; they are purely needed because Android
+    now requires them for services.\n\n
+    Please enable notifications if you want to use scheduled uploads. Only manual uploads will
+    work reliably if notifications are disabled.
+  </string>
+  <string name="notifications_permitted">
+    Notifications permitted.
+  </string>
+  <string name="notifications_denied">
+    Notifications denied!
+  </string>
+
 </resources>

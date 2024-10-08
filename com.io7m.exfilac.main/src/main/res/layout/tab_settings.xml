@@ -102,6 +102,24 @@
         android:background="?android:attr/listDivider" />
 
       <TextView
+        android:id="@+id/settingsPermissions"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/settingsMarginHorizontal"
+        android:paddingEnd="@dimen/settingsMarginHorizontal"
+        tools:text="NOTIFICATIONS DENIED"
+        android:textSize="@dimen/settingsHeaderTextSize"
+        android:textStyle="bold" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+      <TextView
         android:id="@+id/settingsUserManual"
         android:layout_width="match_parent"
         android:layout_height="48dp"

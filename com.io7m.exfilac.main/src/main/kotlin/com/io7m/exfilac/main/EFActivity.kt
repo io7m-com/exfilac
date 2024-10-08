@@ -46,6 +46,26 @@ class EFActivity : AppCompatActivity(R.layout.main_activity) {
         this.onStateChanged(newValue)
       }
     )
+
+    /*
+     * If the user hasn't seen the permissions nag screen, then display it. They'll
+     * be given an opportunity to grant permissions to the application. Unfortunately,
+     * if they refuse the first time, there's no point making the system request them
+     * again, because it'll just silently fail.
+     */
+
+    val settings = EFApplication.application.exfilac.settings.get()
+    if (!settings.notifications.hasSeenNotificationsNagScreen) {
+      EFNotifications.notificationsDisplayDialog(this) {
+        EFApplication.application.exfilac.settingsUpdate(
+          settings = settings.copy(
+            notifications = settings.notifications.copy(
+              hasSeenNotificationsNagScreen = true
+            )
+          )
+        )
+      }
+    }
   }
 
   @UiThread

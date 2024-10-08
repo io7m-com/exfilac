@@ -25,11 +25,23 @@ import com.io7m.exfilac.core.ExfilacFactory
 import com.io7m.exfilac.core.ExfilacType
 import com.io7m.exfilac.s3_uploader.amazon.EFS3AMZUploaders
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 class EFApplication : Application() {
 
   private val logger =
     LoggerFactory.getLogger(EFApplication::class.java)
+
+  private val supervisor: ScheduledExecutorService =
+    Executors.newSingleThreadScheduledExecutor { r ->
+      val thread = Thread(r)
+      thread.isDaemon = true
+      thread.priority = Thread.MIN_PRIORITY
+      thread.name = "com.io7m.exfilac.supervisor[${thread.id}]"
+      thread
+    }
 
   private lateinit var exfilacField: ExfilacType
 
@@ -39,34 +51,9 @@ class EFApplication : Application() {
   companion object {
     private lateinit var INSTANCE: EFApplication
 
-    private val logger =
-      LoggerFactory.getLogger(EFApplication::class.java)
-
     @JvmStatic
     val application: EFApplication
       get() = this.INSTANCE
-
-    fun startServices(
-      context: Context
-    ) {
-      try {
-        context.startService(Intent(context, EFSchedulerService::class.java))
-      } catch (e: Throwable) {
-        this.logger.error("Failed to start service: ", e)
-      }
-
-      try {
-        context.startService(Intent(context, EFNetworkConnectivityService::class.java))
-      } catch (e: Throwable) {
-        this.logger.error("Failed to start service: ", e)
-      }
-
-      try {
-        context.startService(Intent(context, EFPhotoService::class.java))
-      } catch (e: Throwable) {
-        this.logger.error("Failed to start service: ", e)
-      }
-    }
   }
 
   override fun onCreate() {
@@ -99,5 +86,20 @@ class EFApplication : Application() {
       )
 
     startServices(this)
+  }
+
+  private fun startServices(
+    context: Context
+  ) {
+    this.supervisor.scheduleWithFixedDelay({
+      if (!EFSupervisorService.isRunning()) {
+        try {
+          this.logger.debug("(Re)starting controller service…")
+          context.startService(Intent(context, EFSupervisorService::class.java))
+        } catch (e: Throwable) {
+          this.logger.error("Failed to start service: ", e)
+        }
+      }
+    }, 5L, 30L, TimeUnit.SECONDS)
   }
 }

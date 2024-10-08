@@ -18,6 +18,7 @@ package com.io7m.exfilac.core.internal.database
 
 import com.io7m.exfilac.core.EFSettings
 import com.io7m.exfilac.core.EFSettingsNetworking
+import com.io7m.exfilac.core.EFSettingsNotifications
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -67,13 +68,18 @@ object EFSettingsTexts {
       p.getProperty("networking.uploadOnCellular")?.toBoolean() ?: true
     val paused =
       p.getProperty("paused")?.toBoolean() ?: false
+    val hasSeenNotificationsNagScreen =
+      p.getProperty("notifications.hasSeenNotificationsNagScreen")?.toBoolean() ?: false
 
     return EFSettings(
-      EFSettingsNetworking(
+      networking = EFSettingsNetworking(
         uploadOnWifi = uploadOnWifi,
         uploadOnCellular = uploadOnCellular,
       ),
-      paused = paused
+      paused = paused,
+      notifications = EFSettingsNotifications(
+        hasSeenNotificationsNagScreen = hasSeenNotificationsNagScreen
+      )
     )
   }
 
@@ -83,8 +89,18 @@ object EFSettingsTexts {
     val p = Properties()
     p.setProperty("@type", "com.io7m.exfilac.settings")
     p.setProperty("@version", "1")
-    p.setProperty("networking.uploadOnWifi", u.networking.uploadOnWifi.toString())
-    p.setProperty("networking.uploadOnCellular", u.networking.uploadOnCellular.toString())
+    p.setProperty(
+      "networking.uploadOnWifi",
+      u.networking.uploadOnWifi.toString()
+    )
+    p.setProperty(
+      "networking.uploadOnCellular",
+      u.networking.uploadOnCellular.toString()
+    )
+    p.setProperty(
+      "notifications.hasSeenNotificationsNagScreen",
+      u.notifications.hasSeenNotificationsNagScreen.toString()
+    )
     p.setProperty("paused", u.paused.toString())
     return p
   }

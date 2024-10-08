@@ -16,17 +16,17 @@
 
 package com.io7m.exfilac.core
 
-data class EFSettings(
-  val networking: EFSettingsNetworking,
-  val paused: Boolean,
-  val notifications: EFSettingsNotifications
+/**
+ * Notifications settings.
+ */
+
+data class EFSettingsNotifications(
+  val hasSeenNotificationsNagScreen: Boolean
 ) {
   companion object {
-    fun defaults(): EFSettings {
-      return EFSettings(
-        networking = EFSettingsNetworking.defaults(),
-        paused = false,
-        notifications = EFSettingsNotifications.defaults()
+    fun defaults(): EFSettingsNotifications {
+      return EFSettingsNotifications(
+        hasSeenNotificationsNagScreen = false
       )
     }
   }

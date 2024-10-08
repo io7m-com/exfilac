@@ -19,15 +19,25 @@ package com.io7m.exfilac.main
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import org.slf4j.LoggerFactory
 
 class EFBootReceiver : BroadcastReceiver() {
+
+  private val logger =
+    LoggerFactory.getLogger(EFBootReceiver::class.java)
+
   override fun onReceive(
     context: Context?,
     intent: Intent?
   ) {
     if (context != null && intent != null) {
       if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
-        EFApplication.startServices(context)
+        /*
+         * Receiving this intent means the application has started.
+         * We don't need to do anything explicitly because the supervisor service will start
+         * everything else.
+         */
+        this.logger.debug("Device boot completed.")
       }
     }
   }

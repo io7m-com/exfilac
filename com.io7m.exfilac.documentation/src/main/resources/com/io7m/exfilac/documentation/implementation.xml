@@ -206,6 +206,32 @@
         permission in order to use the camera to scan QR codes to configure buckets.
       </Paragraph>
     </Subsection>
+    <Subsection title="android.permission.FOREGROUND_SERVICE">
+      <Paragraph>
+        The application requires the
+        <Term type="constant">android.permission.FOREGROUND_SERVICE</Term>
+        permission in order to start a foreground service that can schedule uploads. This is only required due to
+        Android's new draconian restrictions on background jobs for applications.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="android.permission.FOREGROUND_SERVICE_DATA_SYNC">
+      <Paragraph>
+        The application requires the
+        <Term type="constant">android.permission.FOREGROUND_SERVICE_DATA_SYNC</Term>
+        permission in order to start a foreground service that can schedule uploads. This is only required due to
+        Android's new draconian restrictions on background jobs for applications.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="android.permission.POST_NOTIFICATIONS">
+      <Paragraph>
+        The application requires the
+        <Term type="constant">android.permission.POST_NOTIFICATIONS</Term>
+        permission in order to create a notification that sits in the Android status area and tells users that
+        the application is running. Android now requires this for applications that are doing non-trivial
+        background work, presumably so that users can blame a particular app when the device's battery runs
+        out.
+      </Paragraph>
+    </Subsection>
   </Section>
 
 </Section>

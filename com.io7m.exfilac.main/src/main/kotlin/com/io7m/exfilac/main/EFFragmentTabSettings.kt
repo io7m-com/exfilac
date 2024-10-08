@@ -17,6 +17,7 @@
 package com.io7m.exfilac.main
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -43,6 +44,7 @@ class EFFragmentTabSettings : Fragment() {
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
+  private lateinit var permissions: TextView
   private lateinit var commit: TextView
   private lateinit var manual: TextView
   private lateinit var paused: SwitchMaterial
@@ -83,6 +85,8 @@ class EFFragmentTabSettings : Fragment() {
       view.findViewById(R.id.settingsUserManual)
     this.saveLogs =
       view.findViewById(R.id.settingsDumpLogs)
+    this.permissions =
+      view.findViewById(R.id.settingsPermissions)
 
     this.uploadCellular.setOnCheckedChangeListener { _, isChecked ->
       this.updateSettings { settings: EFSettings ->
@@ -178,6 +182,29 @@ class EFFragmentTabSettings : Fragment() {
     this.subscriptions.add(
       EFApplication.application.exfilac.settings.subscribe { _, newValue ->
         this.onSettingsChanged(newValue)
+      }
+    )
+    this.subscriptions.add(
+      EFSupervisorService.areNotificationsPermitted.subscribe { _, isPermitted ->
+        try {
+          if (isPermitted) {
+            this.permissions.setText(R.string.notifications_permitted)
+            this.permissions.setTextColor(Color.BLACK)
+            this.permissions.setOnClickListener {
+              // Nothing required
+            }
+          } else {
+            this.permissions.setText(R.string.notifications_denied)
+            this.permissions.setTextColor(Color.RED)
+            this.permissions.setOnClickListener {
+              EFNotifications.notificationsDisplayDialog(this.requireActivity()) {
+                // Nothing required
+              }
+            }
+          }
+        } catch (e: Throwable) {
+          this.logger.debug("Failed to open activity: ", e)
+        }
       }
     )
   }
