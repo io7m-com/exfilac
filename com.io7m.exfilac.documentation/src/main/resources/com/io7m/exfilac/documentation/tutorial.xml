@@ -392,6 +392,26 @@ SecretKey=03cbe0c80539c8bb2883c2f3bb239f62cab89493
             <Cell>The upload will be attempted every sixty minutes.</Cell>
           </Row>
           <Row>
+            <Cell>Every two hours.</Cell>
+            <Cell>The upload will be attempted every two hours.</Cell>
+          </Row>
+          <Row>
+            <Cell>Every four hours.</Cell>
+            <Cell>The upload will be attempted every four hours.</Cell>
+          </Row>
+          <Row>
+            <Cell>Every eight hours.</Cell>
+            <Cell>The upload will be attempted every eight hours.</Cell>
+          </Row>
+          <Row>
+            <Cell>Every twelve hours.</Cell>
+            <Cell>The upload will be attempted every twelve hours.</Cell>
+          </Row>
+          <Row>
+            <Cell>Every twenty-four hours.</Cell>
+            <Cell>The upload will be attempted every twenty-four hours.</Cell>
+          </Row>
+          <Row>
             <Cell>No schedule; only upload on trigger events.</Cell>
             <Cell>
               The upload will not use a time-based schedule and will only start in response to one or more of the

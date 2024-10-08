@@ -8,6 +8,11 @@
     <item>Every twenty minutes.</item>
     <item>Every thirty minutes.</item>
     <item>Every hour.</item>
+    <item>Every two hours.</item>
+    <item>Every four hours.</item>
+    <item>Every eight hours.</item>
+    <item>Every twelve hours.</item>
+    <item>Every twenty-four hours.</item>
     <item>No schedule; only upload on trigger events.</item>
     <item>No schedule; only upload manually.</item>
   </string-array>

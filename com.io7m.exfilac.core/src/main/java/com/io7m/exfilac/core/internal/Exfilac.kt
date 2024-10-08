@@ -36,7 +36,18 @@ import com.io7m.exfilac.core.EFUploadReason
 import com.io7m.exfilac.core.EFUploadReasonManual
 import com.io7m.exfilac.core.EFUploadReasonTime
 import com.io7m.exfilac.core.EFUploadReasonTrigger
-import com.io7m.exfilac.core.EFUploadSchedule
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_EIGHT_HOURS
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_FIVE_MINUTES
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_FOUR_HOURS
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_HOUR
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_TEN_MINUTES
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_THIRTY_MINUTES
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_TWELVE_HOURS
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_TWENTY_FOUR_HOURS
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_TWENTY_MINUTES
+import com.io7m.exfilac.core.EFUploadSchedule.EVERY_TWO_HOURS
+import com.io7m.exfilac.core.EFUploadSchedule.ONLY_MANUALLY
+import com.io7m.exfilac.core.EFUploadSchedule.ONLY_ON_TRIGGERS
 import com.io7m.exfilac.core.EFUploadStatus
 import com.io7m.exfilac.core.EFUploadStatusChanged
 import com.io7m.exfilac.core.EFUploadStatusNone
@@ -753,23 +764,38 @@ internal class Exfilac private constructor(
       EFUploadReasonManual -> true
       EFUploadReasonTime -> {
         when (upload.policy.schedule) {
-          EFUploadSchedule.EVERY_FIVE_MINUTES ->
+          EVERY_FIVE_MINUTES ->
             this.timeSatisfies(timeLast, Duration.of(5L, ChronoUnit.MINUTES))
 
-          EFUploadSchedule.EVERY_TEN_MINUTES ->
+          EVERY_TEN_MINUTES ->
             this.timeSatisfies(timeLast, Duration.of(10L, ChronoUnit.MINUTES))
 
-          EFUploadSchedule.EVERY_TWENTY_MINUTES ->
+          EVERY_TWENTY_MINUTES ->
             this.timeSatisfies(timeLast, Duration.of(20L, ChronoUnit.MINUTES))
 
-          EFUploadSchedule.EVERY_THIRTY_MINUTES ->
+          EVERY_THIRTY_MINUTES ->
             this.timeSatisfies(timeLast, Duration.of(30L, ChronoUnit.MINUTES))
 
-          EFUploadSchedule.EVERY_HOUR ->
+          EVERY_HOUR ->
             this.timeSatisfies(timeLast, Duration.of(60L, ChronoUnit.MINUTES))
 
-          EFUploadSchedule.ONLY_ON_TRIGGERS,
-          EFUploadSchedule.ONLY_MANUALLY -> false
+          ONLY_ON_TRIGGERS,
+          ONLY_MANUALLY -> false
+
+          EVERY_TWO_HOURS ->
+            this.timeSatisfies(timeLast, Duration.of(2L, ChronoUnit.HOURS))
+
+          EVERY_FOUR_HOURS ->
+            this.timeSatisfies(timeLast, Duration.of(4L, ChronoUnit.HOURS))
+
+          EVERY_EIGHT_HOURS ->
+            this.timeSatisfies(timeLast, Duration.of(8L, ChronoUnit.HOURS))
+
+          EVERY_TWELVE_HOURS ->
+            this.timeSatisfies(timeLast, Duration.of(12L, ChronoUnit.HOURS))
+
+          EVERY_TWENTY_FOUR_HOURS ->
+            this.timeSatisfies(timeLast, Duration.of(24L, ChronoUnit.HOURS))
         }
       }
 
