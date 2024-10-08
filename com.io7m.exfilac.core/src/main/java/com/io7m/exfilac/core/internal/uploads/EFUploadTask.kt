@@ -43,6 +43,7 @@ import com.io7m.exfilac.core.EFUploadTrigger
 import com.io7m.exfilac.core.internal.EFUploadEventID
 import com.io7m.exfilac.core.internal.EFUploadEventRecord
 import com.io7m.exfilac.core.internal.EFUploadRecord
+import com.io7m.exfilac.core.internal.database.EFDatabaseTransactionType
 import com.io7m.exfilac.core.internal.database.EFDatabaseType
 import com.io7m.exfilac.core.internal.database.EFQBucketListType
 import com.io7m.exfilac.core.internal.database.EFQUploadConfigurationListType
@@ -58,6 +59,8 @@ import com.io7m.taskrecorder.core.TRNoResult
 import com.io7m.taskrecorder.core.TRTaskRecorder
 import com.io7m.taskrecorder.core.TRTaskRecorderType
 import org.slf4j.LoggerFactory
+import org.sqlite.SQLiteErrorCode
+import org.sqlite.SQLiteException
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URI
@@ -66,6 +69,7 @@ import java.util.Optional
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.math.roundToLong
 
 class EFUploadTask(
   val database: EFDatabaseType,
@@ -125,7 +129,7 @@ class EFUploadTask(
                 EFQUploadRecordCreateParameters(
                   timeStart = this.clock.now(),
                   uploadName = this.name,
-                  reason = reasonTextOf(this.reason)
+                  reason = this.reasonTextOf(this.reason)
                 )
               )
           )
@@ -252,7 +256,7 @@ class EFUploadTask(
       failed = false
     )
 
-    this.database.openTransaction().use { transaction ->
+    this.doTransactionalUpdate { transaction ->
       transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
       transaction.query(EFQUploadEventRecordAddType::class.java).execute(e)
       transaction.commit()
@@ -274,7 +278,7 @@ class EFUploadTask(
       failed = false
     )
 
-    this.database.openTransaction().use { transaction ->
+    this.doTransactionalUpdate { transaction ->
       transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
       transaction.query(EFQUploadEventRecordAddType::class.java).execute(e)
       transaction.commit()
@@ -297,7 +301,7 @@ class EFUploadTask(
       failed = true
     )
 
-    this.database.openTransaction().use { transaction ->
+    this.doTransactionalUpdate { transaction ->
       transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
       transaction.query(EFQUploadEventRecordAddType::class.java).execute(e)
       transaction.commit()
@@ -330,7 +334,7 @@ class EFUploadTask(
       failed = false
     )
 
-    this.database.openTransaction().use { transaction ->
+    this.doTransactionalUpdate { transaction ->
       transaction.query(EFQUploadEventRecordAddType::class.java).execute(e)
       transaction.commit()
     }
@@ -371,7 +375,7 @@ class EFUploadTask(
       this.files.shuffle()
 
       this.uploadRecord.getAndUpdate { r -> r.copy(filesRequired = this.files.size.toLong()) }
-      this.database.openTransaction().use { transaction ->
+      this.doTransactionalUpdate { transaction ->
         transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
         transaction.commit()
       }
@@ -423,7 +427,7 @@ class EFUploadTask(
       this.checkCancelled()
       this.setRunningFromTask(0.0, null)
 
-      this.database.openTransaction().use { transaction ->
+      this.doTransactionalUpdate { transaction ->
         this.checkCancelled()
 
         val uConfiguration =
@@ -493,7 +497,7 @@ class EFUploadTask(
       this.uploadRecord.getAndUpdate { r ->
         r.copy(result = EFUploadResult.FAILED, timeEnd = this.clock.now())
       }
-      this.database.openTransaction().use { transaction ->
+      this.doTransactionalUpdate { transaction ->
         transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
         transaction.commit()
       }
@@ -514,7 +518,7 @@ class EFUploadTask(
     this.uploadRecord.getAndUpdate { r ->
       r.copy(result = EFUploadResult.SUCCEEDED, timeEnd = this.clock.now())
     }
-    this.database.openTransaction().use { transaction ->
+    this.doTransactionalUpdate { transaction ->
       transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
       transaction.commit()
     }
@@ -536,7 +540,7 @@ class EFUploadTask(
     this.uploadRecord.getAndUpdate { r ->
       r.copy(result = EFUploadResult.CANCELLED, timeEnd = this.clock.now())
     }
-    this.database.openTransaction().use { transaction ->
+    this.doTransactionalUpdate { transaction ->
       transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
       transaction.commit()
     }
@@ -557,7 +561,7 @@ class EFUploadTask(
     this.uploadRecord.getAndUpdate { r ->
       r.copy(result = EFUploadResult.FAILED, timeEnd = this.clock.now())
     }
-    this.database.openTransaction().use { transaction ->
+    this.doTransactionalUpdate { transaction ->
       transaction.query(EFQUploadRecordUpdateType::class.java).execute(this.uploadRecord.get())
       transaction.commit()
     }
@@ -577,5 +581,22 @@ class EFUploadTask(
     this.cancelled.set(true)
     this.onStatusChanged(EFUploadStatusCancelling(this.name, id = this.uploadRecord.get()?.id))
     this.statusChangedSource.set(EFUploadStatusChanged())
+  }
+
+  private fun doTransactionalUpdate(
+    f: (EFDatabaseTransactionType) -> Unit
+  ) {
+    for (attempt in 1..10) {
+      try {
+        this.database.openTransaction().use(f)
+        return
+      } catch (e: SQLiteException) {
+        this.logger.debug("doTransactionalUpdate: ", e)
+        if (e.resultCode != SQLiteErrorCode.SQLITE_BUSY || attempt == 10) {
+          throw e
+        }
+        Thread.sleep((Math.random() * 1_000L).roundToLong())
+      }
+    }
   }
 }
