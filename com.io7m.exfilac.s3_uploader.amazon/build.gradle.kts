@@ -5,6 +5,7 @@ dependencies {
 
   implementation(libs.apache.commons.io)
   implementation(libs.apache.commons.math3)
+  implementation(libs.io7m.jmulticlose.core)
   implementation(libs.io7m.peixoto.sdk)
   implementation(libs.kotlin.stdlib)
   implementation(libs.slf4j)

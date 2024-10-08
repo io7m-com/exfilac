@@ -53,6 +53,7 @@ import com.io7m.exfilac.core.internal.database.EFQUploadRecordCreateType
 import com.io7m.exfilac.core.internal.database.EFQUploadRecordUpdateType
 import com.io7m.exfilac.s3_uploader.api.EFS3TransferStatistics
 import com.io7m.exfilac.s3_uploader.api.EFS3UploadRequest
+import com.io7m.exfilac.s3_uploader.api.EFS3UploadType
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderType
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.taskrecorder.core.TRNoResult
@@ -82,6 +83,7 @@ class EFUploadTask(
   val clock: EFClockServiceType,
 ) {
 
+  private var s3Upload: EFS3UploadType? = null
   private val uploadRecord: AtomicReference<EFUploadRecord> = AtomicReference()
   private var bucketConfiguration: EFBucketConfiguration? = null
   private var uploadConfiguration: EFUploadConfiguration? = null
@@ -111,6 +113,12 @@ class EFUploadTask(
     } catch (e: Throwable) {
       this.setFailed(e)
       throw e
+    } finally {
+      try {
+        this.s3Upload?.close()
+      } catch (e: Throwable) {
+        this.logger.debug("Failed to close upload: ", e)
+      }
     }
   }
 
@@ -233,7 +241,8 @@ class EFUploadTask(
           }
         )
 
-      this.s3Uploader.create(uploadInfo, this.clock).use { upload -> upload.execute() }
+      this.s3Upload = this.s3Uploader.create(uploadInfo, this.clock)
+      this.s3Upload?.execute()
       step.setStepSucceeded("OK")
     } catch (e: Throwable) {
       step.setStepFailed(this.exceptionMessage(e), e)
@@ -579,6 +588,13 @@ class EFUploadTask(
 
   fun cancel() {
     this.cancelled.set(true)
+
+    try {
+      this.s3Upload?.close()
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to close upload: ", e)
+    }
+
     this.onStatusChanged(EFUploadStatusCancelling(this.name, id = this.uploadRecord.get()?.id))
     this.statusChangedSource.set(EFUploadStatusChanged())
   }
