@@ -32,7 +32,7 @@ interface EFUploadServiceType : RPServiceType, AutoCloseable {
   fun upload(
     name: EFUploadName,
     reason: EFUploadReason
-  ): CompletableFuture<*>
+  ): CompletableFuture<Unit>
 
   fun cancel(name: EFUploadName)
 

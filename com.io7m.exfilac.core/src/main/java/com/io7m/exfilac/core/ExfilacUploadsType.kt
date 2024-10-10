@@ -20,6 +20,7 @@ import com.io7m.exfilac.core.internal.EFUploadEventRecord
 import com.io7m.exfilac.core.internal.EFUploadID
 import com.io7m.exfilac.core.internal.EFUploadRecord
 import com.io7m.jattribute.core.AttributeReadableType
+import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
 
@@ -37,12 +38,17 @@ interface ExfilacUploadsType {
   fun uploadSelectionClear(): CompletableFuture<*>
   fun uploadSelectionContains(name: EFUploadName): Boolean
   fun uploadStatus(name: EFUploadName): EFUploadStatus
+
   fun uploadStart(
     name: EFUploadName,
+    delay: Duration,
     reason: EFUploadReason
   ): CompletableFuture<*>
 
   fun uploadCancel(name: EFUploadName)
+
+  fun uploadStartAllSetDelayMaximum(delayMax: Duration)
+
   fun uploadStartAllAsNecessary(
     reason: EFUploadReason
   ): CompletableFuture<*>

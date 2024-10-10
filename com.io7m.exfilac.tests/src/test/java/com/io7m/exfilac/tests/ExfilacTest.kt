@@ -49,6 +49,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.io.TempDir
 import java.net.URI
 import java.nio.file.Path
+import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.TimeUnit
 
@@ -292,7 +293,7 @@ class ExfilacTest {
     this.e.bucketEditConfirm(bucket).get()
     this.e.uploadEditBegin().get()
     this.e.uploadEditConfirm(upload).get()
-    this.e.uploadStart(upload.name, EFUploadReasonManual).get()
+    this.e.uploadStart(upload.name, Duration.ofMillis(0L), EFUploadReasonManual).get()
     this.e.uploadViewSelect(upload.name, uploadId = null).get()
 
     assertEquals(
@@ -333,8 +334,11 @@ class ExfilacTest {
     this.e.bucketEditConfirm(bucket).get()
     this.e.uploadEditBegin().get()
     this.e.uploadEditConfirm(upload).get()
-    this.e.uploadStart(upload.name, EFUploadReasonTrigger(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN))
-      .get()
+    this.e.uploadStart(
+      upload.name,
+      Duration.ofMillis(0L),
+      EFUploadReasonTrigger(EFUploadTrigger.TRIGGER_WHEN_PHOTO_TAKEN)
+    ).get()
     this.e.uploadViewSelect(upload.name, uploadId = null).get()
 
     assertEquals(
@@ -1121,6 +1125,7 @@ class ExfilacTest {
     while (c.state.get() !is EFStateReady) {
       Thread.sleep(1_000L)
     }
+    c.uploadStartAllSetDelayMaximum(Duration.ofMillis(1L))
     return c
   }
 }

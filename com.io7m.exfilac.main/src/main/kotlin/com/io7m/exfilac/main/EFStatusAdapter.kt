@@ -34,6 +34,7 @@ import com.io7m.exfilac.core.EFUploadStatusFailed
 import com.io7m.exfilac.core.EFUploadStatusNone
 import com.io7m.exfilac.core.EFUploadStatusRunning
 import com.io7m.exfilac.core.EFUploadStatusSucceeded
+import java.time.Duration
 
 class EFStatusAdapter : ListAdapter<EFUploadStatus, RecyclerView.ViewHolder>(diffCallback) {
 
@@ -109,6 +110,7 @@ class EFStatusAdapter : ListAdapter<EFUploadStatus, RecyclerView.ViewHolder>(dif
         OnClick.START -> {
           EFApplication.application.exfilac.uploadStart(
             this.uploadStatus.name,
+            Duration.ofMillis(0L),
             EFUploadReasonManual
           )
         }
@@ -160,6 +162,7 @@ class EFStatusAdapter : ListAdapter<EFUploadStatus, RecyclerView.ViewHolder>(dif
           this.startCancel.setOnClickListener {
             EFApplication.application.exfilac.uploadStart(
               newUploadStatus.name,
+              Duration.ofMillis(0L),
               EFUploadReasonManual
             )
           }
@@ -209,6 +212,7 @@ class EFStatusAdapter : ListAdapter<EFUploadStatus, RecyclerView.ViewHolder>(dif
           this.startCancel.setOnClickListener {
             EFApplication.application.exfilac.uploadStart(
               newUploadStatus.name,
+              Duration.ofMillis(0L),
               EFUploadReasonManual
             )
           }

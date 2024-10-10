@@ -117,6 +117,10 @@ internal class Exfilac private constructor(
   private val clock: EFClockServiceType
 ) : ExfilacType {
 
+  @Volatile
+  private var uploadDelayMax: Duration =
+    Duration.ofMinutes(5L)
+
   private val attributes =
     Attributes.create { e -> logger.debug("Uncaught attribute exception: ", e) }
   private val stateSource: AttributeType<EFState> =
@@ -211,7 +215,10 @@ internal class Exfilac private constructor(
 
   private fun boot() {
     val taskRecorder =
-      TRTaskRecorder.create<Unit>(logger, "Booting...")
+      TRTaskRecorder.create<Unit>(
+        com.io7m.exfilac.core.internal.Exfilac.Companion.logger,
+        "Booting..."
+      )
 
     val progress =
       AtomicReference(0.0)
@@ -254,7 +261,7 @@ internal class Exfilac private constructor(
         services.register(serviceClass, this.unsafeCast(service))
         recorder.setTaskSucceeded("OK", TRNoResult.NO_RESULT)
       } catch (e: Throwable) {
-        logger.error("Service error: ", e)
+        com.io7m.exfilac.core.internal.Exfilac.Companion.logger.error("Service error: ", e)
         recorder.setTaskFailed(e.message, Optional.of(e))
       }
     }
@@ -588,18 +595,37 @@ internal class Exfilac private constructor(
 
   override fun uploadStart(
     name: EFUploadName,
+    delay: Duration,
     reason: EFUploadReason
   ): CompletableFuture<*> {
-    val future =
-      this.uploadService?.upload(name, reason)
-        ?: CompletableFuture.completedFuture(Unit)
+    val waitFuture: CompletableFuture<Unit> = CompletableFuture<Unit>()
+    this.commandExecutor.execute {
+      try {
+        val ms = Math.max(delay.toMillis(), 1L)
+        waitFuture.complete(Thread.sleep(ms))
+      } catch (e: Throwable) {
+        waitFuture.complete(Unit)
+      }
+    }
 
-    future.thenRun { this.uploadsLastRan[name] = this.clock.now() }
-    return future
+    val uploadFuture: CompletableFuture<Unit> =
+      waitFuture.thenCompose {
+        this.uploadService?.upload(name, reason)
+          ?: CompletableFuture.completedFuture(Unit)
+      }
+
+    uploadFuture.thenRun { this.uploadsLastRan[name] = this.clock.now() }
+    return uploadFuture
   }
 
   override fun uploadCancel(name: EFUploadName) {
     this.uploadService?.cancel(name)
+  }
+
+  override fun uploadStartAllSetDelayMaximum(
+    delayMax: Duration
+  ) {
+    this.uploadDelayMax = Duration.ofMillis(Math.max(1L, delayMax.toMillis()))
   }
 
   override fun uploadStartAllAsNecessary(
@@ -608,7 +634,11 @@ internal class Exfilac private constructor(
     return this.executeCommand {
       for (upload in this.uploads.get()) {
         if (this.uploadShouldRun(upload, reason, this.uploadsLastRan[upload.name])) {
-          this.uploadStart(upload.name, reason)
+          val delay =
+            Duration.ofMillis(
+              (Math.random() * this.uploadDelayMax.toMillis()).roundToLong()
+            )
+          this.uploadStart(upload.name, delay, reason)
         }
       }
     }
@@ -756,7 +786,7 @@ internal class Exfilac private constructor(
       return false
     }
 
-    if (!uploadPermittedByNetworkStatus()) {
+    if (!this.uploadPermittedByNetworkStatus()) {
       return false
     }
 

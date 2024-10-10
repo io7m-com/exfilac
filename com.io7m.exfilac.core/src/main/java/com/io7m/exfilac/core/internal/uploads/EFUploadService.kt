@@ -73,7 +73,7 @@ class EFUploadService(
   override fun upload(
     name: EFUploadName,
     reason: EFUploadReason
-  ): CompletableFuture<*> {
+  ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
 
     this.taskLock.withLock {
