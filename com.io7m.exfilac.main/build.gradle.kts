@@ -144,6 +144,7 @@ dependencies {
   this.implementation(libs.androidx.tracing)
   this.implementation(libs.androidx.vectordrawable)
   this.implementation(libs.androidx.vectordrawable.animated)
+  this.implementation(libs.androidx.versionedparcelable)
   this.implementation(libs.androidx.viewpager)
   this.implementation(libs.androidx.viewpager2)
 

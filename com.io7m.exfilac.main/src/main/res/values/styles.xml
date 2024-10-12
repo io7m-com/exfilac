@@ -32,6 +32,7 @@
   <style name="Exfilac.TabLayout" parent="Widget.Material3.TabLayout">
     <item name="materialThemeOverlay">@style/Exfilac.Overlay.TabLayout</item>
     <item name="tabRippleColor">@color/primary3</item>
+    <item name="android:background">#ffffff</item>
   </style>
 
   <style name="Exfilac.Overlay.TabLayout" parent="">
