@@ -75,9 +75,9 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-10-13T09:49:12+00:00" is-open="true" ticket-system="com.github.io7m.exfilac" version="1.1.1">
+    <c:release date="2024-10-13T09:50:18+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.1.1">
       <c:changes>
-        <c:change date="2024-10-13T09:49:12+00:00" summary="Fix an issue that can block UI navigation when uploads are waiting to start.">
+        <c:change date="2024-10-13T00:00:00+00:00" summary="Fix an issue that can block UI navigation when uploads are waiting to start.">
           <c:tickets>
             <c:ticket id="23"/>
           </c:tickets>
