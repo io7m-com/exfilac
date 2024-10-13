@@ -110,6 +110,7 @@ internal class Exfilac private constructor(
   private val resources: CloseableCollectionType<ClosingResourceFailedException>,
   private val databaseExecutor: ExecutorService,
   private val commandExecutor: ExecutorService,
+  private val waitExecutor: ExecutorService,
   private val dataDirectory: Path,
   private val cacheDirectory: Path,
   private val contentTrees: EFContentTreeFactoryType,
@@ -194,13 +195,23 @@ internal class Exfilac private constructor(
           thread
         }
 
+      val waitExecutor =
+        Executors.newSingleThreadExecutor { r ->
+          val thread = Thread(r)
+          thread.priority = Thread.MIN_PRIORITY
+          thread.name = "com.io7m.exfilac.wait"
+          thread
+        }
+
       resources.add(AutoCloseable { databaseExecutor.shutdown() })
       resources.add(AutoCloseable { commandExecutor.shutdown() })
+      resources.add(AutoCloseable { waitExecutor.shutdown() })
 
       val controller = Exfilac(
         resources = resources,
         databaseExecutor = databaseExecutor,
         commandExecutor = commandExecutor,
+        waitExecutor = waitExecutor,
         dataDirectory = dataDirectory,
         cacheDirectory = cacheDirectory,
         contentTrees = contentTrees,
@@ -216,7 +227,7 @@ internal class Exfilac private constructor(
   private fun boot() {
     val taskRecorder =
       TRTaskRecorder.create<Unit>(
-        com.io7m.exfilac.core.internal.Exfilac.Companion.logger,
+        logger,
         "Booting..."
       )
 
@@ -261,7 +272,7 @@ internal class Exfilac private constructor(
         services.register(serviceClass, this.unsafeCast(service))
         recorder.setTaskSucceeded("OK", TRNoResult.NO_RESULT)
       } catch (e: Throwable) {
-        com.io7m.exfilac.core.internal.Exfilac.Companion.logger.error("Service error: ", e)
+        logger.error("Service error: ", e)
         recorder.setTaskFailed(e.message, Optional.of(e))
       }
     }
@@ -599,7 +610,7 @@ internal class Exfilac private constructor(
     reason: EFUploadReason
   ): CompletableFuture<*> {
     val waitFuture: CompletableFuture<Unit> = CompletableFuture<Unit>()
-    this.commandExecutor.execute {
+    this.waitExecutor.execute {
       try {
         val ms = Math.max(delay.toMillis(), 1L)
         waitFuture.complete(Thread.sleep(ms))
