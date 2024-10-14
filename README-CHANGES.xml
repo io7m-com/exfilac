@@ -84,9 +84,9 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-10-14T18:56:00+00:00" is-open="true" ticket-system="com.github.io7m.exfilac" version="1.1.2">
+    <c:release date="2024-10-14T19:02:06+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.1.2">
       <c:changes>
-        <c:change date="2024-10-14T18:56:00+00:00" summary="Fix a responsiveness issue in the upload status menu.">
+        <c:change date="2024-10-14T00:00:00+00:00" summary="Fix a responsiveness issue in the upload status menu.">
           <c:tickets>
             <c:ticket id="25"/>
           </c:tickets>
