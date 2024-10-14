@@ -196,7 +196,7 @@ internal class Exfilac private constructor(
         }
 
       val waitExecutor =
-        Executors.newSingleThreadExecutor { r ->
+        Executors.newCachedThreadPool { r ->
           val thread = Thread(r)
           thread.priority = Thread.MIN_PRIORITY
           thread.name = "com.io7m.exfilac.wait"
