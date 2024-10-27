@@ -101,8 +101,8 @@ class EFS3AMZUpload(
       this.httpClient =
         this.resources.add(
           ApacheHttpClient.builder()
-            .connectionTimeout(Duration.ofSeconds(10L))
-            .socketTimeout(Duration.ofSeconds(10L))
+            .connectionTimeout(Duration.ofSeconds(60L))
+            .socketTimeout(Duration.ofSeconds(60L))
             .build()
         )
 
