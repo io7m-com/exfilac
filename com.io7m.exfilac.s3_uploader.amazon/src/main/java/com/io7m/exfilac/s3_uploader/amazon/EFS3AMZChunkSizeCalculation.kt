@@ -40,21 +40,25 @@ object EFS3AMZChunkSizeCalculation {
     var index = 1
 
     while (index <= chunkCount) {
-      chunks.add(EFS3AMZChunk(
-        partNumber = index,
-        chunkSize = chunkSize,
-        chunkOffset = offset
-      ))
+      chunks.add(
+        EFS3AMZChunk(
+          partNumber = index,
+          chunkSize = chunkSize,
+          chunkOffset = offset
+        )
+      )
       offset += chunkSize
       ++index
     }
 
     if (offset < size) {
-      chunks.add(EFS3AMZChunk(
-        partNumber = index,
-        chunkSize = size - offset,
-        chunkOffset = offset
-      ))
+      chunks.add(
+        EFS3AMZChunk(
+          partNumber = index,
+          chunkSize = size - offset,
+          chunkOffset = offset
+        )
+      )
     }
 
     val sizeSum = chunks.sumOf { c -> c.chunkSize }
