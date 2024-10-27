@@ -450,8 +450,8 @@ class EFUploadServiceTest {
     val file =
       ContentTreeFile(
         OffsetDateTime.now(),
-        EFContentPath(URI.create("content://xyx"), listOf("Example", "File.txt")),
-        URI.create("content://xyx/File.txt")
+        EFContentPath(URI.create("content://xyx"), listOf("Example", "OneFile.txt")),
+        URI.create("content://xyx/OneFile.txt")
       )
     directory.childrenField.add(file)
     this.contentTrees.next = directory
