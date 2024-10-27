@@ -42,6 +42,7 @@ class EFBootDatabase(
               JXEHardenedSAXParsers { SAXParserFactoryImpl() },
             ),
             filePath = file,
+            concurrency = 1
           ),
         ) { message -> logger.debug("Database: {}", message) },
     )

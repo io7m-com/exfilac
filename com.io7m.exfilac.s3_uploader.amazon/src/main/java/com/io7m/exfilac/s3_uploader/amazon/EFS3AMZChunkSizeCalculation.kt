@@ -22,7 +22,7 @@ object EFS3AMZChunkSizeCalculation {
     size: Long,
     minimumChunkSize: Long,
     maximumChunkCount: Long
-  ): EFS3AMZChunkSizes {
+  ): List<EFS3AMZChunk> {
     require(maximumChunkCount >= 1) {
       "Maximum chunk count $maximumChunkCount must be >= 1"
     }
@@ -35,9 +35,32 @@ object EFS3AMZChunkSizeCalculation {
     val chunkCount =
       size / chunkSize
 
-    return EFS3AMZChunkSizes(
-      chunkCount = chunkCount,
-      chunkSize = chunkSize
-    )
+    val chunks = mutableListOf<EFS3AMZChunk>()
+    var offset = 0L
+    var index = 1
+
+    while (index <= chunkCount) {
+      chunks.add(EFS3AMZChunk(
+        partNumber = index,
+        chunkSize = chunkSize,
+        chunkOffset = offset
+      ))
+      offset += chunkSize
+      ++index
+    }
+
+    if (offset < size) {
+      chunks.add(EFS3AMZChunk(
+        partNumber = index,
+        chunkSize = size - offset,
+        chunkOffset = offset
+      ))
+    }
+
+    val sizeSum = chunks.sumOf { c -> c.chunkSize }
+    check(sizeSum == size) {
+      "Sum of chunks $sizeSum must equal original size $size"
+    }
+    return chunks.toList()
   }
 }

@@ -84,8 +84,9 @@ class EFDatabaseTest {
       EFDatabaseFactory()
         .open(
           EFDatabaseConfiguration(
-            Optional.empty(),
-            this.databaseFile
+            saxParsersOpt = Optional.empty(),
+            filePath = this.databaseFile,
+            concurrency = 1
           )
         ) {
 

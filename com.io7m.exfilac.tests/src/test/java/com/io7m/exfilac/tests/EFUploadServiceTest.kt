@@ -57,6 +57,7 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.URI
 import java.nio.file.Path
+import java.security.SecureRandom
 import java.time.OffsetDateTime
 import java.util.Optional
 import java.util.concurrent.TimeUnit
@@ -202,8 +203,9 @@ class EFUploadServiceTest {
       EFDatabaseFactory()
         .open(
           EFDatabaseConfiguration(
-            Optional.empty(),
-            this.databaseFile
+            saxParsersOpt = Optional.empty(),
+            filePath = this.databaseFile,
+            concurrency = 1
           )
         ) {
 
@@ -259,6 +261,28 @@ class EFUploadServiceTest {
 
     override fun read(): InputStream {
       return ByteArrayInputStream("Hello.".toByteArray())
+    }
+  }
+
+  class ContentTreeLargeFile(
+    override val lastModified: OffsetDateTime,
+    override val path: EFContentPath,
+    override val contentURI: URI
+  ) : EFContentFileType {
+    val data = ByteArray(32123123)
+
+    init {
+      val rng = SecureRandom.getInstanceStrong()
+      rng.nextBytes(this.data)
+    }
+
+    override val parent: EFContentDirectoryType?
+      get() = null
+    override val size: Long
+      get() = 32123123L
+
+    override fun read(): InputStream {
+      return ByteArrayInputStream(data)
     }
   }
 
@@ -681,6 +705,128 @@ class EFUploadServiceTest {
             )
           )
       )
+    }
+  }
+
+  /**
+   * Uploading a large multi-part file works.
+   */
+
+  @Test
+  // @Timeout(value = 10L, unit = TimeUnit.SECONDS)
+  fun testMultiPartLargeUpload() {
+    minio.createUser(
+      "someone",
+      "12345678",
+      this.BUCKET_1.accessKey,
+      this.BUCKET_1.secret
+    )
+    minio.createBucket(BUCKET_1.name)
+
+    val directory =
+      ContentTreeDirectory(
+        OffsetDateTime.now(),
+        EFContentPath(URI.create("content://xyx"), listOf("Example"))
+      )
+
+    val file =
+      ContentTreeLargeFile(
+        OffsetDateTime.now(),
+        EFContentPath(URI.create("content://xyx"), listOf("Example", "File.txt")),
+        URI.create("content://xyx/File.txt")
+      )
+
+    directory.childrenField.add(file)
+    this.contentTrees.next = directory
+
+    this.database.openTransaction().use { t ->
+      t.query(EFQBucketPutType::class.java).execute(this.BUCKET_1)
+      t.query(EFQUploadConfigurationPutType::class.java).execute(this.UPLOAD_1)
+      t.commit()
+    }
+
+    this.uploads.upload(this.UPLOAD_1.name, EFUploadReasonManual).get()
+
+    val records = mutableListOf<EFUploadRecord>()
+    val events = mutableListOf<EFUploadEventRecord>()
+    this.fetchUploadRecordsAndEvents(records, 0, events)
+
+    assertEquals("Upload was triggered manually.", records.get(0).reason)
+    assertEquals(1, records.get(0).filesRequired)
+    assertEquals(0, records.get(0).filesFailed)
+    assertEquals(0, records.get(0).filesSkipped)
+    assertEquals(1, records.get(0).filesUploaded)
+    assertEquals(EFUploadResult.SUCCEEDED, records.get(0).result)
+
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Upload started"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Calculating local content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Local content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Fetching remote content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Remote file does not exist"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Uploading as 4 chunks"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Requesting multi-part upload…"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Uploading part 1 (Size 8388608)…"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Uploading part 2 (Size 8388608)…"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Uploading part 3 (Size 8388608)…"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Uploading part 4 (Size 6957299)…"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Completing multi-part upload…"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Uploading completed."))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("File was successfully uploaded."))
     }
   }
 }

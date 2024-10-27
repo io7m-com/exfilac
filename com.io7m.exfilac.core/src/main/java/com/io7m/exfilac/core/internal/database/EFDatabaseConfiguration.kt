@@ -35,6 +35,7 @@ import java.util.Optional
 data class EFDatabaseConfiguration(
   val saxParsersOpt: Optional<JXEHardenedSAXParsers>,
   val filePath: Path,
+  val concurrency: Int,
 ) : DSDatabaseConfigurationType {
   override fun saxParsers(): Optional<JXEHardenedSAXParsers> {
     return this.saxParsersOpt

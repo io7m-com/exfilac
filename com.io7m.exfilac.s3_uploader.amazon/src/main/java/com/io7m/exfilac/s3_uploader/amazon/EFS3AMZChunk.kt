@@ -16,7 +16,7 @@
 
 package com.io7m.exfilac.s3_uploader.amazon
 
-data class EFS3AMZChunkSizes(
-  val chunkCount: Long,
-  val chunkSize: Long
-)
+data class EFS3AMZChunk(
+  val partNumber: Int,
+  val chunkSize: Long,
+  val chunkOffset: Long)

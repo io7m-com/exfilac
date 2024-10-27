@@ -18,10 +18,14 @@
 package com.io7m.exfilac.core.internal.database;
 
 import com.io7m.darco.api.DDatabaseConnectionAbstract;
+import com.io7m.darco.api.DDatabaseException;
 import com.io7m.darco.api.DDatabaseTransactionCloseBehavior;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Semaphore;
 
 import io.opentelemetry.api.trace.Span;
 
@@ -31,12 +35,16 @@ final class EFDatabaseConnection
   EFDatabaseTransactionType,
   EFDatabaseQueryProviderType<?, ?, ?>>
   implements EFDatabaseConnectionType {
+
+  private final Semaphore transactionSemaphore;
+
   EFDatabaseConnection(
     final EFDatabase database,
     final Span span,
     final Connection connection,
     final Map<Class<?>, EFDatabaseQueryProviderType<?, ?, ?>> queries) {
     super(database.configuration(), span, connection, queries);
+    this.transactionSemaphore = new Semaphore(configuration().concurrency());
   }
 
   @Override
@@ -44,6 +52,13 @@ final class EFDatabaseConnection
     final DDatabaseTransactionCloseBehavior closeBehavior,
     final Span transactionSpan,
     final Map<Class<?>, EFDatabaseQueryProviderType<?, ?, ?>> queries) {
+
+    try {
+      this.transactionSemaphore.acquire();
+    } catch (final InterruptedException e) {
+      throw new IllegalStateException(e);
+    }
+
     return new EFDatabaseTransaction(
       closeBehavior,
       this.configuration(),

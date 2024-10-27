@@ -291,9 +291,7 @@ class EFS3AMZUpload(
         maximumChunkCount = 900
       )
 
-    this.upload.onInformativeEvent(
-      "Uploading as ${chunks.chunkCount} chunks of size ${chunks.chunkSize}."
-    )
+    this.upload.onInformativeEvent("Uploading as ${chunks.size} chunks.")
 
     val metadata =
       mapOf(Pair(this.exfilacSHA256Header, this.sha256()))
@@ -312,12 +310,10 @@ class EFS3AMZUpload(
     try {
       val completedParts =
         mutableMapOf<Int, CompletedPart>()
-      val chunkCount =
-        chunks.chunkCount.toInt()
 
-      val parts = this.createParts(chunkCount, chunks)
+      val parts = this.createParts(chunks)
       for (part in parts.values) {
-        this.upload.onInformativeEvent("Uploading part ${part.partNumber}…")
+        this.upload.onInformativeEvent("Uploading part ${part.partNumber} (Size ${part.size})…")
         this.upload.streams.invoke()
           .use { stream ->
             stream.skip(part.offset)
@@ -366,6 +362,9 @@ class EFS3AMZUpload(
           .key(this.upload.path)
           .build()
       )
+
+      this.upload.onInformativeEvent("Uploading completed.")
+      this.upload.onFileSuccessfullyUploaded()
     } catch (e: Throwable) {
       client.abortMultipartUpload(
         AbortMultipartUploadRequest.builder()
@@ -379,19 +378,15 @@ class EFS3AMZUpload(
   }
 
   private fun createParts(
-    chunkCount: Int,
-    chunks: EFS3AMZChunkSizes
+    chunks: List<EFS3AMZChunk>
   ): MutableMap<Int, Part> {
     val parts = mutableMapOf<Int, Part>()
-    var offset = 0L
-    for (part0Number in 0 until chunkCount) {
-      val partAMZNumber = part0Number + 1
-      parts[partAMZNumber] = Part(
-        partNumber = partAMZNumber,
-        offset = offset,
-        size = chunks.chunkSize
+    for (chunk in chunks) {
+      parts[chunk.partNumber] = Part(
+        partNumber = chunk.partNumber,
+        offset = chunk.chunkOffset,
+        size = chunk.chunkSize
       )
-      offset += chunks.chunkSize
     }
     return parts
   }

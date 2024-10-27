@@ -49,8 +49,11 @@ class EFS3AMZChunkSizeCalculationTest {
         maximumChunkCount = 100
       )
     logger.debug("{}", r)
-    assertEquals(1, r.chunkCount)
-    assertEquals(megabytes(10L), r.chunkSize)
+
+    assertEquals(1, r.size)
+    for (c in r) {
+      assertEquals(megabytes(10L), c.chunkSize)
+    }
   }
 
   /**
@@ -67,8 +70,11 @@ class EFS3AMZChunkSizeCalculationTest {
         maximumChunkCount = 100
       )
     logger.debug("{}", r)
-    assertEquals(10, r.chunkCount)
-    assertEquals(megabytes(10L), r.chunkSize)
+
+    assertEquals(10, r.size)
+    for (c in r) {
+      assertEquals(megabytes(10L), c.chunkSize)
+    }
   }
 
   /**
@@ -85,8 +91,10 @@ class EFS3AMZChunkSizeCalculationTest {
         maximumChunkCount = 100
       )
     logger.debug("{}", r)
-    assertEquals(100, r.chunkCount)
-    assertEquals(megabytes(10L), r.chunkSize)
+    assertEquals(100, r.size)
+    for (c in r) {
+      assertEquals(megabytes(10L), c.chunkSize)
+    }
   }
 
   /**
@@ -103,8 +111,10 @@ class EFS3AMZChunkSizeCalculationTest {
         maximumChunkCount = 100
       )
     logger.debug("{}", r)
-    assertEquals(100, r.chunkCount)
-    assertEquals(megabytes(10L), r.chunkSize)
+    assertEquals(100, r.size)
+    for (c in r) {
+      assertEquals(megabytes(10L), c.chunkSize)
+    }
   }
 
   /**
@@ -121,8 +131,31 @@ class EFS3AMZChunkSizeCalculationTest {
         maximumChunkCount = 200
       )
     logger.debug("{}", r)
-    assertEquals(200, r.chunkCount)
-    assertEquals(megabytes(5L), r.chunkSize)
+    assertEquals(200, r.size)
+    for (c in r) {
+      assertEquals(megabytes(5L), c.chunkSize)
+    }
+  }
+
+  /**
+   * Remainders are respected.
+   */
+
+  @Test
+  fun testChunkSize5() {
+    val size = 479001599L
+    val r =
+      EFS3AMZChunkSizeCalculation.calculate(
+        size = size,
+        minimumChunkSize = megabytes(10),
+        maximumChunkCount = 200
+      )
+    logger.debug("{}", r)
+    assertEquals(48, r.size)
+    for (c in r.subList(0, 46)) {
+      assertEquals(megabytes(10L), c.chunkSize)
+    }
+    assertEquals(9001599, r[47].chunkSize)
   }
 
   @Property
@@ -137,17 +170,6 @@ class EFS3AMZChunkSizeCalculationTest {
       size = size,
       minimumChunkSize = minChunkSize,
       maximumChunkCount = maxChunkCount
-    )
-
-    logger.debug("{} {} {} -> {} {}", size, minChunkSize, maxChunkCount, r.chunkSize, r.chunkCount)
-
-    assertTrue(
-      r.chunkSize >= minChunkSize,
-      "Chunk size ${r.chunkSize} must be >= $minChunkSize"
-    )
-    assertTrue(
-      r.chunkCount <= maxChunkCount,
-      "Chunk count ${r.chunkCount} must be <= $maxChunkCount"
     )
   }
 }
