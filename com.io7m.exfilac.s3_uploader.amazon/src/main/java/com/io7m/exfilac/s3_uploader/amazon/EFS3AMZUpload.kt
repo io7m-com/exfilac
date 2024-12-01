@@ -41,6 +41,7 @@ import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.PutObjectRe
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.UploadPartRequest
 import org.apache.commons.io.input.BoundedInputStream
 import org.slf4j.LoggerFactory
+import java.io.IOException
 import java.security.MessageDigest
 import java.time.Duration
 import java.util.concurrent.ExecutorService
@@ -220,6 +221,11 @@ class EFS3AMZUpload(
     this.upload.onInformativeEvent("Uploading file.")
     val body = RequestBody.fromInputStream(inputStream, this.upload.size)
     client.putObject(put, body)
+
+    if (this.isUploadNecessary(client, contentSHA256)) {
+      throw IOException("After uploading, the size or hash does not match!")
+    }
+
     this.upload.onInformativeEvent("Uploading completed.")
     this.upload.onFileSuccessfullyUploaded()
   }
@@ -237,10 +243,11 @@ class EFS3AMZUpload(
           .build()
 
       val response = client.headObject(head)
+      val remoteSize = response.contentLength()
       val remoteHash = response.metadata()[this.exfilacSHA256Header]
       this.upload.onInformativeEvent("Remote content hash: $remoteHash")
-      if (remoteHash == contentSHA256) {
-        this.upload.onInformativeEvent("Hashes match, no upload is required.")
+      if (remoteHash == contentSHA256 && this.upload.size == remoteSize) {
+        this.upload.onInformativeEvent("Hashes and size match, no upload is required.")
         this.upload.onFileSkipped()
         return false
       }
@@ -362,6 +369,10 @@ class EFS3AMZUpload(
           .key(this.upload.path)
           .build()
       )
+
+      if (this.isUploadNecessary(client, contentSHA256)) {
+        throw IOException("After uploading, the size or hash does not match!")
+      }
 
       this.upload.onInformativeEvent("Uploading completed.")
       this.upload.onFileSuccessfullyUploaded()
