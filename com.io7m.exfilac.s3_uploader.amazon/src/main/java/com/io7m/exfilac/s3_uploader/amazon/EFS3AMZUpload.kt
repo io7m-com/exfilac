@@ -201,7 +201,7 @@ class EFS3AMZUpload(
     val contentSHA256 = this.sha256()
     this.upload.onInformativeEvent("Local content hash: $contentSHA256")
 
-    if (!this.isUploadNecessary(client, contentSHA256)) {
+    if (!this.isUploadNecessary(client, contentSHA256, recordSkipped = true)) {
       return
     }
 
@@ -222,7 +222,7 @@ class EFS3AMZUpload(
     val body = RequestBody.fromInputStream(inputStream, this.upload.size)
     client.putObject(put, body)
 
-    if (this.isUploadNecessary(client, contentSHA256)) {
+    if (this.isUploadNecessary(client, contentSHA256, recordSkipped = false)) {
       throw IOException("After uploading, the size or hash does not match!")
     }
 
@@ -232,7 +232,8 @@ class EFS3AMZUpload(
 
   private fun isUploadNecessary(
     client: S3Client,
-    contentSHA256: String
+    contentSHA256: String,
+    recordSkipped: Boolean
   ): Boolean {
     try {
       this.upload.onInformativeEvent("Fetching remote content hash.")
@@ -248,7 +249,9 @@ class EFS3AMZUpload(
       this.upload.onInformativeEvent("Remote content hash: $remoteHash")
       if (remoteHash == contentSHA256 && this.upload.size == remoteSize) {
         this.upload.onInformativeEvent("Hashes and size match, no upload is required.")
-        this.upload.onFileSkipped()
+        if (recordSkipped) {
+          this.upload.onFileSkipped()
+        }
         return false
       }
     } catch (e: NoSuchKeyException) {
@@ -287,7 +290,7 @@ class EFS3AMZUpload(
     val contentSHA256 = this.sha256()
     this.upload.onInformativeEvent("Local content hash: $contentSHA256")
 
-    if (!this.isUploadNecessary(client, contentSHA256)) {
+    if (!this.isUploadNecessary(client, contentSHA256, recordSkipped = true)) {
       return
     }
 
@@ -370,7 +373,7 @@ class EFS3AMZUpload(
           .build()
       )
 
-      if (this.isUploadNecessary(client, contentSHA256)) {
+      if (this.isUploadNecessary(client, contentSHA256, recordSkipped = false)) {
         throw IOException("After uploading, the size or hash does not match!")
       }
 

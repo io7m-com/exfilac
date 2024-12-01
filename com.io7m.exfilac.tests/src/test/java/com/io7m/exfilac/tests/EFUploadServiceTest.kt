@@ -508,6 +508,21 @@ class EFUploadServiceTest {
     run {
       val e = events.removeAt(0)
       logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Fetching remote content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Remote content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Hashes and size match"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
       assertTrue(e.message.startsWith("Uploading completed"))
     }
     run {
@@ -594,7 +609,7 @@ class EFUploadServiceTest {
     run {
       val e = events.removeAt(0)
       logger.debug("{}", e)
-      assertTrue(e.message.startsWith("Hashes match, no upload is required"))
+      assertTrue(e.message.startsWith("Hashes and size match, no upload is required"))
     }
   }
 
@@ -675,7 +690,7 @@ class EFUploadServiceTest {
     run {
       val e = events.removeAt(0)
       logger.debug("{}", e)
-      assertTrue(e.message.startsWith("Hashes match, no upload is required"))
+      assertTrue(e.message.startsWith("Hashes and size match, no upload is required"))
     }
   }
 
@@ -817,6 +832,21 @@ class EFUploadServiceTest {
       val e = events.removeAt(0)
       logger.debug("{}", e)
       assertTrue(e.message.startsWith("Completing multi-part upload…"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Fetching remote content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Remote content hash"))
+    }
+    run {
+      val e = events.removeAt(0)
+      logger.debug("{}", e)
+      assertTrue(e.message.startsWith("Hashes and size match"))
     }
     run {
       val e = events.removeAt(0)
