@@ -93,11 +93,20 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-11-03T09:54:41+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.1.3">
+    <c:release date="2024-11-03T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.1.3">
       <c:changes>
         <c:change date="2024-10-27T00:00:00+00:00" summary="Fix a serious bug in multi-part upload part size calculations. Thanks @jannefoo!.">
           <c:tickets>
             <c:ticket id="29"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2024-12-03T12:12:55+00:00" is-open="true" ticket-system="com.github.io7m.exfilac" version="1.1.4">
+      <c:changes>
+        <c:change date="2024-12-03T12:12:55+00:00" summary="Ensure the application can cope with differing HTTP header cases. Thanks @floryst!">
+          <c:tickets>
+            <c:ticket id="34"/>
           </c:tickets>
         </c:change>
       </c:changes>

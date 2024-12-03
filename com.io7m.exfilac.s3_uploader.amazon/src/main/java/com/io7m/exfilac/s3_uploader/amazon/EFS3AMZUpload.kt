@@ -36,6 +36,7 @@ import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.CompletedMu
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.CompletedPart
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.HeadObjectRequest
+import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.HeadObjectResponse
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.NoSuchKeyException
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.PutObjectRequest
 import com.io7m.peixoto.sdk.software.amazon.awssdk.services.s3.model.UploadPartRequest
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.security.MessageDigest
 import java.time.Duration
+import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -59,7 +61,7 @@ class EFS3AMZUpload(
     LoggerFactory.getLogger(EFS3AMZUpload::class.java)
 
   private val exfilacSHA256Header =
-    "exfilac-sha256"
+    "EXFILAC-SHA256"
   private val multipartThreshold =
     16_777_216L
   private val minimumChunkSize =
@@ -245,7 +247,7 @@ class EFS3AMZUpload(
 
       val response = client.headObject(head)
       val remoteSize = response.contentLength()
-      val remoteHash = response.metadata()[this.exfilacSHA256Header]
+      val remoteHash = fixMetadataCase(response)[this.exfilacSHA256Header]
       this.upload.onInformativeEvent("Remote content hash: $remoteHash")
       if (remoteHash == contentSHA256 && this.upload.size == remoteSize) {
         this.upload.onInformativeEvent("Hashes and size match, no upload is required.")
@@ -258,6 +260,17 @@ class EFS3AMZUpload(
       this.upload.onInformativeEvent("Remote file does not exist. Upload is required.")
     }
     return true
+  }
+
+  private fun fixMetadataCase(
+    response: HeadObjectResponse
+  ): Map<String, String> {
+    val existing = response.metadata()
+    val result = mutableMapOf<String, String>()
+    for (entry in existing) {
+      result[entry.key.uppercase(Locale.ROOT)] = entry.value
+    }
+    return result.toMap()
   }
 
   private fun sha256(): String {
