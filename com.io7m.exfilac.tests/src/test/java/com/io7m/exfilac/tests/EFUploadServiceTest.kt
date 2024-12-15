@@ -699,6 +699,12 @@ class EFUploadServiceTest {
     recordForEvents: Int,
     events: MutableList<EFUploadEventRecord>
   ) {
+    try {
+      Thread.sleep(1_000L)
+    } catch (e: Exception) {
+      Thread.currentThread().interrupt()
+    }
+
     this.database.openTransaction().use { t ->
       records.addAll(
         t.query(EFQUploadRecordListType::class.java)
