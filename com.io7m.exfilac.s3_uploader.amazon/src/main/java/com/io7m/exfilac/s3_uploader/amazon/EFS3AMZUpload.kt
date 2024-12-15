@@ -213,7 +213,6 @@ class EFS3AMZUpload(
     val put =
       PutObjectRequest.builder()
         .bucket(this.upload.bucket)
-        .checksumSHA256(contentSHA256)
         .contentLength(this.upload.size)
         .contentType(this.upload.contentType)
         .metadata(metadata)
