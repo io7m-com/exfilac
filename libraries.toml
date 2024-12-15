@@ -12,6 +12,7 @@ junreachable     = "4.0.2"
 jxe              = "2.0.0"
 logback_android  = "3.0.0"
 opentelemetry    = "1.43.0"
+percentpass      = "1.0.1"
 slf4j            = "2.0.16"
 sqlite           = "3.46.1.0"
 trasco           = "3.0.0"
@@ -55,6 +56,7 @@ io7m_junreachable_core   = { module = "com.io7m.junreachable:com.io7m.junreachab
 io7m_jxe_core            = { module = "com.io7m.jxe:com.io7m.jxe.core", version.ref = "jxe" }
 io7m_lanark_core         = { module = "com.io7m.lanark:com.io7m.lanark.core", version = "1.2.0" }
 io7m_peixoto_sdk         = { module = "com.io7m.peixoto:com.io7m.peixoto.sdk", version = "2.27.21" }
+io7m_percentpass         = { module = "com.io7m.percentpass:com.io7m.percentpass.extension", version.ref = "percentpass" }
 io7m_seltzer_api         = { module = "com.io7m.seltzer:com.io7m.seltzer.api", version = "1.1.0" }
 io7m_taskrecorder_core   = { module = "com.io7m.taskrecorder:com.io7m.taskrecorder.core", version = "1.0.0" }
 io7m_trasco_api          = { module = "com.io7m.trasco:com.io7m.trasco.api", version.ref = "trasco" }

@@ -37,6 +37,7 @@ dependencies {
   testImplementation(libs.io7m.jxe.core)
   testImplementation(libs.io7m.lanark.core)
   testImplementation(libs.io7m.peixoto.sdk)
+  testImplementation(libs.io7m.percentpass)
   testImplementation(libs.io7m.seltzer.api)
   testImplementation(libs.io7m.taskrecorder.core)
   testImplementation(libs.io7m.trasco.api)

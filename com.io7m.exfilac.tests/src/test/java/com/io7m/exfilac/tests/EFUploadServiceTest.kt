@@ -41,12 +41,14 @@ import com.io7m.exfilac.s3_uploader.amazon.EFS3AMZUploaders
 import com.io7m.exfilac.s3_uploader.api.EFS3UploaderType
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.jattribute.core.Attributes
+import com.io7m.percentpass.extension.MinimumPassing
 import org.apache.commons.io.input.BoundedInputStream
 import org.apache.commons.io.input.InfiniteCircularInputStream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.assertThrows
@@ -536,8 +538,8 @@ class EFUploadServiceTest {
    * If remote already contains a given file, it is not uploaded twice.
    */
 
-  @Test
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
+  @MinimumPassing(executionCount = 8, passMinimum = 2)
   fun testOneFileRedundant() {
     minio.createUser(
       "someone",
@@ -617,8 +619,8 @@ class EFUploadServiceTest {
    * If remote already contains a given file, it is not uploaded twice.
    */
 
-  @Test
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
+  @MinimumPassing(executionCount = 8, passMinimum = 2)
   fun testOneFileRedundantMultiPart() {
     minio.createUser(
       "someone",
