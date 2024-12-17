@@ -102,14 +102,14 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-12-15T10:10:13+00:00" is-open="true" ticket-system="com.github.io7m.exfilac" version="1.1.4">
+    <c:release date="2024-12-17T10:08:46+00:00" is-open="false" ticket-system="com.github.io7m.exfilac" version="1.1.4">
       <c:changes>
         <c:change date="2024-12-03T00:00:00+00:00" summary="Ensure the application can cope with differing HTTP header cases. Thanks @floryst!">
           <c:tickets>
             <c:ticket id="34"/>
           </c:tickets>
         </c:change>
-        <c:change date="2024-12-15T10:10:13+00:00" summary="Support Backblaze B2 by turning off x-amz-checksum-sha256. Thanks @bfgoh!.">
+        <c:change date="2024-12-15T00:00:00+00:00" summary="Support Backblaze B2 by turning off x-amz-checksum-sha256. Thanks @bfgoh!.">
           <c:tickets>
             <c:ticket id="35"/>
           </c:tickets>
