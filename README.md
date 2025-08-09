@@ -1,21 +1,25 @@
-exfilac
-===
-
-[<img src="https://liberapay.com/assets/widgets/donate.svg">](https://liberapay.com/io7m/donate)
-[<img src="https://img.shields.io/f-droid/v/com.io7m.exfilac.main?style=for-the-badge">](https://f-droid.org/en/packages/com.io7m.exfilac.main/)
-
-![com.io7m.exfilac](./src/site/resources/exfilac.jpg?raw=true)
-
-| JVM | Platform | Status |
-|-----|----------|--------|
-| OpenJDK (Temurin) LTS | Linux | [![Build (OpenJDK (Temurin) LTS, Linux)](https://img.shields.io/github/actions/workflow/status/io7m-com/exfilac/main.linux.temurin.lts.yml)](https://www.github.com/io7m-com/exfilac/actions?query=workflow%3Amain.linux.temurin.lts)|
-| OpenJDK (Temurin) LTS | Windows | [![Build (OpenJDK (Temurin) LTS, Windows)](https://img.shields.io/github/actions/workflow/status/io7m-com/exfilac/main.windows.temurin.lts.yml)](https://www.github.com/io7m-com/exfilac/actions?query=workflow%3Amain.windows.temurin.lts)|
-
-
-## Exfilac 
-
-Simple, reliable, automated S3 uploads for Android.
-
-### Documentation
-
-See the [user manual](https://www.io7m.com/software/exfilac/documentation/index-m.xhtml).
+ERROR com.io7m.ghrepostools.Main : /home/rm/git/com.github/io7m-com/exfilac/pom.xml (No such file or directory)
+DEBUG com.io7m.ghrepostools.Main : Exception: 
+java.io.FileNotFoundException: /home/rm/git/com.github/io7m-com/exfilac/pom.xml (No such file or directory)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:213)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:152)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:106)
+	at java.base/sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:84)
+	at java.base/sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:186)
+	at java.xml/com.sun.org.apache.xerces.internal.impl.XMLEntityManager.setupCurrentEntity(XMLEntityManager.java:654)
+	at java.xml/com.sun.org.apache.xerces.internal.impl.XMLVersionDetector.determineDocVersion(XMLVersionDetector.java:150)
+	at java.xml/com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:861)
+	at java.xml/com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:825)
+	at java.xml/com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
+	at java.xml/com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:247)
+	at java.xml/com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:342)
+	at java.xml/javax.xml.parsers.DocumentBuilder.parse(DocumentBuilder.java:206)
+	at com.io7m.ghrepostools.GHRTProjectNames.parsePOM(GHRTProjectNames.java:100)
+	at com.io7m.ghrepostools.GHRTProjectNames.projectName(GHRTProjectNames.java:42)
+	at com.io7m.ghrepostools.GHRTCommandReadme.onExecute(GHRTCommandReadme.java:91)
+	at com.io7m.quarrel.core.internal.QCommandContext.execute(QCommandContext.java:207)
+	at com.io7m.quarrel.core.QApplicationType.run(QApplicationType.java:94)
+	at com.io7m.ghrepostools.Main.run(Main.java:124)
+	at com.io7m.ghrepostools.Main.mainExitless(Main.java:108)
+	at com.io7m.ghrepostools.Main.main(Main.java:93)
