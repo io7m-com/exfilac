@@ -1,25 +1,25 @@
-ERROR com.io7m.ghrepostools.Main : /home/rm/git/com.github/io7m-com/exfilac/pom.xml (No such file or directory)
-DEBUG com.io7m.ghrepostools.Main : Exception: 
-java.io.FileNotFoundException: /home/rm/git/com.github/io7m-com/exfilac/pom.xml (No such file or directory)
-	at java.base/java.io.FileInputStream.open0(Native Method)
-	at java.base/java.io.FileInputStream.open(FileInputStream.java:213)
-	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:152)
-	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:106)
-	at java.base/sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:84)
-	at java.base/sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:186)
-	at java.xml/com.sun.org.apache.xerces.internal.impl.XMLEntityManager.setupCurrentEntity(XMLEntityManager.java:654)
-	at java.xml/com.sun.org.apache.xerces.internal.impl.XMLVersionDetector.determineDocVersion(XMLVersionDetector.java:150)
-	at java.xml/com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:861)
-	at java.xml/com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:825)
-	at java.xml/com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
-	at java.xml/com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:247)
-	at java.xml/com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:342)
-	at java.xml/javax.xml.parsers.DocumentBuilder.parse(DocumentBuilder.java:206)
-	at com.io7m.ghrepostools.GHRTProjectNames.parsePOM(GHRTProjectNames.java:100)
-	at com.io7m.ghrepostools.GHRTProjectNames.projectName(GHRTProjectNames.java:42)
-	at com.io7m.ghrepostools.GHRTCommandReadme.onExecute(GHRTCommandReadme.java:91)
-	at com.io7m.quarrel.core.internal.QCommandContext.execute(QCommandContext.java:207)
-	at com.io7m.quarrel.core.QApplicationType.run(QApplicationType.java:94)
-	at com.io7m.ghrepostools.Main.run(Main.java:124)
-	at com.io7m.ghrepostools.Main.mainExitless(Main.java:108)
-	at com.io7m.ghrepostools.Main.main(Main.java:93)
+exfilac
+===
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.io7m.exfilac/com.io7m.exfilac.svg?style=flat-square)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.io7m.exfilac%22)
+[![Maven Central (snapshot)](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fcentral.sonatype.com%2Frepository%2Fmaven-snapshots%2Fcom%2Fio7m%2Fexfilac%2Fcom.io7m.exfilac%2Fmaven-metadata.xml&style=flat-square)](https://central.sonatype.com/repository/maven-snapshots/com/io7m/exfilac/)
+[![Codecov](https://img.shields.io/codecov/c/github/io7m-com/exfilac.svg?style=flat-square)](https://codecov.io/gh/io7m-com/exfilac)
+![Java Version](https://img.shields.io/badge/17-java?label=java&color=e65cc3)
+
+![com.io7m.exfilac](./src/site/resources/exfilac.jpg?raw=true)
+
+| JVM | Platform | Status |
+|-----|----------|--------|
+| OpenJDK (Temurin) Current | Linux | [![Build (OpenJDK (Temurin) Current, Linux)](https://img.shields.io/github/actions/workflow/status/io7m-com/exfilac/main.linux.temurin.current.yml)](https://www.github.com/io7m-com/exfilac/actions?query=workflow%3Amain.linux.temurin.current)|
+| OpenJDK (Temurin) LTS | Linux | [![Build (OpenJDK (Temurin) LTS, Linux)](https://img.shields.io/github/actions/workflow/status/io7m-com/exfilac/main.linux.temurin.lts.yml)](https://www.github.com/io7m-com/exfilac/actions?query=workflow%3Amain.linux.temurin.lts)|
+| OpenJDK (Temurin) Current | Windows | [![Build (OpenJDK (Temurin) Current, Windows)](https://img.shields.io/github/actions/workflow/status/io7m-com/exfilac/main.windows.temurin.current.yml)](https://www.github.com/io7m-com/exfilac/actions?query=workflow%3Amain.windows.temurin.current)|
+| OpenJDK (Temurin) LTS | Windows | [![Build (OpenJDK (Temurin) LTS, Windows)](https://img.shields.io/github/actions/workflow/status/io7m-com/exfilac/main.windows.temurin.lts.yml)](https://www.github.com/io7m-com/exfilac/actions?query=workflow%3Amain.windows.temurin.lts)|
+## Exfilac 
+
+Simple, reliable, automated S3 uploads for Android.
+
+### User Manual
+
+See the [user manual](https://www.io7m.com/software/exfilac/documentation/index-m.xhtml).
+
+
