@@ -5,6 +5,9 @@ on:
     branches: [ develop, master, feature/*, release/* ]
     tags: [ com.io7m.exfilac-* ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
