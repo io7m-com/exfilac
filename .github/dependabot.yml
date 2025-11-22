@@ -5,12 +5,16 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
+    cooldown:
+      default-days: 21
 
-  - package-ecosystem: "gradle"
+  - package-ecosystem: "maven"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
+    cooldown:
+      default-days: 21
 
     target-branch: "develop"
     ignore:
